@@ -9,9 +9,11 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import Home from './Screens/DashBoard/Home';
 import Profile from './Screens/Profile';
 import Moodtracker from './Screens/Moodtracker';
+import MenuExample from './Screens/MenuExample';
 import DrawerScreen from './Components/DrawerScreen';
 import MyTabBar from './MyTabBar';
 import {colors} from './Constants';
+import {Menu, MenuProvider} from 'react-native-popup-menu';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -71,6 +73,7 @@ const MainStack = () => {
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="AppDrawer" component={AppDrawer} />
       <Stack.Screen name="CustomeTab" component={CustomeTab} />
+      <Stack.Screen name="Menu" component={MenuExample} />
     </Stack.Navigator>
   );
 };
@@ -78,7 +81,9 @@ const MainStack = () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <MainStack />
+      <MenuProvider>
+        <MainStack />
+      </MenuProvider>
     </NavigationContainer>
   );
 }

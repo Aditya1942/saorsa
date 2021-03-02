@@ -37,7 +37,8 @@ const Profile = ({navigation}) => {
   };
   const backActionHandler = () => {
     if (!ProfileIsOpen) {
-      BackHandler.exitApp();
+      BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
+      navigation.goBack();
     } else {
       setProfileIsOpen(false);
     }
@@ -108,7 +109,7 @@ const Profile = ({navigation}) => {
           </View>
         </View>
         {ProfileIsOpen ? (
-          <View style={ProfileStyle.profileTabBody}>
+          <View style={ProfileStyle.editprofileTabBody}>
             <TouchableOpacity
               style={ProfileStyle.editProfileInTab}
               onPress={() => {

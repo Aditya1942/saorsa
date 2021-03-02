@@ -75,7 +75,7 @@ export const MoodImgs = [
     {
       id: 8,
       name: 'bored',
-      img: require('./assets/Moods/excited.png'),
+      img: require('./assets/Moods/bored.png'),
     },
     {
       id: 9,

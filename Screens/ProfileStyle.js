@@ -15,6 +15,7 @@ export const ProfileStyle = StyleSheet.create({
     marginBottom: 50,
     overflow: 'visible',
   },
+  // Avatar
   AvatarBody: {
     backgroundColor: colors.secondary,
     position: 'relative',
@@ -30,6 +31,7 @@ export const ProfileStyle = StyleSheet.create({
     alignSelf: 'center',
     zIndex: 2,
   },
+  // profile heading
   profileBodyHeading: {
     position: 'absolute',
     top: 85,
@@ -43,6 +45,7 @@ export const ProfileStyle = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  // edit profile button
   editProfile: {
     color: '#fff',
     fontSize: 8,
@@ -55,10 +58,49 @@ export const ProfileStyle = StyleSheet.create({
     borderColor: '#fff',
     borderRadius: 10,
   },
+  // profile Body
+  profileBody: {
+    flex: 1,
+    flexDirection: 'row',
+    width: sizes.width,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginLeft: 20,
+    marginTop: 5,
+    borderRadius: 10,
+    backgroundColor: colors.primary,
+  },
+  // profile tabs
+  profileTabText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  profileTab: {
+    padding: 5,
+    paddingHorizontal: 5,
+    borderRadius: 10,
+  },
+  profileTabActive: {
+    backgroundColor: colors.secondary,
+    padding: 5,
+    paddingHorizontal: 5,
+    borderRadius: 10,
+  },
+  // profile tabs
+  //edit profile tabs body
+  editprofileTabBody: {
+    minHeight: sizes.height,
+    marginHorizontal: 10,
+    backgroundColor: '#fff',
+    marginTop: -40,
+    paddingHorizontal: 5,
+    borderTopEndRadius: 50,
+    borderTopStartRadius: 50,
+  },
   editProfileInTab: {
     padding: 3,
     paddingHorizontal: 0,
-    // backgroundColor: 'grey',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -75,40 +117,5 @@ export const ProfileStyle = StyleSheet.create({
     borderColor: 'black',
     borderRadius: 10,
   },
-  profileBody: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    // paddingLeft: 20,
-    marginTop: 5,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
-    zIndex: 0,
-  },
-  profileTabText: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  profileTab: {
-    padding: 5,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  profileTabActive: {
-    backgroundColor: colors.secondary,
-    padding: 5,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  profileTabBody: {
-    minHeight: sizes.height,
-    marginHorizontal: 10,
-    backgroundColor: '#fff',
-    marginTop: -40,
-    paddingHorizontal: 10,
-    borderTopEndRadius: 50,
-    borderTopStartRadius: 50,
-  },
+  //edit profile tabs body
 });
