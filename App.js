@@ -7,13 +7,12 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import Home from './Screens/DashBoard/Home';
-import Profile from './Screens/Profile';
+import Profile from './Screens/Profile/Profile';
 import Moodtracker from './Screens/Moodtracker';
 import MenuExample from './Screens/MenuExample';
 import DrawerScreen from './Components/DrawerScreen';
 import MyTabBar from './MyTabBar';
 import {colors} from './Constants';
-import {Menu, MenuProvider} from 'react-native-popup-menu';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
