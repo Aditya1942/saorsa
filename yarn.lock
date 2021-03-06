@@ -6134,7 +6134,7 @@ react-devtools-core@4.10.1, react-devtools-core@^4.6.0:
 
 react-devtools@^4.10.1:
   version "4.10.1"
-  resolved "https://registry.npmjs.org/react-devtools/-/react-devtools-4.10.1.tgz"
+  resolved "https://registry.yarnpkg.com/react-devtools/-/react-devtools-4.10.1.tgz#579c14fe0b181e222e262a75fc55c2e2e17abc7a"
   integrity sha512-gGOu0tcpCdm2+LZNrFgyimImtkYDoi6z5aKMRxxfuRM0VrJpmZakxAwaLs0BMRA9+UUF22Emzku366+m5eBtIQ==
   dependencies:
     cross-spawn "^5.0.1"

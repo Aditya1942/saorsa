@@ -9,39 +9,43 @@ import {ProfileStyle} from './ProfileStyle';
 import EditProfile from './EditProfile';
 
 const Profile = ({navigation}) => {
-  const [TabAbout, setTabAbout] = useState(ProfileStyle.profileTab);
-  const [TabPost, setTabPost] = useState(ProfileStyle.profileTab);
-  const [TabComments, setTabComments] = useState(ProfileStyle.profileTab);
+  const [Tab1, setTab1] = useState(ProfileStyle.profileTab);
+  const [Tab2, setTab2] = useState(ProfileStyle.profileTab);
+  const [Tab3, setTab3] = useState(ProfileStyle.profileTab);
   const [ProfileIsOpen, setProfileIsOpen] = useState(false);
+  const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(false);
 
   const handleTabChange = (e) => {
     if (e === 'about') {
-      if (TabAbout === ProfileStyle.profileTab)
-        setTabAbout(ProfileStyle.profileTabActive);
-      else setTabAbout(ProfileStyle.profileTab);
-      setTabPost(ProfileStyle.profileTab);
-      setTabComments(ProfileStyle.profileTab);
+      if (Tab1 === ProfileStyle.profileTab)
+        setTab1(ProfileStyle.profileTabActive);
+      else setTab1(ProfileStyle.profileTab);
+      setTab2(ProfileStyle.profileTab);
+      setTab3(ProfileStyle.profileTab);
     } else if (e === 'post') {
-      if (TabPost === ProfileStyle.profileTab)
-        setTabPost(ProfileStyle.profileTabActive);
-      else setTabPost(ProfileStyle.profileTab);
-      setTabAbout(ProfileStyle.profileTab);
-      setTabComments(ProfileStyle.profileTab);
+      if (Tab2 === ProfileStyle.profileTab)
+        setTab2(ProfileStyle.profileTabActive);
+      else setTab2(ProfileStyle.profileTab);
+      setTab1(ProfileStyle.profileTab);
+      setTab3(ProfileStyle.profileTab);
     } else if (e === 'comments') {
-      if (TabComments === ProfileStyle.profileTab)
-        setTabComments(ProfileStyle.profileTabActive);
-      else setTabComments(ProfileStyle.profileTab);
-      setTabAbout(ProfileStyle.profileTab);
-      setTabPost(ProfileStyle.profileTab);
+      if (Tab3 === ProfileStyle.profileTab)
+        setTab3(ProfileStyle.profileTabActive);
+      else setTab3(ProfileStyle.profileTab);
+      setTab1(ProfileStyle.profileTab);
+      setTab2(ProfileStyle.profileTab);
     }
     console.log(e);
   };
   const backActionHandler = () => {
-    if (!ProfileIsOpen) {
+    if (ProfileIsOpen) {
+      setProfileIsOpen(false);
+    }
+    if (ProfileTabIsOpen) {
+      setProfileTabIsOpen(false);
+    } else {
       BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
       navigation.goBack();
-    } else {
-      setProfileIsOpen(false);
     }
     return true;
   };
@@ -51,9 +55,11 @@ const Profile = ({navigation}) => {
     // Add event listener for hardware back button press on Android
     BackHandler.addEventListener('hardwareBackPress', backActionHandler);
 
-    return () =>
+    return () => {
       // clear/remove event listener
       BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
+      setProfileTabIsOpen(false);
+    };
   }, [ProfileIsOpen]);
   const getDataFromEditProfile = (val) => {
     setProfileIsOpen(val);
@@ -88,34 +94,67 @@ const Profile = ({navigation}) => {
             }}>
             <Text style={ProfileStyle.editProfile}>Edit Profile</Text>
           </TouchableOpacity>
-          <View style={ProfileStyle.profileBody}>
-            <TouchableOpacity
-              onPress={() => {
-                handleTabChange('about');
-              }}
-              style={TabAbout}>
-              <Text style={ProfileStyle.profileTabText}>About</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                handleTabChange('post');
-              }}
-              style={TabPost}>
-              <Text style={ProfileStyle.profileTabText}>Post</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                handleTabChange('comments');
-              }}
-              style={TabComments}>
-              <Text style={ProfileStyle.profileTabText}>Comments</Text>
-            </TouchableOpacity>
-          </View>
         </View>
         {ProfileIsOpen ? (
           <EditProfile isOpen={getDataFromEditProfile} />
         ) : (
-          <View></View>
+          <View>
+            <View style={ProfileStyle.profileBody}>
+              <TouchableOpacity
+                onPress={() => {
+                  handleTabChange('about');
+                  setProfileTabIsOpen(true);
+                }}
+                style={Tab1}>
+                <Text style={ProfileStyle.profileTabText}>PROGRESS</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  handleTabChange('post');
+                  setProfileTabIsOpen(true);
+                }}
+                style={Tab2}>
+                <Text style={ProfileStyle.profileTabText}>MOOD REPORT</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  handleTabChange('comments');
+                  setProfileTabIsOpen(true);
+                }}
+                style={Tab3}>
+                <Text style={ProfileStyle.profileTabText}>YOUR PLAN</Text>
+              </TouchableOpacity>
+            </View>
+            {ProfileTabIsOpen ? (
+              <View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  padding: 10,
+                }}>
+                <ScrollView
+                  style={{
+                    backgroundColor: '#fff',
+                    padding: 10,
+                    borderRadius: 25,
+                  }}>
+                  <Text>
+                    {Tab1 === ProfileStyle.profileTabActive
+                      ? 'tab1'
+                      : Tab2 === ProfileStyle.profileTabActive
+                      ? 'tab2'
+                      : 'tab3'}
+                  </Text>
+                  <View
+                    style={{
+                      marginBottom: 1000,
+                    }}></View>
+                </ScrollView>
+              </View>
+            ) : (
+              <View></View>
+            )}
+          </View>
         )}
       </View>
     </SafeAreaView>

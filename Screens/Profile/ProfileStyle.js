@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {colors, sizes, MoodImgs} from '../../Constants';
+import {colors, sizes} from '../../Constants';
 
 export const ProfileStyle = StyleSheet.create({
   header: {
@@ -60,20 +60,21 @@ export const ProfileStyle = StyleSheet.create({
   },
   // profile Body
   profileBody: {
-    flex: 1,
+    display: 'flex',
     flexDirection: 'row',
-    width: sizes.width,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginLeft: 20,
-    marginTop: 5,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+  },
+  profileTabHeading: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
   },
   // profile tabs
   profileTabText: {
     color: '#fff',
-    fontSize: 22,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   profileTab: {
@@ -88,34 +89,4 @@ export const ProfileStyle = StyleSheet.create({
     borderRadius: 10,
   },
   // profile tabs
-  //edit profile tabs body
-  editprofileTabBody: {
-    minHeight: sizes.height,
-    marginHorizontal: 10,
-    backgroundColor: '#fff',
-    marginTop: -40,
-    paddingHorizontal: 5,
-    borderTopEndRadius: 50,
-    borderTopStartRadius: 50,
-  },
-  editProfileInTab: {
-    padding: 3,
-    paddingHorizontal: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  editProfileInTabText: {
-    color: 'black',
-    fontSize: 8,
-    fontWeight: 'bold',
-    marginTop: 5,
-    textTransform: 'uppercase',
-    padding: 3,
-    paddingHorizontal: 8,
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 10,
-  },
-  //edit profile tabs body
 });
