@@ -81,9 +81,7 @@ const MainStack = () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <MenuProvider>
-        <MainStack />
-      </MenuProvider>
+      <MainStack />
     </NavigationContainer>
   );
 }
