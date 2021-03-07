@@ -12,57 +12,71 @@ const Profile = ({navigation}) => {
   const [Tab1, setTab1] = useState(ProfileStyle.profileTab);
   const [Tab2, setTab2] = useState(ProfileStyle.profileTab);
   const [Tab3, setTab3] = useState(ProfileStyle.profileTab);
-  const [ProfileIsOpen, setProfileIsOpen] = useState(false);
+  const [editProfileIsOpen, seteditProfileIsOpen] = useState(false);
   const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(false);
-
+  const [activeProfileTab, setactiveProfileTab] = useState(null);
+  const closeAllTab = () => {
+    // class all tabs
+    setTab1(ProfileStyle.profileTab);
+    setTab2(ProfileStyle.profileTab);
+    setTab3(ProfileStyle.profileTab);
+    seteditProfileIsOpen(false);
+    setProfileTabIsOpen(false);
+    setactiveProfileTab(null);
+  };
   const handleTabChange = (e) => {
-    if (e === 'about') {
-      if (Tab1 === ProfileStyle.profileTab)
+    // to open, close or navigate in different tabs
+    closeAllTab();
+    if (e === 'tab1') {
+      if (activeProfileTab === 'tab1') {
+        setTab1(ProfileStyle.profileTab);
+        setactiveProfileTab(null);
+      } else {
         setTab1(ProfileStyle.profileTabActive);
-      else setTab1(ProfileStyle.profileTab);
-      setTab2(ProfileStyle.profileTab);
-      setTab3(ProfileStyle.profileTab);
-    } else if (e === 'post') {
-      if (Tab2 === ProfileStyle.profileTab)
+        setactiveProfileTab('tab1');
+        setProfileTabIsOpen(true);
+      }
+      return null;
+    } else if (e === 'tab2') {
+      if (activeProfileTab === 'tab2') {
+        setTab2(ProfileStyle.profileTab);
+        setactiveProfileTab(null);
+      } else {
         setTab2(ProfileStyle.profileTabActive);
-      else setTab2(ProfileStyle.profileTab);
-      setTab1(ProfileStyle.profileTab);
-      setTab3(ProfileStyle.profileTab);
-    } else if (e === 'comments') {
-      if (Tab3 === ProfileStyle.profileTab)
+        setactiveProfileTab('tab2');
+        setProfileTabIsOpen(true);
+      }
+      return null;
+    } else if (e === 'tab3') {
+      if (activeProfileTab === 'tab3') {
+        setTab3(ProfileStyle.profileTab);
+        setactiveProfileTab(null);
+      } else {
         setTab3(ProfileStyle.profileTabActive);
-      else setTab3(ProfileStyle.profileTab);
-      setTab1(ProfileStyle.profileTab);
-      setTab2(ProfileStyle.profileTab);
+        setactiveProfileTab('tab3');
+        setProfileTabIsOpen(true);
+      }
+      return null;
     }
-    console.log(e);
   };
   const backActionHandler = () => {
-    if (ProfileIsOpen) {
-      setProfileIsOpen(false);
-    }
-    if (ProfileTabIsOpen) {
-      setProfileTabIsOpen(false);
+    // to handle back press if tab is open
+    if (editProfileIsOpen || ProfileTabIsOpen) {
+      closeAllTab();
     } else {
-      BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
       navigation.goBack();
     }
     return true;
   };
 
-  // hook which handles event listeners under the hood
   useEffect(() => {
-    // Add event listener for hardware back button press on Android
     BackHandler.addEventListener('hardwareBackPress', backActionHandler);
-
     return () => {
-      // clear/remove event listener
       BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
-      setProfileTabIsOpen(false);
     };
-  }, [ProfileIsOpen]);
+  }, [editProfileIsOpen, ProfileTabIsOpen]);
   const getDataFromEditProfile = (val) => {
-    setProfileIsOpen(val);
+    seteditProfileIsOpen(val);
   };
   return (
     <SafeAreaView
@@ -90,36 +104,33 @@ const Profile = ({navigation}) => {
           <Text style={ProfileStyle.PrifileName}>Name LastName</Text>
           <TouchableOpacity
             onPress={() => {
-              setProfileIsOpen(true);
+              seteditProfileIsOpen(true);
             }}>
             <Text style={ProfileStyle.editProfile}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
-        {ProfileIsOpen ? (
+        {editProfileIsOpen ? (
           <EditProfile isOpen={getDataFromEditProfile} />
         ) : (
           <View>
             <View style={ProfileStyle.profileBody}>
               <TouchableOpacity
                 onPress={() => {
-                  handleTabChange('about');
-                  setProfileTabIsOpen(true);
+                  handleTabChange('tab1');
                 }}
                 style={Tab1}>
                 <Text style={ProfileStyle.profileTabText}>PROGRESS</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  handleTabChange('post');
-                  setProfileTabIsOpen(true);
+                  handleTabChange('tab2');
                 }}
                 style={Tab2}>
                 <Text style={ProfileStyle.profileTabText}>MOOD REPORT</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  handleTabChange('comments');
-                  setProfileTabIsOpen(true);
+                  handleTabChange('tab3');
                 }}
                 style={Tab3}>
                 <Text style={ProfileStyle.profileTabText}>YOUR PLAN</Text>
@@ -138,13 +149,7 @@ const Profile = ({navigation}) => {
                     padding: 10,
                     borderRadius: 25,
                   }}>
-                  <Text>
-                    {Tab1 === ProfileStyle.profileTabActive
-                      ? 'tab1'
-                      : Tab2 === ProfileStyle.profileTabActive
-                      ? 'tab2'
-                      : 'tab3'}
-                  </Text>
+                  <Text>{activeProfileTab}</Text>
                   <View
                     style={{
                       marginBottom: 1000,
