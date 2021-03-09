@@ -1,7 +1,6 @@
 import React from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
-import CustomeTabBar from './CustomeTabBar';
-import Navigations from './Navigations';
+
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';

@@ -41,7 +41,7 @@ export const MoodReportTab = () => {
     datasets: [
       {
         data: [10, 30, 20, 40, 45, 35, 48, 50],
-        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+        color: (opacity = 1) => `black`, // optional
         strokeWidth: 2, // optional
       },
     ],
