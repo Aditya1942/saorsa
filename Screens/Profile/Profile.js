@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {ScrollView, Text, View, BackHandler} from 'react-native';
+import {Text, View, BackHandler} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../../Components/Header';
 import {colors, sizes, MoodImgs} from '../../Constants';
@@ -7,6 +7,9 @@ import {Avatar} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {ProfileStyle} from './ProfileStyle';
 import EditProfile from './EditProfile';
+import {ProgressTab} from './tabs/ProgressTab';
+import {MoodReportTab} from './tabs/MoodReportTab';
+import {YourPlanTab} from './tabs/YourPlanTab';
 
 const Profile = ({navigation}) => {
   const [Tab1, setTab1] = useState(ProfileStyle.profileTab);
@@ -101,12 +104,12 @@ const Profile = ({navigation}) => {
           />
         </View>
         <View style={ProfileStyle.profileBodyHeading}>
-          <Text style={ProfileStyle.PrifileName}>Name LastName</Text>
+          <Text style={ProfileStyle.PrifileName}>Name&nbsp;LastName</Text>
           <TouchableOpacity
             onPress={() => {
               seteditProfileIsOpen(true);
             }}>
-            <Text style={ProfileStyle.editProfile}>Edit Profile</Text>
+            <Text style={ProfileStyle.editProfile}>Edit&nbsp;Profile</Text>
           </TouchableOpacity>
         </View>
         {editProfileIsOpen ? (
@@ -119,42 +122,51 @@ const Profile = ({navigation}) => {
                   handleTabChange('tab1');
                 }}
                 style={Tab1}>
-                <Text style={ProfileStyle.profileTabText}>PROGRESS</Text>
+                <Text
+                  accessibilityRole="tab"
+                  style={ProfileStyle.profileTabText}>
+                  PROGRESS
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   handleTabChange('tab2');
                 }}
                 style={Tab2}>
-                <Text style={ProfileStyle.profileTabText}>MOOD REPORT</Text>
+                <Text
+                  accessibilityRole="tab"
+                  style={ProfileStyle.profileTabText}>
+                  MOOD&nbsp;REPORT
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   handleTabChange('tab3');
                 }}
                 style={Tab3}>
-                <Text style={ProfileStyle.profileTabText}>YOUR PLAN</Text>
+                <Text
+                  accessibilityRole="tab"
+                  adjustsFontSizeToFit={true}
+                  style={ProfileStyle.profileTabText}>
+                  YOUR&nbsp;PLAN
+                </Text>
               </TouchableOpacity>
             </View>
             {ProfileTabIsOpen ? (
               <View
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  padding: 10,
+                  width: '95%',
+                  height: '90%',
+                  margin: 10,
+                  overflow: 'hidden',
                 }}>
-                <ScrollView
-                  style={{
-                    backgroundColor: '#fff',
-                    padding: 10,
-                    borderRadius: 25,
-                  }}>
-                  <Text>{activeProfileTab}</Text>
-                  <View
-                    style={{
-                      marginBottom: 1000,
-                    }}></View>
-                </ScrollView>
+                {activeProfileTab === 'tab1' ? <ProgressTab /> : <View></View>}
+                {activeProfileTab === 'tab2' ? (
+                  <MoodReportTab />
+                ) : (
+                  <View></View>
+                )}
+                {activeProfileTab === 'tab3' ? <YourPlanTab /> : <View></View>}
               </View>
             ) : (
               <View></View>
@@ -165,5 +177,4 @@ const Profile = ({navigation}) => {
     </SafeAreaView>
   );
 };
-
 export default Profile;

@@ -45,7 +45,7 @@ const CustomeTab = () => {
   return (
     <Tab.Navigator
       tabBar={(props) => <MyTabBar {...props} />}
-      initialRouteName={'Home'}>
+      initialRouteName={'Profile'}>
       <Tab.Screen
         initialParams={{image: require('./assets/userprofile.png')}}
         name="Profile"

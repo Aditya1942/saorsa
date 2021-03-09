@@ -39,6 +39,8 @@ export const ProfileStyle = StyleSheet.create({
     right: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
+    zIndex: 2,
   },
   PrifileName: {
     color: '#fff',
@@ -62,20 +64,15 @@ export const ProfileStyle = StyleSheet.create({
   profileBody: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     marginHorizontal: 10,
-  },
-  profileTabHeading: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
   },
   // profile tabs
   profileTabText: {
     color: '#fff',
     fontSize: 15,
     fontWeight: 'bold',
+    width: '100%',
   },
   profileTab: {
     padding: 5,
