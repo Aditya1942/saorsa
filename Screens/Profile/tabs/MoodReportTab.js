@@ -45,7 +45,7 @@ export const MoodReportTab = () => {
         strokeWidth: 2, // optional
       },
     ],
-    legend: ['Moot Report'], // optional
+    legend: ['Mood Report'], // optional
   };
   return (
     <ScrollView style={MoodReportStyle.mainContainer}>

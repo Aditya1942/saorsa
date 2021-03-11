@@ -14,10 +14,10 @@ import {YourPlanTab} from './tabs/YourPlanTab';
 const Profile = ({navigation}) => {
   const [Tab1, setTab1] = useState(ProfileStyle.profileTab);
   const [Tab2, setTab2] = useState(ProfileStyle.profileTab);
-  const [Tab3, setTab3] = useState(ProfileStyle.profileTab);
+  const [Tab3, setTab3] = useState(ProfileStyle.profileTabActive);
   const [editProfileIsOpen, seteditProfileIsOpen] = useState(false);
-  const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(false);
-  const [activeProfileTab, setactiveProfileTab] = useState(null);
+  const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(true);
+  const [activeProfileTab, setactiveProfileTab] = useState('tab3');
   const closeAllTab = () => {
     // class all tabs
     setTab1(ProfileStyle.profileTab);

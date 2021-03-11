@@ -23,8 +23,7 @@ const EditProfile = ({isOpen}) => {
         <EditProfileDetails text="Accounts Details" icon="user" />
         <EditProfileDetails text="Privacy" icon="lock" />
         <EditProfileDetails text="Change Password" icon="key" />
-        <View style={{height: 500, marginBottom: 100}}></View>
-        <Text>LOL</Text>
+        {/* <View style={{height: 500, marginBottom: 100}}></View> */}
       </ScrollView>
     </View>
   );
@@ -59,6 +58,7 @@ export default EditProfile;
 const editProfileStyle = StyleSheet.create({
   //edit profile tabs body
   editprofileTabBody: {
+    flex: 1,
     minHeight: sizes.height,
     marginHorizontal: 10,
     backgroundColor: '#fff',

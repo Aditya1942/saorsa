@@ -44,7 +44,9 @@ export const ProfileStyle = StyleSheet.create({
   },
   PrifileName: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 19,
+    width: '100%',
+    textAlign: 'center',
     fontWeight: 'bold',
   },
   // edit profile button
@@ -64,13 +66,13 @@ export const ProfileStyle = StyleSheet.create({
   profileBody: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     marginHorizontal: 10,
   },
   // profile tabs
   profileTabText: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     width: '100%',
   },
@@ -78,6 +80,7 @@ export const ProfileStyle = StyleSheet.create({
     padding: 5,
     paddingHorizontal: 5,
     borderRadius: 10,
+    width: '100%',
   },
   profileTabActive: {
     backgroundColor: colors.secondary,

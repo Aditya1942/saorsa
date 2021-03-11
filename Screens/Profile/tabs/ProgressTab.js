@@ -20,66 +20,63 @@ const PieChartSteps = () => {
       key: 2,
       amount: 1,
       svg: {fill: colors.primary},
-      step: 'Step 1',
+      step: 'Step 2',
       name: 'Emotinal Awareness',
     },
     {
       key: 3,
       amount: 1,
       svg: {fill: colors.primary},
-      step: 'Step 1',
+      step: 'Step 3',
       name: 'Emotinal Awareness',
     },
     {
       key: 4,
       amount: 1,
       svg: {fill: colors.primary},
-      step: 'Step 1',
+      step: 'Step 4',
       name: 'Emotinal Awareness',
     },
     {
       key: 5,
       amount: 1,
       svg: {fill: colors.primary},
-      step: 'Step 1',
+      step: 'Step 5',
       name: 'Emotinal Awareness',
     },
     {
       key: 6,
       amount: 1,
       svg: {fill: colors.primary},
-      step: 'Step 1',
+      step: 'Step 6',
       name: 'Emotinal Awareness',
     },
   ];
-  const Labels = ({slices, height, width}) => {
-    return slices.map((slice, index) => {
-      const {labelCentroid, pieCentroid, data} = slice;
-      return (
-        <View key={index}>
-          <SvgText
-            fill={'black'}
-            y={-15}
-            textAnchor={'middle'}
-            alignmentBaseline={'middle'}
-            fontSize={24}
-            stroke={'black'}
-            strokeWidth={0.2}>
-            {data.step}
-          </SvgText>
-          <SvgText
-            y={10}
-            fill={'black'}
-            textAnchor={'middle'}
-            alignmentBaseline={'middle'}
-            fontSize={14}
-            stroke={'black'}
-            strokeWidth={0.2}>
-            {data.name}
-          </SvgText>
-        </View>
-      );
-    });
+  const Labels = ({data}) => {
+    return (
+      <View key={1}>
+        <SvgText
+          fill={'black'}
+          y={-15}
+          textAnchor={'middle'}
+          alignmentBaseline={'middle'}
+          fontSize={24}
+          stroke={'black'}
+          strokeWidth={0.2}>
+          {data[0].step}
+        </SvgText>
+        <SvgText
+          y={10}
+          fill={'black'}
+          textAnchor={'middle'}
+          alignmentBaseline={'middle'}
+          fontSize={14}
+          stroke={'black'}
+          strokeWidth={0.2}>
+          {data[0].name}
+        </SvgText>
+      </View>
+    );
   };
   return (
     <View>
@@ -90,7 +87,7 @@ const PieChartSteps = () => {
         spacing={0}
         innerRadius={'75%'}
         outerRadius={'65%'}>
-        <Labels />
+        <Labels data={data} />
       </PieChart>
     </View>
   );
@@ -160,14 +157,16 @@ const StepDetails = ({title, percentage, list}) => {
       <Text style={ProgressTabStyle.StepDetailsTitle}>{title}</Text>
       <Text style={ProgressTabStyle.StepDetailsPr}>{percentage}</Text>
       <View>
-        <FlatList
+        {list.map((item) => (
+          <Text key={item.id} style={ProgressTabStyle.StepDetailsList}>
+            {`\u2022  ${item.value}`}
+          </Text>
+        ))}
+        {/* <FlatList
           data={list}
           renderItem={({item}) => (
-            <Text style={ProgressTabStyle.StepDetailsList}>
-              {`\u2022  ${item.key}`}
-            </Text>
           )}
-        />
+        /> */}
       </View>
     </View>
   );
@@ -185,7 +184,10 @@ export const ProgressTab = () => {
         <StepDetails
           title="Step&nbsp;1:&nbsp;Emotinal&nbsp;Awareness"
           percentage="80%&nbsp;Completed"
-          list={[{key: 'Feelings Wheel'}, {key: 'Feelings Wheel 2'}]}
+          list={[
+            {id: 1, value: 'Feelings Wheel'},
+            {id: 2, value: 'Feelings Wheel 2'},
+          ]}
         />
       </View>
       <View style={{paddingBottom: 400}}></View>
