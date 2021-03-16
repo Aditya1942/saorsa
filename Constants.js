@@ -1,13 +1,13 @@
 import {Dimensions} from 'react-native';
 import {Component} from 'react/cjs/react.production.min';
 
+// app colors
 export const colors = {
   primary: '#09386E',
   secondary: '#496AD1',
 };
-
+// constant screen heightand width
 const {width, height} = Dimensions.get('window');
-
 export const sizes = {
   // global sizes
   base: 16,
@@ -30,7 +30,7 @@ export const sizes = {
   height,
   width,
 };
-
+// imgs/icons for moodTracker
 export const MoodImgs = [
   [
     {
@@ -102,6 +102,7 @@ export const MoodImgs = [
   ],
 ];
 
+// six steps course
 export const coursesImages = [
   {
     id: 'Step 1',
@@ -135,6 +136,7 @@ export const coursesImages = [
   },
 ];
 
+// courses
 export const courses = [
   {
     id: '1',
@@ -167,3 +169,6 @@ export const courses = [
     Component: 'Anxiety',
   },
 ];
+
+// login
+// http://localhost:4000/api/auth/ {email:"email",password:"password"}

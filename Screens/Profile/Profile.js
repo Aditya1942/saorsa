@@ -10,14 +10,24 @@ import EditProfile from './EditProfile';
 import {ProgressTab} from './tabs/ProgressTab';
 import {MoodReportTab} from './tabs/MoodReportTab';
 import {YourPlanTab} from './tabs/YourPlanTab';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = ({navigation}) => {
+  const getUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@userInfo');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+    }
+  };
+  const [UserData, setUserData] = useState({});
   const [Tab1, setTab1] = useState(ProfileStyle.profileTab);
-  const [Tab2, setTab2] = useState(ProfileStyle.profileTab);
-  const [Tab3, setTab3] = useState(ProfileStyle.profileTabActive);
+  const [Tab2, setTab2] = useState(ProfileStyle.profileTabActive);
+  const [Tab3, setTab3] = useState(ProfileStyle.profileTab);
   const [editProfileIsOpen, seteditProfileIsOpen] = useState(false);
   const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(true);
-  const [activeProfileTab, setactiveProfileTab] = useState('tab3');
+  const [activeProfileTab, setactiveProfileTab] = useState('tab2');
   const closeAllTab = () => {
     // class all tabs
     setTab1(ProfileStyle.profileTab);
@@ -78,9 +88,16 @@ const Profile = ({navigation}) => {
       BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
     };
   }, [editProfileIsOpen, ProfileTabIsOpen]);
+  useEffect(() => {
+    getUserData().then((data) => {
+      console.log(data);
+      setUserData(data);
+    });
+  }, []);
   const getDataFromEditProfile = (val) => {
     seteditProfileIsOpen(val);
   };
+
   return (
     <SafeAreaView
       style={{
@@ -104,7 +121,7 @@ const Profile = ({navigation}) => {
           />
         </View>
         <View style={ProfileStyle.profileBodyHeading}>
-          <Text style={ProfileStyle.PrifileName}>Name&nbsp;LastName</Text>
+          <Text style={ProfileStyle.PrifileName}>{UserData.name}</Text>
           <TouchableOpacity
             onPress={() => {
               seteditProfileIsOpen(true);

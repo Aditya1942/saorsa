@@ -48,6 +48,7 @@ export const ProfileStyle = StyleSheet.create({
     width: '100%',
     textAlign: 'center',
     fontWeight: 'bold',
+    textTransform: 'capitalize',
   },
   // edit profile button
   editProfile: {
