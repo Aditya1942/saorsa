@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
-
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -8,13 +7,13 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import Home from './Screens/DashBoard/Home';
 import Profile from './Screens/Profile/Profile';
 import Moodtracker from './Screens/Moodtracker';
-import MenuExample from './Screens/MenuExample';
 import DrawerScreen from './Components/DrawerScreen';
 import MyTabBar from './MyTabBar';
 import {colors} from './Constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Register from './Screens/Auth/Register';
 import Login from './Screens/Auth/Login';
+import axios from './Screens/Auth/axios';
+import {getUserAuthToken, storetUserProfileData} from './Screens/Auth/auth';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -42,7 +41,26 @@ const AppDrawer = () => {
   );
 };
 
-const CustomeTab = () => {
+const CustomeTab = ({navigation}) => {
+  const [loginToken, setloginToken] = useState('');
+  getUserAuthToken().then((token) => {
+    setloginToken(token);
+    axios({
+      method: 'get',
+      url: '/api/profile/me',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token,
+      },
+    }).then(({data}) => {
+      storetUserProfileData(data);
+    });
+    console.log('token', token);
+  });
+  useEffect(() => {
+    if (!loginToken) navigation.navigate('Login');
+  }, [loginToken]);
+
   return (
     <Tab.Navigator
       tabBar={(props) => <MyTabBar {...props} />}
@@ -67,47 +85,10 @@ const CustomeTab = () => {
 };
 
 const MainStack = () => {
-  const [loginToken, setLoginToken] = useState('0');
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@loginToken');
-      if (value !== null) {
-        setLoginToken(value);
-        console.log('loginToken', value);
-      }
-    } catch (e) {
-      setLoginToken('');
-      console.log(e);
-    }
-  };
-  const storeData = async (value) => {
-    try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem('@userInfo', jsonValue);
-    } catch (e) {
-      // saving error
-    }
-  };
-  useEffect(() => {
-    getData();
-    fetch('http://192.168.1.172:4000/api/auth', {
-      method: 'GET', // *GET, POST, PUT, DELETE, etc.
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-        'x-auth-token': loginToken,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        storeData(data);
-        console.log(data);
-      });
-  }, [loginToken]);
-
+  const [loginToken, setloginToken] = useState('lol');
   return (
     <Stack.Navigator
-      initialRouteName={loginToken ? 'AppDrawer' : 'Register'}
+      initialRouteName={loginToken ? 'AppDrawer' : 'Login'}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="AppDrawer" component={AppDrawer} />
       <Stack.Screen name="CustomeTab" component={CustomeTab} />
@@ -133,3 +114,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+// "proxy":"http://192.168.1.172:4000",

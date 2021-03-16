@@ -3,63 +3,54 @@ import {StyleSheet, Text, View} from 'react-native';
 import {Button, Input} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {sizes} from '../../Constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {storeUserAuthToken, getUserAuthToken} from './auth';
+import axios from './axios';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginToken, setLoginToken] = useState();
-
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@loginToken');
-      if (value !== null) {
-        // value previously stored
-        setLoginToken(value);
-        navigation.navigate('CustomeTab');
-      }
-    } catch (e) {
-      // error reading value
-      console.log(e);
-    }
-  };
-  const storeToken = async (value) => {
-    try {
-      await AsyncStorage.setItem('@loginToken', value);
-      navigation.navigate('CustomeTab');
-    } catch (e) {
-      // saving error
-      console.log(e);
-    }
-  };
+  const [loginToken, setLoginToken] = useState('');
   const handleLogin = () => {
-    console.log(email, password);
-    async function postData(url = '', data = {}) {
-      const response = await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
+    axios({
+      method: 'post',
+      url: '/api/auth',
+      data: {
+        email: 'parmaraditya1942@gmail.com',
+        password: 'aditya123',
+      },
+      headers: {'Content-Type': 'application/json'},
+    }).then(({data}) => {
+      // make a profile for user
+      console.log(data.token);
+      axios({
+        method: 'post',
+        url: '/api/profile',
+        data: {
+          bio: 'add bio',
+          coverImage: 'coverImage',
+        },
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': data.token,
         },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify(data),
+      }).then((data2) => {
+        console.log(data2.data);
+        setLoginToken(data.token);
       });
-      return response.json();
-    }
-    postData('http://192.168.1.172:4000/api/auth', {
-      email: email,
-      password: password,
-    }).then((data) => {
-      setLoginToken(data.token);
-      storeToken(data.token);
-      console.log('loginToken', loginToken);
     });
   };
   useEffect(() => {
-    // getData();
+    if (loginToken) {
+      storeUserAuthToken(loginToken);
+      navigation.navigate('Home');
+    }
+  }, [loginToken]);
+  useEffect(() => {
+    getUserAuthToken().then((token) => {
+      if (token) {
+        navigation.navigate('Home');
+      }
+    });
   }, []);
   return (
     <View>
@@ -67,12 +58,23 @@ const Login = ({navigation}) => {
         <Input
           placeholder="Email"
           value={email}
+          textContentType={'emailAddress'}
+          autoCompleteType={'email'}
+          clearButtonMode={'while-editing'}
+          returnKeyLabel={'next'}
+          returnKeyType={'next'}
+          keyboardType={'email-address'}
           onChangeText={(value) => setEmail(value)}
           leftIcon={<Icon name="envelope" size={24} color="black" />}
         />
         <Input
           placeholder="Password"
           value={password}
+          textContentType={'password'}
+          autoCompleteType={'password'}
+          clearButtonMode={'while-editing'}
+          returnKeyLabel={'done'}
+          returnKeyType={'done'}
           onChangeText={(value) => setPassword(value)}
           secureTextEntry={true}
           leftIcon={<Icon name="lock" size={24} color="black" />}
@@ -124,3 +126,63 @@ const loginStyle = StyleSheet.create({
     fontSize: 15,
   },
 });
+// const getData = async () => {
+//   try {
+//     const value = await AsyncStorage.getItem('@loginToken');
+//     if (value !== null) {
+//       // value previously stored
+//       setLoginToken(value);
+//       navigation.closeDrawer();
+//       navigation.navigate('AppDrawer');
+//     }
+//   } catch (e) {
+//     // error reading value
+//     console.log(e);
+//   }
+// };
+// const storeToken = async (value) => {
+//   try {
+//     await AsyncStorage.setItem('@loginToken', value);
+//     navigation.reset({
+//       routes: [{name: 'AppDrawer'}],
+//     });
+//   } catch (e) {
+//     // saving error
+//     console.log(e);
+//   }
+// };
+
+// const handleLogin = () => {
+//   console.log(email, password);
+//   async function postuserData(url = '', data = {}) {
+//     const response = await fetch(url, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-auth-token': loginToken,
+//       },
+//       body: JSON.stringify(data),
+//     });
+//     return response.json();
+//   }
+//   postuserData('/api/auth', {
+//     email: email,
+//     password: password,
+//   }).then((data) => {
+//     console.log('loginToken', data);
+//     if (data.errors) {
+//       alert(data.errors[0].msg);
+//     } else {
+//       setLoginToken(data.token);
+//       postuserData('/api/profile', {
+//         bio: 'add bio',
+//         coverImage: 'coverImage',
+//       }).then((data2) => {
+//         if (!data2.errors) {
+//           console.log(data2);
+//           storeToken(data.token);
+//         }
+//       });
+//     }
+//   });
+// };

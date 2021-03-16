@@ -11,6 +11,7 @@ import {ProgressTab} from './tabs/ProgressTab';
 import {MoodReportTab} from './tabs/MoodReportTab';
 import {YourPlanTab} from './tabs/YourPlanTab';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getUserProfileData} from '../Auth/auth';
 
 const Profile = ({navigation}) => {
   const getUserData = async () => {
@@ -89,7 +90,7 @@ const Profile = ({navigation}) => {
     };
   }, [editProfileIsOpen, ProfileTabIsOpen]);
   useEffect(() => {
-    getUserData().then((data) => {
+    getUserProfileData().then((data) => {
       console.log(data);
       setUserData(data);
     });
@@ -117,11 +118,12 @@ const Profile = ({navigation}) => {
             overlayContainerStyle={ProfileStyle.AvatarBody}
             containerStyle={ProfileStyle.AvatarImg}
             rounded
+            // source={{uri: UserData.user.avatar}}
             icon={{name: 'user', type: 'font-awesome'}}
           />
         </View>
         <View style={ProfileStyle.profileBodyHeading}>
-          <Text style={ProfileStyle.PrifileName}>{UserData.name}</Text>
+          <Text style={ProfileStyle.PrifileName}>{UserData.user.name}</Text>
           <TouchableOpacity
             onPress={() => {
               seteditProfileIsOpen(true);

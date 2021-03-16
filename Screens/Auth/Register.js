@@ -10,6 +10,7 @@ const Register = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setpassword] = useState('');
   const [error, seterror] = useState('');
+  const [loginToken, setLoginToken] = useState('');
 
   const storeToken = async (value) => {
     try {
@@ -29,6 +30,7 @@ const Register = ({navigation}) => {
         cache: 'no-cache',
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': loginToken,
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
@@ -36,13 +38,23 @@ const Register = ({navigation}) => {
       });
       return response.json();
     }
-    postNewUserData('http://192.168.1.172:4000/api/user', {
+    postNewUserData('/api/auth', {
       name: name,
       email: email,
       password: password,
     }).then((data) => {
       if (data.errors) seterror(data.errors[0].msg);
-      else storeToken(data.token);
+      else {
+        setLoginToken(data.token);
+        postNewUserData('/api/profile', {
+          bio: 'add bio',
+          coverImage: 'coverImage',
+        }).then((data2) => {
+          if (!data2.errors) {
+            storeToken(data.token);
+          }
+        });
+      }
     });
   };
   useEffect(() => {

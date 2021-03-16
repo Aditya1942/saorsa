@@ -37,28 +37,34 @@ const MoodIcons = ({id, img, name, navigation, loginToken}) => {
   async function postMoodData(url = '', data = {}) {
     // Default options are marked with *
     const response = await fetch(url, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
         'x-auth-token': loginToken,
-        // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify(data), // body data type must match "Content-Type" header
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: JSON.stringify(data),
     });
     return response.json(); // parses JSON response into native JavaScript objects
   }
-
-  loginToken;
+  const handleUpdateMoodStatus = (mood, rating) => {
+    postMoodData('/api/mood/new', {
+      mood: mood,
+      moodImage: mood + ' image',
+      rating: rating,
+    }).then((data) => {
+      console.log(data);
+      setopenMenu(false);
+    });
+  };
 
   useEffect(() => {
     // Add event listener for hardware back button press on Android
     BackHandler.addEventListener('hardwareBackPress', backActionHandler);
-
     return () =>
       // clear/remove event listener
       BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
@@ -69,13 +75,7 @@ const MoodIcons = ({id, img, name, navigation, loginToken}) => {
       opened={openMenu}
       onBackdropPress={() => setopenMenu(false)}
       onSelect={(value) => {
-        // postData('http://192.168.1.172:4000/api/auth', {
-        //   email: 'parmaraditya1942@gmail.com',
-        //   password: 'aditya123',
-        // }).then((data) => {
-        //   setopenMenu(false);
-        // });
-        alert(`Selected: ${name} => ${value}`);
+        handleUpdateMoodStatus(name, value);
       }}>
       <MenuTrigger
         children={
@@ -135,6 +135,7 @@ const MoodOptionCustomStyle = (props) => {
   );
 };
 const Moodtracker = ({navigation}) => {
+  const [loginToken, setLoginToken] = useState('');
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@loginToken');
@@ -178,6 +179,7 @@ const Moodtracker = ({navigation}) => {
                     img={MoodImgObject.img}
                     name={MoodImgObject.name}
                     navigation={navigation}
+                    loginToken={loginToken}
                   />
                 ))}
               </View>
