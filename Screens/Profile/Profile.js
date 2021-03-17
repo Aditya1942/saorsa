@@ -123,7 +123,7 @@ const Profile = ({navigation}) => {
           />
         </View>
         <View style={ProfileStyle.profileBodyHeading}>
-          <Text style={ProfileStyle.PrifileName}>{UserData.user.name}</Text>
+          <Text style={ProfileStyle.PrifileName}>{UserData?.user?.name}</Text>
           <TouchableOpacity
             onPress={() => {
               seteditProfileIsOpen(true);

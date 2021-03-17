@@ -15,29 +15,36 @@ const Login = ({navigation}) => {
       method: 'post',
       url: '/api/auth',
       data: {
-        email: 'parmaraditya1942@gmail.com',
-        password: 'aditya123',
+        email: email,
+        password: password,
       },
       headers: {'Content-Type': 'application/json'},
-    }).then(({data}) => {
-      // make a profile for user
-      console.log(data.token);
-      axios({
-        method: 'post',
-        url: '/api/profile',
-        data: {
-          bio: 'add bio',
-          coverImage: 'coverImage',
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': data.token,
-        },
-      }).then((data2) => {
-        console.log(data2.data);
-        setLoginToken(data.token);
-      });
-    });
+    })
+      .then(({data}) => {
+        // make a profile for user
+        if (data.errors) alert(data.errors[0].msg);
+        else {
+          console.log(data.token);
+          axios({
+            method: 'post',
+            url: '/api/profile',
+            data: {
+              bio: 'add bio',
+              coverImage: 'coverImage',
+            },
+            headers: {
+              'Content-Type': 'application/json',
+              'x-auth-token': data.token,
+            },
+          })
+            .then((data2) => {
+              console.log(data2.data);
+              setLoginToken(data.token);
+            })
+            .catch((err) => {});
+        }
+      })
+      .catch((err) => {});
   };
   useEffect(() => {
     if (loginToken) {
@@ -46,11 +53,13 @@ const Login = ({navigation}) => {
     }
   }, [loginToken]);
   useEffect(() => {
-    getUserAuthToken().then((token) => {
-      if (token) {
-        navigation.navigate('Home');
-      }
-    });
+    getUserAuthToken()
+      .then((token) => {
+        if (token) {
+          navigation.navigate('Home');
+        }
+      })
+      .catch((err) => {});
   }, []);
   return (
     <View>

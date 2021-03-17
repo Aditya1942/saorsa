@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, Input} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {sizes} from '../../Constants';
+import {getUserAuthToken, storeUserAuthToken} from './auth';
+import axios from './axios';
 
 const Register = ({navigation}) => {
   const [name, setName] = useState('');
@@ -12,53 +13,58 @@ const Register = ({navigation}) => {
   const [error, seterror] = useState('');
   const [loginToken, setLoginToken] = useState('');
 
-  const storeToken = async (value) => {
-    try {
-      await AsyncStorage.setItem('@loginToken', value);
-      navigation.navigate('CustomeTab');
-    } catch (e) {
-      // saving error
-      console.log(e);
-    }
-  };
   const handleRegister = () => {
     console.log(name, email, password);
-    async function postNewUserData(url = '', data = {}) {
-      const response = await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': loginToken,
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify(data),
+
+    axios({
+      method: 'post',
+      url: 'http://10.0.2.2:4000/api/user',
+      data: {name: name, email: email, password: password},
+      headers: {'Content-Type': 'application/json'},
+    })
+      .then(({data}) => {
+        console.log(data);
+        if (data.errors) {
+          // alert(data.errors[0].msg);
+          seterror(data.errors[0].msg);
+        } else {
+          axios({
+            method: 'post',
+            url: '/api/profile',
+            data: {
+              bio: 'add bio',
+              coverImage: 'coverImage',
+            },
+            headers: {
+              'Content-Type': 'application/json',
+              'x-auth-token': data.token,
+            },
+          })
+            .then((data2) => {
+              console.log(data2.data);
+              setLoginToken(data.token);
+            })
+            .catch((err) => {});
+        }
+      })
+      .catch((err) => {
+        console.log('err=>', err);
       });
-      return response.json();
-    }
-    postNewUserData('/api/auth', {
-      name: name,
-      email: email,
-      password: password,
-    }).then((data) => {
-      if (data.errors) seterror(data.errors[0].msg);
-      else {
-        setLoginToken(data.token);
-        postNewUserData('/api/profile', {
-          bio: 'add bio',
-          coverImage: 'coverImage',
-        }).then((data2) => {
-          if (!data2.errors) {
-            storeToken(data.token);
-          }
-        });
-      }
-    });
   };
   useEffect(() => {
-    // Example POST method implementation:
+    if (loginToken) {
+      storeUserAuthToken(loginToken);
+      navigation.navigate('Home');
+    }
+  }, [loginToken]);
+  useEffect(() => {
+    getUserAuthToken()
+      .then((token) => {
+        if (token) {
+          navigation.navigate('Home');
+        }
+      })
+      .catch((err) => {});
   }, []);
   return (
     <View>

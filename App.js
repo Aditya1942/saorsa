@@ -52,9 +52,11 @@ const CustomeTab = ({navigation}) => {
         'Content-Type': 'application/json',
         'x-auth-token': token,
       },
-    }).then(({data}) => {
-      storetUserProfileData(data);
-    });
+    })
+      .then(({data}) => {
+        storetUserProfileData(data);
+      })
+      .catch((err) => {});
     console.log('token', token);
   });
   useEffect(() => {
