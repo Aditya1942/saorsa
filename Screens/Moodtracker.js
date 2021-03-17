@@ -20,9 +20,9 @@ import {
 } from 'react-native-popup-menu';
 import FastImage from 'react-native-fast-image';
 import {BackHandler} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const MoodIcons = ({id, img, name, navigation, loginToken}) => {
+import {getUserAuthToken, getUserProfileData} from './Auth/auth';
+import axios from './Auth/axios';
+const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
   const {ContextMenu, SlideInMenu, Popover} = renderers;
   const [openMenu, setopenMenu] = useState(false);
   const backActionHandler = () => {
@@ -34,32 +34,31 @@ const MoodIcons = ({id, img, name, navigation, loginToken}) => {
     }
     return true;
   };
-  async function postMoodData(url = '', data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'same-origin',
+
+  const handleUpdateMoodStatus = (mood, rating) => {
+    axios({
+      method: 'post',
+      url: '/api/mood/new',
+      data: {
+        mood: mood,
+        rating: rating,
+        moodImage: `${mood} image`,
+      },
       headers: {
         'Content-Type': 'application/json',
         'x-auth-token': loginToken,
       },
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-      body: JSON.stringify(data),
+    }).then(({data}) => {
+      if (data.errors) {
+        alert(data.errors[0].msg);
+      } else {
+        console.log('data', data);
+        update();
+        // alert(data);
+      }
     });
-    return response.json(); // parses JSON response into native JavaScript objects
-  }
-  const handleUpdateMoodStatus = (mood, rating) => {
-    postMoodData('/api/mood/new', {
-      mood: mood,
-      moodImage: mood + ' image',
-      rating: rating,
-    }).then((data) => {
-      console.log(data);
-      setopenMenu(false);
-    });
+    console.log(mood, rating, loginToken);
+    setopenMenu(false);
   };
 
   useEffect(() => {
@@ -136,21 +135,86 @@ const MoodOptionCustomStyle = (props) => {
 };
 const Moodtracker = ({navigation}) => {
   const [loginToken, setLoginToken] = useState('');
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@loginToken');
-      if (value !== null) {
-        // value previously stored
-        console.log('loginToken', value);
+  const [MoodHistory, setMoodHistory] = useState([]);
+  const [triggerMoodUpdateFromMain, setTriggerMoodUpdateFromMain] = useState(
+    '',
+  );
+  const setTriggerMoodUpdateFromMainFun = async () => {
+    await axios({
+      method: 'get',
+      url: 'api/mood/all',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': loginToken,
+      },
+    }).then(({data}) => {
+      function formatDate(date) {
+        let day = date.getDate();
+        if (day === 1) {
+          day = day + 'st';
+        } else if (day === 2) {
+          day = day + 'nd';
+        } else if (day === 3) {
+          day = day + 'rd';
+        } else {
+          day = day + 'th';
+        }
+        var month_names_short = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
+
+        const options = {month: 'short'};
+
+        let month = month_names_short[date.getMonth()];
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ampm;
+        return day + ' ' + month + ' ' + strTime;
       }
-    } catch (e) {
-      // error reading value
-      console.log(e);
-    }
+      console.log('data', data);
+      var moodDateAndTime = new Array();
+      try {
+        data.map((m) => {
+          var dateObject = new Date(m.date);
+          let dateAndTime = formatDate(dateObject);
+          let moodDateAndTimeObject = {
+            mood: m.mood.toUpperCase(),
+            date: dateAndTime,
+          };
+          moodDateAndTime.push(moodDateAndTimeObject);
+          console.log('moodDateAndTimeObject', moodDateAndTime);
+        });
+      } catch (error) {
+        console.log('error', error);
+      }
+      setTriggerMoodUpdateFromMain('0');
+      console.log('MoodHistory', MoodHistory);
+      setMoodHistory(moodDateAndTime);
+    });
   };
+
   useEffect(() => {
-    getData();
-  }, []);
+    getUserAuthToken().then((token) => {
+      setLoginToken(token);
+      console.log('loginToken', loginToken);
+      setTriggerMoodUpdateFromMainFun();
+    });
+  }, [loginToken]);
   return (
     <MenuProvider customStyles={menuProviderStyles}>
       <SafeAreaView
@@ -180,6 +244,7 @@ const Moodtracker = ({navigation}) => {
                     name={MoodImgObject.name}
                     navigation={navigation}
                     loginToken={loginToken}
+                    update={setTriggerMoodUpdateFromMainFun}
                   />
                 ))}
               </View>
@@ -191,12 +256,11 @@ const Moodtracker = ({navigation}) => {
                     Mood Chart
                   </Text>
                   <View>
-                    <Text style={MoodTrackerStyle.MoodInfo}>
-                      HAPPY 23rd Feb 1:28pm
-                    </Text>
-                    <Text style={MoodTrackerStyle.MoodInfo}>
-                      ANGRY 13th Feb 4:30pm
-                    </Text>
+                    {MoodHistory.map((m) => (
+                      <Text key={m.date} style={MoodTrackerStyle.MoodInfo}>
+                        {`${m.mood} ${m.date}`}
+                      </Text>
+                    ))}
                   </View>
                 </View>
                 <View style={MoodTrackerStyle.MoodInfoChart}>

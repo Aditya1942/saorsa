@@ -29,7 +29,7 @@ const Login = ({navigation}) => {
             method: 'post',
             url: '/api/profile',
             data: {
-              bio: 'add bio',
+              bio: 'addbio',
               coverImage: 'coverImage',
             },
             headers: {
