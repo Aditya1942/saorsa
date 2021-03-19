@@ -14,9 +14,11 @@ import Register from './Screens/Auth/Register';
 import Login from './Screens/Auth/Login';
 import axios from './Screens/Auth/axios';
 import {getUserAuthToken, storetUserProfileData} from './Screens/Auth/auth';
+import Step from './Screens/steps/Step';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const HomeStack = createStackNavigator();
 
 function CustomDrawerContent({navigation}) {
   return (
@@ -29,7 +31,6 @@ function CustomDrawerContent({navigation}) {
     />
   );
 }
-
 const AppDrawer = () => {
   return (
     <Drawer.Navigator
@@ -41,6 +42,16 @@ const AppDrawer = () => {
   );
 };
 
+const HomeStackScreen = () => {
+  return (
+    <HomeStack.Navigator
+      initialRouteName={'Home'}
+      screenOptions={{headerShown: false}}>
+      <HomeStack.Screen name="Home" component={Home} />
+      <HomeStack.Screen name="Step" component={Step} />
+    </HomeStack.Navigator>
+  );
+};
 const CustomeTab = ({navigation}) => {
   const [loginToken, setloginToken] = useState('');
   getUserAuthToken().then((token) => {
@@ -75,7 +86,7 @@ const CustomeTab = ({navigation}) => {
       <Tab.Screen
         initialParams={{image: require('./assets/Home.png'), middle: true}}
         name="Home"
-        component={Home}
+        component={HomeStackScreen}
       />
       <Tab.Screen
         initialParams={{image: require('./assets/moodtracker.png')}}

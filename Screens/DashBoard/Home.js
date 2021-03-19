@@ -16,7 +16,7 @@ const Home = ({ navigation }) => {
                 <Text style={{ fontSize: sizes.title, color: '#fff', fontFamily: 'AvenirLTStd-Book' }}>How are you feel today</Text>
                 <Text style={{ fontSize: sizes.header * 0.9, color: '#fff', paddingTop: 20, fontFamily: 'AvenirLTStd-Black' }}>FREE EMOTIONAL REGULATION COURSES</Text>
 
-                <Steps />
+                <Steps  navigation={navigation} />
 
                 <View style={styles.description}>
                     <Text style={{ fontSize: sizes.body, color: 'black', fontWeight: 'bold', fontFamily: 'AvenirLTStd-Black' }}>What is Emotional Regulation ?</Text>

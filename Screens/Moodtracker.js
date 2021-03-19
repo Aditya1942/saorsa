@@ -134,6 +134,7 @@ const MoodOptionCustomStyle = (props) => {
   );
 };
 const Moodtracker = ({navigation}) => {
+  console.log(MoodImgs);
   const [loginToken, setLoginToken] = useState('');
   const [MoodHistory, setMoodHistory] = useState([]);
   const [triggerMoodUpdateFromMain, setTriggerMoodUpdateFromMain] = useState(
@@ -189,16 +190,21 @@ const Moodtracker = ({navigation}) => {
       console.log('data', data);
       var moodDateAndTime = new Array();
       try {
-        data.map((m) => {
-          var dateObject = new Date(m.date);
+        // add only last two mood history
+        for (let i = 1; i < 3; i++) {
+          var dateObject = new Date(data[data.length - i].date);
+          // format date according
           let dateAndTime = formatDate(dateObject);
           let moodDateAndTimeObject = {
-            mood: m.mood.toUpperCase(),
-            date: dateAndTime,
+            id: data[data.length - i]._id,
+            moodType: data[data.length - i].mood.toUpperCase(),
+            rating: data[data.length - i].rating,
+            dateAndTime: dateAndTime,
+            date: data[data.length - i].date,
           };
           moodDateAndTime.push(moodDateAndTimeObject);
           console.log('moodDateAndTimeObject', moodDateAndTime);
-        });
+        }
       } catch (error) {
         console.log('error', error);
       }
@@ -257,8 +263,8 @@ const Moodtracker = ({navigation}) => {
                   </Text>
                   <View>
                     {MoodHistory.map((m) => (
-                      <Text key={m.date} style={MoodTrackerStyle.MoodInfo}>
-                        {`${m.mood} ${m.date}`}
+                      <Text key={m.id} style={MoodTrackerStyle.MoodInfo}>
+                        {`${m.moodType} ${m.dateAndTime}`}
                       </Text>
                     ))}
                   </View>
@@ -303,6 +309,7 @@ const MoodTrackerStyle = StyleSheet.create({
   },
   MoodInfoMain: {
     flex: 0.6,
+    overflow: 'hidden',
   },
   MoodInfoChart: {
     flex: 0.4,

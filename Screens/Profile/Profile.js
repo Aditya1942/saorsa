@@ -82,7 +82,6 @@ const Profile = ({navigation}) => {
     }
     return true;
   };
-
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backActionHandler);
     return () => {

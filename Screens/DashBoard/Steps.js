@@ -5,7 +5,8 @@ import {View, Text, FlatList, Image, StyleSheet} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {colors, sizes, coursesImages} from '../../Constants';
 
-const Steps = () => {
+const Steps = ({navigation}) => {
+  console.log('navigation');
   return (
     <FlatList
       data={coursesImages}
@@ -19,7 +20,14 @@ const Steps = () => {
       contentContainerStyle={{paddingRight: sizes.SPACING * 2}}
       renderItem={({item, index}) => {
         return (
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Step', {
+                id: index + 1,
+                step: item.id,
+                title: item.title,
+              });
+            }}>
             <View style={styles.courseItems}>
               <FastImage
                 source={item.img}

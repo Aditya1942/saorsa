@@ -54,14 +54,14 @@ const Register = ({navigation}) => {
   useEffect(() => {
     if (loginToken) {
       storeUserAuthToken(loginToken);
-      navigation.navigate('Home');
+      navigation.goBack();
     }
   }, [loginToken]);
   useEffect(() => {
     getUserAuthToken()
       .then((token) => {
         if (token) {
-          navigation.navigate('Home');
+          navigation.goBack();
         }
       })
       .catch((err) => {});

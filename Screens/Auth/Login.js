@@ -11,6 +11,7 @@ const Login = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [loginToken, setLoginToken] = useState('');
   const handleLogin = () => {
+    console.log(email, password);
     axios({
       method: 'post',
       url: '/api/auth',
@@ -40,23 +41,26 @@ const Login = ({navigation}) => {
             .then((data2) => {
               console.log(data2.data);
               setLoginToken(data.token);
+              navigation.goBack();
             })
             .catch((err) => {});
         }
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log(err);
+      });
   };
   useEffect(() => {
     if (loginToken) {
       storeUserAuthToken(loginToken);
-      navigation.navigate('Home');
+      navigation.goBack();
     }
   }, [loginToken]);
   useEffect(() => {
     getUserAuthToken()
       .then((token) => {
         if (token) {
-          navigation.navigate('Home');
+          navigation.goBack();
         }
       })
       .catch((err) => {});
