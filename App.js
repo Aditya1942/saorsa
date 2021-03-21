@@ -15,6 +15,7 @@ import Login from './Screens/Auth/Login';
 import axios from './Screens/Auth/axios';
 import {getUserAuthToken, storetUserProfileData} from './Screens/Auth/auth';
 import Step from './Screens/steps/Step';
+import StepCourse from './Screens/steps/StepCourse';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -49,6 +50,7 @@ const HomeStackScreen = () => {
       screenOptions={{headerShown: false}}>
       <HomeStack.Screen name="Home" component={Home} />
       <HomeStack.Screen name="Step" component={Step} />
+      <HomeStack.Screen name="StepCourse" component={StepCourse} />
     </HomeStack.Navigator>
   );
 };

@@ -15,16 +15,24 @@ import {Image} from 'react-native-elements';
 import {step1} from './stepData.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const StepBtn = ({courseimage, name, id}) => {
+const StepBtn = ({courseimage, name, id, navigation, data}) => {
   return (
-    <View style={StepStyles.StepBtn}>
-      <TouchableOpacity>
+    <TouchableOpacity
+      style={StepStyles.StepBtn}
+      onPress={() => {
+        navigation.navigate('StepCourse', {
+          id: id,
+          Coursename: name,
+          data: data,
+        });
+      }}>
+      <View>
         <View style={StepStyles.StepBtnBody}>
           <FastImage style={StepStyles.courseImg} source={courseimage} />
           <Text style={StepStyles.StepBtnText}>{name}</Text>
         </View>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 const NextStep = ({id, navigation}) => {
@@ -103,10 +111,12 @@ function Step({route, navigation}) {
           <View key={index} style={StepStyles.stepBtns}>
             {stepdata.map((course) => (
               <StepBtn
+                navigation={navigation}
                 id={course.id}
                 key={course.id}
                 name={course.name}
                 courseimage={course.img}
+                data={course}
               />
             ))}
           </View>

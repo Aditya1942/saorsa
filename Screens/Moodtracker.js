@@ -22,19 +22,30 @@ import FastImage from 'react-native-fast-image';
 import {BackHandler} from 'react-native';
 import {getUserAuthToken, getUserProfileData} from './Auth/auth';
 import axios from './Auth/axios';
+import {useFocusEffect} from '@react-navigation/core';
 const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
   const {ContextMenu, SlideInMenu, Popover} = renderers;
   const [openMenu, setopenMenu] = useState(false);
-  const backActionHandler = () => {
-    if (!openMenu) {
-      BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
-      navigation.goBack();
-    } else {
-      setopenMenu(false);
-    }
-    return true;
-  };
-
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('object', navigation);
+      const onBackPress = () => {
+        if (openMenu) {
+          setopenMenu(false);
+        } else if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.reset({
+            routes: [{name: 'Home'}],
+          });
+        }
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [openMenu]),
+  );
   const handleUpdateMoodStatus = (mood, rating) => {
     axios({
       method: 'post',
@@ -61,13 +72,6 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
     setopenMenu(false);
   };
 
-  useEffect(() => {
-    // Add event listener for hardware back button press on Android
-    BackHandler.addEventListener('hardwareBackPress', backActionHandler);
-    return () =>
-      // clear/remove event listener
-      BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
-  }, [openMenu]);
   return (
     <Menu
       renderer={ContextMenu}

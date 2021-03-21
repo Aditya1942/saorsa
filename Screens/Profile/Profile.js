@@ -12,6 +12,7 @@ import {MoodReportTab} from './tabs/MoodReportTab';
 import {YourPlanTab} from './tabs/YourPlanTab';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserProfileData} from '../Auth/auth';
+import {useFocusEffect} from '@react-navigation/core';
 
 const Profile = ({navigation}) => {
   const getUserData = async () => {
@@ -73,21 +74,28 @@ const Profile = ({navigation}) => {
       return null;
     }
   };
-  const backActionHandler = () => {
-    // to handle back press if tab is open
-    if (editProfileIsOpen || ProfileTabIsOpen) {
-      closeAllTab();
-    } else {
-      navigation.goBack();
-    }
-    return true;
-  };
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', backActionHandler);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
-    };
-  }, [editProfileIsOpen, ProfileTabIsOpen]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('object', navigation);
+      const onBackPress = () => {
+        if (editProfileIsOpen || ProfileTabIsOpen) {
+          closeAllTab();
+        } else if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.reset({
+            routes: [{name: 'Home'}],
+          });
+        }
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [editProfileIsOpen, ProfileTabIsOpen]),
+  );
+
   useEffect(() => {
     getUserProfileData().then((data) => {
       console.log(data);
