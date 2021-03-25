@@ -21,7 +21,7 @@ const Audio = ({navigation, audio}) => {
     <TouchableOpacity
       style={StepCourseStyles.audio}
       onPress={async () => {
-        // navigation.navigate('Play');
+        navigation.navigate('PlayerScreen', {title: 'lol', filepath: audio});
       }}>
       <Text style={StepCourseStyles.audioText}>
         Audio <Icon name="headphones" size={15} color="#fff" />
@@ -128,6 +128,7 @@ const Course = ({title, audio, navigation, img, description}) => {
     <View>
       {titles.map((title, index) => (
         <Title
+          key={index}
           titleText={title}
           audio={index === 0 ? audio : null}
           navigation={navigation}
@@ -181,7 +182,7 @@ const StepCourse = ({route, navigation}) => {
         <View style={{marginTop: 30}} />
         {data.data.map((course, index) => (
           <Course
-            keys={course.index}
+            key={index}
             title={course.title}
             description={course.description}
             img={course.img}
