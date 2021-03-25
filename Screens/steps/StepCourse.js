@@ -7,15 +7,22 @@ import {
   TouchableOpacity,
   ScrollView,
   BackHandler,
+  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Header from '../../Components/Header';
 import {colors, sizes} from '../../Constants';
+import {useFocusEffect} from '@react-navigation/core';
+import FastImage from 'react-native-fast-image';
 
-const Audio = () => {
+const Audio = ({navigation, audio}) => {
   return (
-    <TouchableOpacity style={StepCourseStyles.audio}>
+    <TouchableOpacity
+      style={StepCourseStyles.audio}
+      onPress={async () => {
+        // navigation.navigate('Play');
+      }}>
       <Text style={StepCourseStyles.audioText}>
         Audio <Icon name="headphones" size={15} color="#fff" />
       </Text>
@@ -23,7 +30,7 @@ const Audio = () => {
   );
 };
 
-const Title = ({audio, titleText}) => {
+const Title = ({audio, titleText, navigation}) => {
   const stepCourseTitleStyle = {
     main: {
       flexDirection: 'row',
@@ -51,11 +58,11 @@ const Title = ({audio, titleText}) => {
     },
 
     title: {
-      width: sizes.width * 0.6,
-      padding: 10,
-      paddingLeft: 20,
+      width: sizes.width * 0.65,
+      paddingVertical: 10,
+      paddingLeft: 5,
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       backgroundColor: colors.secondary,
       height: 10,
     },
@@ -64,6 +71,7 @@ const Title = ({audio, titleText}) => {
       fontWeight: 'bold',
       fontFamily: 'AvenirLTStd-Black',
       textTransform: 'uppercase',
+      fontSize: 12,
     },
     after: {
       width: 0,
@@ -77,6 +85,7 @@ const Title = ({audio, titleText}) => {
       transform: [{rotate: '0deg'}],
     },
   };
+
   return (
     <View style={stepCourseTitleStyle.main}>
       <View style={stepCourseTitleStyle.body}>
@@ -86,30 +95,73 @@ const Title = ({audio, titleText}) => {
         </View>
         <View style={stepCourseTitleStyle.after} />
       </View>
-      <View>{audio === true ? <Audio /> : <View />}</View>
+      <View>
+        {audio ? <Audio audio={audio} navigation={navigation} /> : <View />}
+      </View>
     </View>
   );
 };
-const Course = ({title, audio}) => {
+const Course = ({title, audio, navigation, img, description}) => {
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     console.log('This will run after 5 second!');
+  //   }, 5000);
+  //   return () => clearTimeout(timer);
+  // }, []);
+  function WordCount(str) {
+    var lengthyTitle = [];
+    let titleStr = '';
+    str = str.split(' ');
+    str.forEach((word, i) => {
+      titleStr = titleStr.concat(word + ' ');
+      if (i === 4) {
+        lengthyTitle.push(titleStr);
+        titleStr = '';
+      }
+    });
+    lengthyTitle.push(titleStr);
+    return lengthyTitle;
+  }
+
+  var titles = WordCount(title);
   return (
     <View>
-      <Title titleText={title} audio={audio} />
+      {titles.map((title, index) => (
+        <Title
+          titleText={title}
+          audio={index === 0 ? audio : null}
+          navigation={navigation}
+        />
+      ))}
+      <Text style={StepCourseStyles.description}>{description}</Text>
+      <View style={{paddingHorizontal: 10}}>
+        <FastImage style={StepCourseStyles.picture} source={img} />
+      </View>
     </View>
   );
 };
 const StepCourse = ({route, navigation}) => {
   const {data} = route.params;
   console.log(route.params);
-  const backActionHandler = () => {
-    navigation.goBack();
-    return true;
-  };
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', backActionHandler);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backActionHandler);
-    };
-  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.reset({
+            routes: [{name: 'Home'}],
+          });
+        }
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
+
   return (
     <SafeAreaView
       style={{
@@ -127,22 +179,17 @@ const StepCourse = ({route, navigation}) => {
       </ImageBackground>
       <ScrollView style={StepCourseStyles.body}>
         <View style={{marginTop: 30}} />
-        <Course title={data.name} audio={true} />
-        <Text
-          style={{
-            color: 'white',
-            padding: 10,
-            fontFamily: sizes.fontFamily,
-            fontSize: sizes.title,
-            textAlign: 'justify',
-          }}>
-          When we can’t regulate our emotions we use unhelpful coping strategies
-          to manage emotions, this is known as Emotional Dysregulation{'\n\n'}
-          Dysregulation results in difficulties coping and processing the
-          emotion. Which can resulting in us using unhelpful coping strategies
-          such as taking substances, binge eating, saying things we regret, self
-          criticising or self harming.
-        </Text>
+        {data.data.map((course, index) => (
+          <Course
+            keys={course.index}
+            title={course.title}
+            description={course.description}
+            img={course.img}
+            audio={course.audio}
+            navigation={navigation}
+          />
+        ))}
+        <View style={{marginTop: 100}} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -184,5 +231,18 @@ const StepCourseStyles = StyleSheet.create({
   },
   audioText: {
     color: '#fff',
+  },
+  description: {
+    color: 'white',
+    padding: 10,
+    paddingHorizontal: 20,
+    fontFamily: sizes.fontFamily,
+    fontSize: sizes.title,
+    textAlign: 'justify',
+  },
+  picture: {
+    flex: 1,
+    aspectRatio: 1.2,
+    resizeMode: 'contain',
   },
 });

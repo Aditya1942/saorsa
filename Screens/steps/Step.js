@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  BackHandler,
   ImageBackground,
   SafeAreaView,
   ScrollView,
@@ -12,10 +13,11 @@ import Header from '../../Components/Header';
 import FastImage from 'react-native-fast-image';
 import {colors, sizes, coursesImages} from '../../Constants';
 import {Image} from 'react-native-elements';
-import {step1} from './stepData.js';
+import {steps} from './stepData.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {useFocusEffect} from '@react-navigation/core';
 
-const StepBtn = ({courseimage, name, id, navigation, data}) => {
+export const StepBtn = ({courseimage, name, id, navigation, data}) => {
   return (
     <TouchableOpacity
       style={StepStyles.StepBtn}
@@ -77,7 +79,25 @@ const PreviousStep = ({id, navigation}) => {
   );
 };
 function Step({route, navigation}) {
-  step1.courses.forEach(function (data) {
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('object', navigation);
+      const onBackPress = () => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.reset({
+            routes: [{name: 'Home'}],
+          });
+        }
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
+  steps.courses.forEach(function (data) {
     console.log('stepData', data);
   });
   console.log(navigation);
@@ -107,20 +127,30 @@ function Step({route, navigation}) {
           you're experiencing, Emotional awareness helps us know what we need
           and want or don't want. It helps us build better relationships
         </Text>
-        {step1.courses.map((stepdata, index) => (
-          <View key={index} style={StepStyles.stepBtns}>
-            {stepdata.map((course) => (
-              <StepBtn
-                navigation={navigation}
-                id={course.id}
-                key={course.id}
-                name={course.name}
-                courseimage={course.img}
-                data={course}
-              />
-            ))}
-          </View>
-        ))}
+        {/* <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+          <Text style={{width: '50%', height: 50, backgroundColor: '#fff'}}>
+            1
+          </Text>
+          <Text style={{width: '50%', height: 50, backgroundColor: '#fff'}}>
+            1
+          </Text>
+          <Text style={{width: '50%', height: 50, backgroundColor: '#fff'}}>
+            1
+          </Text>
+        </View> */}
+
+        <View style={StepStyles.stepBtns}>
+          {steps.courses.map((course, index) => (
+            <StepBtn
+              navigation={navigation}
+              id={course.id}
+              key={course.id}
+              name={course.name}
+              courseimage={course.img}
+              data={course}
+            />
+          ))}
+        </View>
         <View style={StepStyles.footer}>
           {id !== 1 ? (
             <PreviousStep id={id} navigation={navigation} />
@@ -171,14 +201,18 @@ const StepStyles = StyleSheet.create({
     marginBottom: 10,
   },
   stepBtns: {
+    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 30,
+    flexWrap: 'wrap',
   },
   StepBtn: {
     alignItems: 'center',
-    width: '50%',
-    height: '100%',
+    width: sizes.ITEM_WIDTH * 1.65,
+    // width: sizes.width,
+    height: sizes.ITEM_HEIGHT * 1.2,
+    flexGrow: 1,
   },
   StepBtnBody: {
     backgroundColor: '#fff',
@@ -197,7 +231,7 @@ const StepStyles = StyleSheet.create({
   },
   courses: {},
   courseImg: {
-    width: sizes.ITEM_WIDTH * 1.6,
+    width: sizes.ITEM_WIDTH * 1.65,
     height: sizes.ITEM_WIDTH,
     borderRadius: 20,
   },
