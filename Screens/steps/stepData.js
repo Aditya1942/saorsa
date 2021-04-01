@@ -2,6 +2,7 @@ export const steps = {
   id: '1',
   name: 'STEP 1',
   title: 'EMOTIONAL AWARENESS',
+
   headingText:
     "Emotional awareness is essentially being able to identify the emotions you're experiencing, Emotional awareness helps us know what we need and want or don't want. It helps us build better relationships",
   courses: [

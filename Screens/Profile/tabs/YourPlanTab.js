@@ -24,6 +24,7 @@ const BigBox = ({title, body, footer}) => {
     </View>
   );
 };
+
 export const YourPlanTab = () => {
   const [boxData, setBoxData] = useState([
     {
@@ -135,7 +136,7 @@ const YourPlanTabStyle = StyleSheet.create({
 
   // content small box
   smallBoxContainer: {
-    height: 165,
+    // height: 165,
     flexDirection: 'row',
   },
   smallBox: {
@@ -158,11 +159,12 @@ const YourPlanTabStyle = StyleSheet.create({
   },
   smallBoxbody: {
     marginTop: 5,
-    textAlign: 'left',
-    fontSize: 11,
+    textAlign: 'center',
+    fontSize: 12,
+    color: 'black',
     flex: 1,
     lineHeight: 13,
-    fontFamily: 'AvenirLTStd-Book',
+    // fontFamily: 'AvenirLTStd-Book',
   },
   smallBoxFooter: {
     paddingHorizontal: 5,
@@ -196,10 +198,11 @@ const YourPlanTabStyle = StyleSheet.create({
   },
   bigBoxbody: {
     marginTop: 5,
-    textAlign: 'left',
-    fontSize: 11,
+    textAlign: 'center',
+    fontSize: 12,
+    color: 'black',
     lineHeight: 17,
-    fontFamily: 'AvenirLTStd-Book',
+    // fontFamily: 'AvenirLTStd-Book',
   },
   bigBoxFooter: {
     paddingHorizontal: 5,

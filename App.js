@@ -17,6 +17,9 @@ import {getUserAuthToken, storetUserProfileData} from './Screens/Auth/auth';
 import Step from './Screens/steps/Step';
 import StepCourse from './Screens/steps/StepCourse';
 import PlayerScreen from './Screens/steps/Player';
+import {useFocusEffect} from '@react-navigation/core';
+import {BackHandler} from 'react-native';
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -57,26 +60,34 @@ const HomeStackScreen = () => {
   );
 };
 const CustomeTab = ({navigation}) => {
-  const [loginToken, setloginToken] = useState('');
-  getUserAuthToken().then((token) => {
-    setloginToken(token);
-    axios({
-      method: 'get',
-      url: '/api/profile/me',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token,
-      },
-    })
-      .then(({data}) => {
-        storetUserProfileData(data);
-      })
-      .catch((err) => {});
-    console.log('token', token);
-  });
-  useEffect(() => {
-    if (!loginToken) navigation.navigate('Login');
-  }, [loginToken]);
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('main stack');
+      getUserAuthToken().then((token) => {
+        console.log('From Home', token);
+        if (!token) navigation.replace('Login');
+        axios({
+          method: 'get',
+          url: '/api/profile/me',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
+        })
+          .then(({data}) => {
+            storetUserProfileData(data);
+          })
+          .catch((err) => {});
+      });
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   return (
     <Tab.Navigator
@@ -101,11 +112,10 @@ const CustomeTab = ({navigation}) => {
   );
 };
 
-const MainStack = () => {
-  const [loginToken, setloginToken] = useState('lol');
+const MainStack = ({navigation}) => {
   return (
     <Stack.Navigator
-      initialRouteName={loginToken ? 'AppDrawer' : 'Login'}
+      initialRouteName={'AppDrawer'}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="AppDrawer" component={AppDrawer} />
       <Stack.Screen name="CustomeTab" component={CustomeTab} />

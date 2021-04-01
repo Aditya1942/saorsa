@@ -136,7 +136,7 @@ const Course = ({title, audio, navigation, img, description}) => {
       ))}
       <Text style={StepCourseStyles.description}>{description}</Text>
       <View style={{paddingHorizontal: 10}}>
-        <FastImage style={StepCourseStyles.picture} source={img} />
+        <FastImage style={StepCourseStyles.picture} source={{uri: img}} />
       </View>
     </View>
   );
@@ -169,7 +169,9 @@ const StepCourse = ({route, navigation}) => {
         flex: 1,
         backgroundColor: colors.primary,
       }}>
-      <ImageBackground source={data.img} style={StepCourseStyles.headerImg}>
+      <ImageBackground
+        source={{uri: data.img}}
+        style={StepCourseStyles.headerImg}>
         <View style={StepCourseStyles.header}>
           <Header navigation={navigation} />
         </View>

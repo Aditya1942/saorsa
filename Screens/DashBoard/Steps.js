@@ -1,12 +1,42 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {TouchableHighlight} from 'react-native';
 import {View, Text, FlatList, Image, StyleSheet} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {colors, sizes, coursesImages} from '../../Constants';
+import {getUserAuthToken} from '../Auth/auth';
+import axios from '../Auth/axios';
 
 const Steps = ({navigation}) => {
-  console.log('navigation');
+  const setStepData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem('@StepData', jsonValue);
+    } catch (e) {
+      // saving error
+      throw e;
+    }
+  };
+  useEffect(() => {
+    getUserAuthToken().then((token) => {
+      console.log('From Home', token);
+      if (!token) navigation.navigate('Login');
+      axios({
+        method: 'get',
+        url: '/api/step',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+      })
+        .then(({data}) => {
+          console.log(data);
+          setStepData(data);
+        })
+        .catch((err) => {});
+    });
+  }, []);
   return (
     <FlatList
       data={coursesImages}
@@ -24,8 +54,8 @@ const Steps = ({navigation}) => {
             onPress={() => {
               navigation.navigate('Step', {
                 id: index + 1,
-                step: item.id,
-                title: item.title,
+                index: index,
+                stepName: item.id,
               });
             }}>
             <View style={styles.courseItems}>

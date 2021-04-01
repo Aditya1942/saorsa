@@ -7,9 +7,6 @@ import {
   TouchableOpacity,
   TouchableHighlight,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Header from '../Components/Header';
-import {colors, sizes, MoodImgs} from '../Constants';
 import {
   Menu,
   MenuOptions,
@@ -18,14 +15,19 @@ import {
   renderers,
   MenuProvider,
 } from 'react-native-popup-menu';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import Header from '../Components/Header';
+import {colors, sizes, MoodImgs} from '../Constants';
 import FastImage from 'react-native-fast-image';
 import {BackHandler} from 'react-native';
 import {getUserAuthToken, getUserProfileData} from './Auth/auth';
 import axios from './Auth/axios';
 import {useFocusEffect} from '@react-navigation/core';
+
 const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
   const {ContextMenu, SlideInMenu, Popover} = renderers;
   const [openMenu, setopenMenu] = useState(false);
+  // backpress
   useFocusEffect(
     React.useCallback(() => {
       console.log('object', navigation);
@@ -46,6 +48,7 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [openMenu]),
   );
+  // this function will run when user add new mood
   const handleUpdateMoodStatus = (mood, rating) => {
     axios({
       method: 'post',
@@ -59,15 +62,19 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
         'Content-Type': 'application/json',
         'x-auth-token': loginToken,
       },
-    }).then(({data}) => {
-      if (data.errors) {
-        alert(data.errors[0].msg);
-      } else {
-        console.log('data', data);
-        update();
-        // alert(data);
-      }
-    });
+    })
+      .then(({data}) => {
+        if (data.errors) {
+          alert(data.errors[0].msg);
+        } else {
+          console.log('data', data);
+          // this update fun will send update req to parent component
+          update();
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
     console.log(mood, rating, loginToken);
     setopenMenu(false);
   };
@@ -78,7 +85,11 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
       opened={openMenu}
       onBackdropPress={() => setopenMenu(false)}
       onSelect={(value) => {
-        handleUpdateMoodStatus(name, value);
+        try {
+          handleUpdateMoodStatus(name, value);
+        } catch (error) {
+          console.log(error);
+        }
       }}>
       <MenuTrigger
         children={
@@ -145,6 +156,44 @@ const Moodtracker = ({navigation}) => {
     '',
   );
   const setTriggerMoodUpdateFromMainFun = async () => {
+    function formatDate(date) {
+      let day = date.getDate();
+      if (day === 1) {
+        day = day + 'st';
+      } else if (day === 2) {
+        day = day + 'nd';
+      } else if (day === 3) {
+        day = day + 'rd';
+      } else {
+        day = day + 'th';
+      }
+      var month_names_short = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+
+      const options = {month: 'short'};
+
+      let month = month_names_short[date.getMonth()];
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var ampm = hours >= 12 ? 'pm' : 'am';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      var strTime = hours + ':' + minutes + ampm;
+      return day + ' ' + month + ' ' + strTime;
+    }
     await axios({
       method: 'get',
       url: 'api/mood/all',
@@ -153,45 +202,8 @@ const Moodtracker = ({navigation}) => {
         'x-auth-token': loginToken,
       },
     }).then(({data}) => {
-      function formatDate(date) {
-        let day = date.getDate();
-        if (day === 1) {
-          day = day + 'st';
-        } else if (day === 2) {
-          day = day + 'nd';
-        } else if (day === 3) {
-          day = day + 'rd';
-        } else {
-          day = day + 'th';
-        }
-        var month_names_short = [
-          'Jan',
-          'Feb',
-          'Mar',
-          'Apr',
-          'May',
-          'Jun',
-          'Jul',
-          'Aug',
-          'Sep',
-          'Oct',
-          'Nov',
-          'Dec',
-        ];
+      // format date
 
-        const options = {month: 'short'};
-
-        let month = month_names_short[date.getMonth()];
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        var ampm = hours >= 12 ? 'pm' : 'am';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        var strTime = hours + ':' + minutes + ampm;
-        return day + ' ' + month + ' ' + strTime;
-      }
-      console.log('data', data);
       var moodDateAndTime = new Array();
       try {
         // add only last two mood history
@@ -199,6 +211,7 @@ const Moodtracker = ({navigation}) => {
           var dateObject = new Date(data[data.length - i].date);
           // format date according
           let dateAndTime = formatDate(dateObject);
+          // date object
           let moodDateAndTimeObject = {
             id: data[data.length - i]._id,
             moodType: data[data.length - i].mood.toUpperCase(),
@@ -259,7 +272,11 @@ const Moodtracker = ({navigation}) => {
                 ))}
               </View>
             ))}
-            <TouchableOpacity activeOpacity={0.5}>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={() => {
+                navigation.navigate('Profile');
+              }}>
               <View style={MoodTrackerStyle.moodChart}>
                 <View style={MoodTrackerStyle.MoodInfoMain}>
                   <Text style={MoodTrackerStyle.ChartInfoHeading}>
@@ -274,7 +291,7 @@ const Moodtracker = ({navigation}) => {
                   </View>
                 </View>
                 <View style={MoodTrackerStyle.MoodInfoChart}>
-                  <Text>Chart</Text>
+                  {/* <Text>Chart</Text> */}
                 </View>
               </View>
             </TouchableOpacity>

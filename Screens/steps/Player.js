@@ -51,6 +51,7 @@ export default class PlayerScreen extends React.Component {
     }, 100);
   }
   componentWillUnmount() {
+    this.pause;
     if (this.sound) {
       this.sound.release();
       this.sound = null;

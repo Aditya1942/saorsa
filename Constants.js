@@ -107,31 +107,37 @@ export const MoodImgs = [
 export const coursesImages = [
   {
     id: 'Step 1',
+    name: 'Step 1',
     title: 'Emotional Awareness',
     img: require('./assets/New/s1.jpg'),
   },
   {
     id: 'Step 2',
+    name: 'Step 2',
     title: 'Managing Uncertainty,Worry & Anxiety',
     img: require('./assets/New/s2.jpg'),
   },
   {
     id: 'Step 3',
+    name: 'Step 3',
     title: 'Learning to Self Soothe',
     img: require('./assets/New/s3.jpg'),
   },
   {
     id: 'Step 4',
+    name: 'Step 4',
     title: 'Changing Unhealthy Behaviour',
     img: require('./assets/New/s4.jpg'),
   },
   {
     id: 'Step 5',
+    name: 'Step 5',
     title: 'Sleep Better',
     img: require('./assets/New/s5.jpg'),
   },
   {
     id: 'Step 6',
+    name: 'Step 6',
     title: 'Create your own emotional Wellbeing Plan',
     img: require('./assets/New/s6.jpg'),
   },

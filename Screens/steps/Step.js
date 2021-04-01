@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   BackHandler,
   ImageBackground,
@@ -8,14 +8,123 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from 'react-native';
 import Header from '../../Components/Header';
 import FastImage from 'react-native-fast-image';
 import {colors, sizes, coursesImages} from '../../Constants';
-import {Image} from 'react-native-elements';
 import {steps} from './stepData.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useFocusEffect} from '@react-navigation/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from '../Auth/axios';
+
+function Step({route, navigation}) {
+  const [StepData, setStepData] = useState([]);
+  const {stepName, id, index} = route.params;
+  const getStepData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@StepData');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      console.log('axios'.data);
+      // error reading value
+      throw e;
+    }
+  };
+  useFocusEffect(
+    React.useCallback(() => {
+      getStepData()
+        .then((data) => {
+          setStepData(data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+
+      const onBackPress = () => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.reset({
+            routes: [{name: 'Home'}],
+          });
+        }
+        return true;
+        console.log('route', stepName);
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
+  useEffect(() => {}, []);
+
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: colors.primary,
+      }}>
+      {/* require('../../assets/Steps/step1/header.png') */}
+      <ImageBackground
+        source={{uri: StepData[index]?.image}}
+        style={StepStyles.headerImg}>
+        <View style={StepStyles.header}>
+          <Header navigation={navigation} />
+        </View>
+        <View style={StepStyles.headerText}>
+          <Text style={StepStyles.title}>{StepData[index]?.name}</Text>
+          <Text style={StepStyles.title2}>{StepData[index]?.title}</Text>
+        </View>
+      </ImageBackground>
+      <ScrollView style={StepStyles.body}>
+        <Text style={StepStyles.bodyTitles}>
+          {StepData[index]?.headingText}
+        </Text>
+
+        <View style={StepStyles.stepBtns}>
+          {StepData[index]?.courses.map((course, index) => (
+            <StepBtn
+              navigation={navigation}
+              key={course._id}
+              id={course.id}
+              name={course.name}
+              courseimage={course.img}
+              data={course}
+            />
+          ))}
+        </View>
+        <View style={StepStyles.footer}>
+          {id !== 1 ? (
+            <PreviousStep
+              navigationData={{
+                id: index,
+                index: index - 1,
+                stepName: StepData[index - 1]?.name,
+              }}
+              navigation={navigation}
+            />
+          ) : (
+            <View />
+          )}
+          {id !== 6 ? (
+            <NextStep
+              navigationData={{
+                id: index + 2,
+                index: index + 1,
+                stepName: StepData[index + 1]?.name,
+              }}
+              navigation={navigation}
+            />
+          ) : (
+            <View />
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
 
 export const StepBtn = ({courseimage, name, id, navigation, data}) => {
   return (
@@ -30,23 +139,18 @@ export const StepBtn = ({courseimage, name, id, navigation, data}) => {
       }}>
       <View>
         <View style={StepStyles.StepBtnBody}>
-          <FastImage style={StepStyles.courseImg} source={courseimage} />
+          <FastImage style={StepStyles.courseImg} source={{uri: courseimage}} />
           <Text style={StepStyles.StepBtnText}>{name}</Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 };
-const NextStep = ({id, navigation}) => {
+const NextStep = ({navigationData, navigation}) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('Step', {
-          id: id + 1,
-          step: coursesImages[id].id,
-          title: coursesImages[id].title,
-        });
-        console.log(coursesImages[id]);
+        navigation.navigate('Step', navigationData);
       }}>
       <View style={StepStyles.nextStep}>
         <Text style={StepStyles.nextStepText}>
@@ -57,17 +161,11 @@ const NextStep = ({id, navigation}) => {
     </TouchableOpacity>
   );
 };
-const PreviousStep = ({id, navigation}) => {
-  var previousId = id - 2;
-  console.log(coursesImages[previousId]);
+const PreviousStep = ({navigationData, navigation}) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('Step', {
-          id: id - 1,
-          step: coursesImages[previousId].id,
-          title: coursesImages[previousId].title,
-        });
+        navigation.navigate('Step', navigationData);
       }}>
       <View style={StepStyles.PreviousStep}>
         <Text style={StepStyles.PreviousStepText}>
@@ -78,91 +176,6 @@ const PreviousStep = ({id, navigation}) => {
     </TouchableOpacity>
   );
 };
-function Step({route, navigation}) {
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log('object', navigation);
-      const onBackPress = () => {
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        } else {
-          navigation.reset({
-            routes: [{name: 'Home'}],
-          });
-        }
-        return true;
-      };
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
-  );
-  steps.courses.forEach(function (data) {
-    console.log('stepData', data);
-  });
-  console.log(navigation);
-  const {step, title, id} = route.params;
-  console.log('route', id);
-
-  return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: colors.primary,
-      }}>
-      <ImageBackground
-        source={require('../../assets/Steps/step1/header.png')}
-        style={StepStyles.headerImg}>
-        <View style={StepStyles.header}>
-          <Header navigation={navigation} />
-        </View>
-        <View style={StepStyles.headerText}>
-          <Text style={StepStyles.title}>{step}</Text>
-          <Text style={StepStyles.title2}>{title}</Text>
-        </View>
-      </ImageBackground>
-      <ScrollView style={StepStyles.body}>
-        <Text style={StepStyles.bodyTitles}>
-          Emotional awareness is essentially being able to identify the emotions
-          you're experiencing, Emotional awareness helps us know what we need
-          and want or don't want. It helps us build better relationships
-        </Text>
-        {/* <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-          <Text style={{width: '50%', height: 50, backgroundColor: '#fff'}}>
-            1
-          </Text>
-          <Text style={{width: '50%', height: 50, backgroundColor: '#fff'}}>
-            1
-          </Text>
-          <Text style={{width: '50%', height: 50, backgroundColor: '#fff'}}>
-            1
-          </Text>
-        </View> */}
-
-        <View style={StepStyles.stepBtns}>
-          {steps.courses.map((course, index) => (
-            <StepBtn
-              navigation={navigation}
-              id={course.id}
-              key={course.id}
-              name={course.name}
-              courseimage={course.img}
-              data={course}
-            />
-          ))}
-        </View>
-        <View style={StepStyles.footer}>
-          {id !== 1 ? (
-            <PreviousStep id={id} navigation={navigation} />
-          ) : (
-            <View />
-          )}
-          {id !== 6 ? <NextStep id={id} navigation={navigation} /> : <View />}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
 
 export default Step;
 
