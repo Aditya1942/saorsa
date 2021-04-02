@@ -15,7 +15,13 @@ import axios from './axios';
 import {useFocusEffect} from '@react-navigation/core';
 import {TextInput} from 'react-native-paper';
 import {KeyboardAvoidingView} from 'react-native';
-
+import {
+  LoginButton,
+  AccessToken,
+  LoginManager,
+  GraphRequest,
+  GraphRequestManager,
+} from 'react-native-fbsdk';
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -93,6 +99,16 @@ const Login = ({navigation}) => {
       })
       .catch((err) => {});
   }, []);
+  //Create response callback.
+  const _responseInfoCallback = (error, result) => {
+    if (error) {
+      alert('Error fetching data: ' + error.toString());
+    } else {
+      // alert('Result Name: ' + result.name);
+      console.log(result);
+    }
+  };
+
   const passwordRef = useRef();
   return (
     <View style={loginStyle.container}>
@@ -185,7 +201,43 @@ const Login = ({navigation}) => {
               }}
               onPress={handleLogin}
             />
+
             <Button
+              onPress={() => {
+                LoginManager.logInWithPermissions(['public_profile']).then(
+                  function (result) {
+                    if (result.isCancelled) {
+                      console.log('Login cancelled');
+                    } else {
+                      AccessToken.getCurrentAccessToken().then((data) => {
+                        let {accessToken} = data;
+                        console.log(data);
+                        let PROFILE_REQUEST_PARAMS = {
+                          fields: {
+                            string: 'name,email',
+                          },
+                        };
+                        const infoRequest = new GraphRequest(
+                          '/me?fields=email',
+                          {accessToken},
+                          _responseInfoCallback,
+                        );
+                        // Start the graph request.
+                        new GraphRequestManager()
+                          .addRequest(infoRequest)
+                          .start();
+                      });
+                      console.log(
+                        'Login success with permissions: ' +
+                          result.grantedPermissions.toString(),
+                      );
+                    }
+                  },
+                  function (error) {
+                    console.log('Login fail with error: ' + error);
+                  },
+                );
+              }}
               title="CONNECT WITH FACEBOOK"
               titleStyle={{color: 'black'}}
               buttonStyle={{backgroundColor: '#fff'}}
@@ -197,9 +249,6 @@ const Login = ({navigation}) => {
                 marginTop: 20,
                 color: 'black',
               }}
-              onPress={() => {
-                alert('Login with fb');
-              }}
               icon={
                 <Icon
                   name="facebook-square"
@@ -208,6 +257,12 @@ const Login = ({navigation}) => {
                   color={colors.primary}
                 />
               }
+            />
+            <Button
+              title="Logout"
+              onPress={() => {
+                LoginManager.logOut();
+              }}
             />
           </View>
         </KeyboardAvoidingView>
