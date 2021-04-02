@@ -90,7 +90,6 @@ const Register = ({navigation}) => {
               clearButtonMode={'while-editing'}
               returnKeyLabel={'next'}
               returnKeyType={'next'}
-              secureTextEntry={true}
               onSubmitEditing={() => {
                 emailRef.current.focus();
               }}

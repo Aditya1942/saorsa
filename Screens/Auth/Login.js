@@ -37,10 +37,22 @@ const Login = ({navigation}) => {
         // make a profile for user
         if (data.errors) {
           seterror(data.errors[0].msg);
-        } else {
-          console.log(data.token);
-          setLoginToken(data.token);
-          storeUserAuthToken(data.token).then(() => {
+        }
+        if (!data.token) {
+          axios({
+            method: 'post',
+            url: '/api/user/resend',
+            data: {
+              email: email,
+              password: password,
+            },
+            headers: {'Content-Type': 'application/json'},
+          }).then(() => {
+            seterror('This email is not verified. Please Check your email');
+          });
+        } else if (data.token) {
+          setLoginToken(data?.token);
+          storeUserAuthToken(data?.token).then(() => {
             navigation.reset({
               routes: [{name: 'AppDrawer'}],
             });
@@ -55,7 +67,7 @@ const Login = ({navigation}) => {
     React.useCallback(() => {
       axios({
         method: 'get',
-        url: 'https://mighty-bastion-04883.herokuapp.com/api/step',
+        url: '/api/step',
       })
         .then((data) => {
           console.log(data);
