@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "645452951437",
+    "project_id": "saorsa-36a1e",
+    "storage_bucket": "saorsa-36a1e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645452951437:android:534817464610739b6a17c4",
+        "android_client_info": {
+          "package_name": "com.saorsa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645452951437-4822qslv7eev4bnu4dfudv52kv1tfuak.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMeHi9QM88dN0yTdyiTGZMY-4x42-UuuM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645452951437-4822qslv7eev4bnu4dfudv52kv1tfuak.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

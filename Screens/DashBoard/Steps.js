@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {TouchableHighlight} from 'react-native';
 import {View, Text, FlatList, Image, StyleSheet} from 'react-native';
@@ -9,6 +9,7 @@ import {getUserAuthToken} from '../Auth/auth';
 import axios from '../Auth/axios';
 
 const Steps = ({navigation}) => {
+  const [stepDataLoaded, setstepDataLoaded] = useState(false);
   const setStepData = async (value) => {
     try {
       const jsonValue = JSON.stringify(value);
@@ -19,23 +20,26 @@ const Steps = ({navigation}) => {
     }
   };
   useEffect(() => {
-    getUserAuthToken().then((token) => {
-      console.log('From Home', token);
-      if (!token) navigation.navigate('Login');
-      axios({
-        method: 'get',
-        url: '/api/step',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token,
-        },
-      })
-        .then(({data}) => {
-          console.log(data);
-          setStepData(data);
+    setTimeout(() => {
+      getUserAuthToken().then((token) => {
+        console.log('From Home', token);
+        if (!token) navigation.navigate('Login');
+        axios({
+          method: 'get',
+          url: '/api/step',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
         })
-        .catch((err) => {});
-    });
+          .then(({data}) => {
+            console.log(data);
+            setStepData(data);
+          })
+          .catch((err) => {});
+      });
+      setstepDataLoaded(true);
+    }, 1000);
   }, []);
   return (
     <FlatList
@@ -52,11 +56,13 @@ const Steps = ({navigation}) => {
         return (
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('Step', {
-                id: index + 1,
-                index: index,
-                stepName: item.id,
-              });
+              if (stepDataLoaded) {
+                navigation.navigate('Step', {
+                  id: index + 1,
+                  index: index,
+                  stepName: item.id,
+                });
+              }
             }}>
             <View style={styles.courseItems}>
               <FastImage

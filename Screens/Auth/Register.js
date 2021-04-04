@@ -13,7 +13,13 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {colors, sizes} from '../../Constants';
 import {getUserAuthToken, storeUserAuthToken} from './auth';
 import axios from './axios';
-
+import {
+  AccessToken,
+  LoginManager,
+  GraphRequest,
+  GraphRequestManager,
+} from 'react-native-fbsdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Register = ({navigation}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -30,16 +36,13 @@ const Register = ({navigation}) => {
       data: {name: name, email: email, password: password},
       headers: {'Content-Type': 'application/json'},
     })
-      .then(({data}) => {
+      .then((result) => {
+        console.log(result);
+        const {data} = result;
         if (data.errors) {
           seterror(data.errors[0].msg);
         } else {
-          setLoginToken(data.token);
-          storeUserAuthToken(data.token).then(() => {
-            navigation.reset({
-              routes: [{name: 'AppDrawer'}],
-            });
-          });
+          alert('Verification email is sent');
         }
       })
       .catch((err) => {
@@ -57,6 +60,87 @@ const Register = ({navigation}) => {
       })
       .catch((err) => {});
   }, []);
+  const storeFbLogin = (fbData, email, name) => {
+    axios({
+      method: 'post',
+      url: '/api/user/social',
+      data: {
+        name: name,
+        email: email,
+        confirmed: true,
+      },
+      headers: {'Content-Type': 'application/json'},
+    }).then(async ({data}) => {
+      // body of the function
+      try {
+        const jsonValue = JSON.stringify(fbData);
+        await AsyncStorage.setItem('@userFbInfo', jsonValue);
+        console.log('successfully');
+        console.log(data);
+        setLoginToken(data?.token);
+        storeUserAuthToken(data?.token).then(() => {
+          navigation.reset({
+            routes: [{name: 'AppDrawer'}],
+          });
+        });
+      } catch (e) {
+        // saving error
+        throw e;
+      }
+    });
+  };
+
+  const HandleFbLogin = () => {
+    LoginManager.logInWithPermissions(['public_profile', 'email']).then(
+      function (result) {
+        if (result.isCancelled) {
+          console.log('Login cancelled');
+        } else {
+          console.log(
+            'Login success with permissions: ' +
+              result.grantedPermissions.toString(),
+          );
+          AccessToken.getCurrentAccessToken().then((data) => {
+            let {accessToken} = data;
+            console.log(data);
+            let PROFILE_REQUEST_PARAMS = {
+              fields: {
+                string: 'name,email,profile_picture',
+              },
+            };
+            const infoRequest = new GraphRequest(
+              '/me?fields=email,name,picture',
+              {
+                accessToken: accessToken,
+                parameters: {
+                  fields: {
+                    string: 'email,name,picture.height(480)',
+                  },
+                },
+              },
+              _responseInfoCallback,
+            );
+            // Start the graph request.
+            new GraphRequestManager().addRequest(infoRequest).start();
+          });
+        }
+      },
+      function (error) {
+        console.log('Login fail with error: ' + error);
+      },
+    );
+  };
+
+  const _responseInfoCallback = (error, result) => {
+    if (error) {
+      console.log(error);
+    } else {
+      // alert('Result Name: ' + result.name);
+      console.log(result);
+      storeFbLogin(result, result.email, result.name);
+    }
+  };
+
   const emailRef = useRef();
   const passwordRef = useRef();
   return (
@@ -187,7 +271,7 @@ const Register = ({navigation}) => {
                 color: 'black',
               }}
               onPress={() => {
-                alert('Login with fb');
+                HandleFbLogin();
               }}
               icon={
                 <Icon

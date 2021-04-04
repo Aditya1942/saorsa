@@ -22,11 +22,43 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginToken, setLoginToken] = useState('');
   const [error, seterror] = useState('');
+  const passwordRef = useRef();
+
+  const storeFbLogin = (fbData, email, name) => {
+    axios({
+      method: 'post',
+      url: '/api/user/social',
+      data: {
+        name: name,
+        email: email,
+        confirmed: true,
+      },
+      headers: {'Content-Type': 'application/json'},
+    }).then(async ({data}) => {
+      // body of the function
+      try {
+        const jsonValue = JSON.stringify(fbData);
+        await AsyncStorage.setItem('@userFbInfo', jsonValue);
+        console.log('successfully');
+        console.log(data);
+        setLoginToken(data?.token);
+        storeUserAuthToken(data?.token).then(() => {
+          navigation.reset({
+            routes: [{name: 'AppDrawer'}],
+          });
+        });
+      } catch (e) {
+        // saving error
+        throw e;
+      }
+    });
+  };
 
   const handleLogin = () => {
     console.log(email, password);
@@ -100,16 +132,59 @@ const Login = ({navigation}) => {
       .catch((err) => {});
   }, []);
   //Create response callback.
+
+  // login with facebook
+  const HandleFbLogin = () => {
+    LoginManager.logInWithPermissions(['public_profile', 'email']).then(
+      function (result) {
+        if (result.isCancelled) {
+          console.log('Login cancelled');
+        } else {
+          console.log(
+            'Login success with permissions: ' +
+              result.grantedPermissions.toString(),
+          );
+          AccessToken.getCurrentAccessToken().then((data) => {
+            let {accessToken} = data;
+            console.log(data);
+            let PROFILE_REQUEST_PARAMS = {
+              fields: {
+                string: 'name,email,profile_picture',
+              },
+            };
+            const infoRequest = new GraphRequest(
+              '/me?fields=email,name,picture',
+              {
+                accessToken: accessToken,
+                parameters: {
+                  fields: {
+                    string: 'email,name,picture.height(480)',
+                  },
+                },
+              },
+              _responseInfoCallback,
+            );
+            // Start the graph request.
+            new GraphRequestManager().addRequest(infoRequest).start();
+          });
+        }
+      },
+      function (error) {
+        console.log('Login fail with error: ' + error);
+      },
+    );
+  };
+
   const _responseInfoCallback = (error, result) => {
     if (error) {
-      alert('Error fetching data: ' + error.toString());
+      console.log(error);
     } else {
       // alert('Result Name: ' + result.name);
       console.log(result);
+      storeFbLogin(result, result.email, result.name);
     }
   };
 
-  const passwordRef = useRef();
   return (
     <View style={loginStyle.container}>
       <View style={loginStyle.body}>
@@ -204,39 +279,7 @@ const Login = ({navigation}) => {
 
             <Button
               onPress={() => {
-                LoginManager.logInWithPermissions(['public_profile']).then(
-                  function (result) {
-                    if (result.isCancelled) {
-                      console.log('Login cancelled');
-                    } else {
-                      AccessToken.getCurrentAccessToken().then((data) => {
-                        let {accessToken} = data;
-                        console.log(data);
-                        let PROFILE_REQUEST_PARAMS = {
-                          fields: {
-                            string: 'name,email',
-                          },
-                        };
-                        const infoRequest = new GraphRequest(
-                          '/me?fields=email',
-                          {accessToken},
-                          _responseInfoCallback,
-                        );
-                        // Start the graph request.
-                        new GraphRequestManager()
-                          .addRequest(infoRequest)
-                          .start();
-                      });
-                      console.log(
-                        'Login success with permissions: ' +
-                          result.grantedPermissions.toString(),
-                      );
-                    }
-                  },
-                  function (error) {
-                    console.log('Login fail with error: ' + error);
-                  },
-                );
+                HandleFbLogin();
               }}
               title="CONNECT WITH FACEBOOK"
               titleStyle={{color: 'black'}}
@@ -257,12 +300,6 @@ const Login = ({navigation}) => {
                   color={colors.primary}
                 />
               }
-            />
-            <Button
-              title="Logout"
-              onPress={() => {
-                LoginManager.logOut();
-              }}
             />
           </View>
         </KeyboardAvoidingView>
