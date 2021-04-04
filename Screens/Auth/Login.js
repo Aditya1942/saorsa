@@ -23,14 +23,28 @@ import {
   GraphRequestManager,
 } from 'react-native-fbsdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginToken, setLoginToken] = useState('');
   const [error, seterror] = useState('');
   const passwordRef = useRef();
+  // login with google
+  async function onGoogleButtonPress() {
+    // Get the users ID token
+    const {idToken} = await GoogleSignin.signIn();
 
-  const storeFbLogin = (fbData, email, name) => {
+    // Create a Google credential with the token
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+    // Sign-in the user with the credential
+    return auth().signInWithCredential(googleCredential);
+  }
+  // add login details in database from social login
+  const storeSoclialLogin = (fbData, email, name) => {
     axios({
       method: 'post',
       url: '/api/user/social',
@@ -59,7 +73,7 @@ const Login = ({navigation}) => {
       }
     });
   };
-
+  // login with email and password
   const handleLogin = () => {
     console.log(email, password);
     axios({
@@ -75,8 +89,7 @@ const Login = ({navigation}) => {
         // make a profile for user
         if (data.errors) {
           seterror(data.errors[0].msg);
-        }
-        if (!data.token) {
+        } else if (!data.token) {
           axios({
             method: 'post',
             url: '/api/user/resend',
@@ -101,38 +114,6 @@ const Login = ({navigation}) => {
         console.log(err);
       });
   };
-  useFocusEffect(
-    React.useCallback(() => {
-      axios({
-        method: 'get',
-        url: '/api/step',
-      })
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((err) => console.log('err', err));
-      const onBackPress = () => {
-        BackHandler.exitApp();
-        return true;
-      };
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
-  );
-  useEffect(() => {
-    getUserAuthToken()
-      .then((token) => {
-        if (token) {
-          navigation.reset({
-            routes: [{name: 'AppDrawer'}],
-          });
-        }
-      })
-      .catch((err) => {});
-  }, []);
-  //Create response callback.
-
   // login with facebook
   const HandleFbLogin = () => {
     LoginManager.logInWithPermissions(['public_profile', 'email']).then(
@@ -174,17 +155,46 @@ const Login = ({navigation}) => {
       },
     );
   };
-
-  const _responseInfoCallback = (error, result) => {
+  // get data from after login facebook
+  function _responseInfoCallback(error, result) {
     if (error) {
       console.log(error);
     } else {
       // alert('Result Name: ' + result.name);
       console.log(result);
-      storeFbLogin(result, result.email, result.name);
+      storeSoclialLogin(result, result.email, result.name);
     }
-  };
-
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      axios({
+        method: 'get',
+        url: '/api/step',
+      })
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err) => console.log('err', err));
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
+  useEffect(() => {
+    getUserAuthToken()
+      .then((token) => {
+        if (token) {
+          navigation.reset({
+            routes: [{name: 'AppDrawer'}],
+          });
+        }
+      })
+      .catch((err) => {});
+  }, []);
   return (
     <View style={loginStyle.container}>
       <View style={loginStyle.body}>
@@ -301,6 +311,37 @@ const Login = ({navigation}) => {
                 />
               }
             />
+
+            <Button
+              onPress={() => {
+                onGoogleButtonPress().then((data) => {
+                  const {additionalUserInfo} = data;
+                  const email = additionalUserInfo.profile.email;
+                  const name = additionalUserInfo.profile.name;
+                  console.log(email, name);
+                  storeSoclialLogin(data, email, name);
+                });
+              }}
+              title="SIGN IN WITH GOOGLE"
+              titleStyle={{color: 'black'}}
+              buttonStyle={{backgroundColor: '#fff'}}
+              mode="outlined
+            "
+              containerStyle={{
+                width: sizes.ITEM_WIDTH * 2.7,
+                borderRadius: 10,
+                marginTop: 20,
+                color: 'black',
+              }}
+              icon={
+                <Icon
+                  name="google"
+                  style={{paddingHorizontal: 10}}
+                  size={24}
+                  color={'#ea4335'}
+                />
+              }
+            />
           </View>
         </KeyboardAvoidingView>
 
@@ -333,7 +374,7 @@ const loginStyle = StyleSheet.create({
     display: 'flex',
     width: sizes.width,
     padding: 10,
-    marginTop: 100,
+    marginTop: 30,
     justifyContent: 'center',
     alignItems: 'center',
     color: '#fff',

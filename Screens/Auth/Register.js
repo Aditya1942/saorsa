@@ -258,7 +258,7 @@ const Register = ({navigation}) => {
               title={`Sign Up`}
               onPress={handleRegister}
             />
-            <Button
+            {/* <Button
               title="CONNECT WITH FACEBOOK"
               titleStyle={{color: 'black'}}
               buttonStyle={{backgroundColor: '#fff'}}
@@ -281,7 +281,7 @@ const Register = ({navigation}) => {
                   color={colors.primary}
                 />
               }
-            />
+            /> */}
           </View>
         </KeyboardAvoidingView>
 

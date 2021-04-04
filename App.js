@@ -19,6 +19,7 @@ import StepCourse from './Screens/steps/StepCourse';
 import PlayerScreen from './Screens/steps/Player';
 import {useFocusEffect} from '@react-navigation/core';
 import {BackHandler} from 'react-native';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -126,6 +127,12 @@ const MainStack = ({navigation}) => {
 };
 
 export default function App() {
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '645452951437-4822qslv7eev4bnu4dfudv52kv1tfuak.apps.googleusercontent.com',
+    });
+  }, []);
   return (
     <NavigationContainer>
       <MainStack />

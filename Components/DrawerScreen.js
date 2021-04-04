@@ -15,39 +15,55 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 export default function DrawerScreen({navigation}) {
   const logOut = async () => {
     await AsyncStorage.removeItem('@loginToken');
 
     var current_access_token = '';
-    AccessToken.getCurrentAccessToken()
-      .then((data) => {
-        console.log(data);
-        current_access_token = data.accessToken.toString();
-      })
-      .then(() => {
-        let logout = new GraphRequest(
-          'me/permissions/',
-          {
-            accessToken: current_access_token,
-            httpMethod: 'DELETE',
-          },
-          (error, result) => {
-            if (error) {
-              console.log('Error fetching data: ' + error.toString());
-            } else {
-              LoginManager.logOut();
-            }
-          },
-        );
-        new GraphRequestManager().addRequest(logout).start();
-      })
-      .then(() => {
-        navigation.navigate('Login');
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    console.log(LoginManager);
+    try {
+      const isSignedIn = await GoogleSignin.isSignedIn();
+      if (isSignedIn) {
+        await GoogleSignin.revokeAccess();
+        await GoogleSignin.signOut();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    try {
+      AccessToken.getCurrentAccessToken()
+        .then((data) => {
+          console.log(data);
+          current_access_token = data.accessToken.toString();
+        })
+        .then(() => {
+          let logout = new GraphRequest(
+            'me/permissions/',
+            {
+              accessToken: current_access_token,
+              httpMethod: 'DELETE',
+            },
+            (error, result) => {
+              if (error) {
+                console.log('Error fetching data: ' + error.toString());
+              } else {
+                LoginManager.logOut();
+              }
+            },
+          );
+          new GraphRequestManager().addRequest(logout).start();
+        })
+        .then(() => {
+          navigation.navigate('Login');
+        })
+        .catch((error) => {
+          console.log(error);
+          navigation.navigate('Login');
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <View style={DrawerStyle.drawerItem}>
