@@ -48,7 +48,6 @@ const Title = ({audio, titleText, navigation}) => {
       paddingLeft: 20,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'red',
       height: 10,
       marginTop: 10,
       position: 'relative',
@@ -114,7 +113,7 @@ const Course = ({title, audio, navigation, img, description}) => {
     str = str.split(' ');
     str.forEach((word, i) => {
       titleStr = titleStr.concat(word + ' ');
-      if (i === 4) {
+      if (i === 5) {
         lengthyTitle.push(titleStr);
         titleStr = '';
       }
@@ -126,15 +125,18 @@ const Course = ({title, audio, navigation, img, description}) => {
   var titles = WordCount(title);
   return (
     <View>
-      {titles.map((title, index) => (
-        <Title
-          key={index}
-          titleText={title}
-          audio={index === 0 ? audio : null}
-          navigation={navigation}
-        />
-      ))}
-      <Text style={StepCourseStyles.description}>{description}</Text>
+      {title &&
+        titles.map((titleText, index) => (
+          <Title
+            key={index}
+            titleText={titleText}
+            audio={index === 0 ? audio : null}
+            navigation={navigation}
+          />
+        ))}
+      {description && (
+        <Text style={StepCourseStyles.description}>{description}</Text>
+      )}
       <View style={{paddingHorizontal: 10}}>
         <FastImage style={StepCourseStyles.picture} source={{uri: img}} />
       </View>
@@ -218,10 +220,12 @@ const StepCourseStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   description: {
-    fontWeight: 'normal',
-    color: '#fff',
-    fontFamily: 'AvenirLTStd-Black',
-    fontSize: 25,
+    color: 'white',
+    padding: 10,
+    paddingHorizontal: 20,
+    fontFamily: sizes.fontFamily,
+    fontSize: sizes.title,
+    textAlign: 'justify',
   },
   body: {},
   audio: {
@@ -235,14 +239,7 @@ const StepCourseStyles = StyleSheet.create({
   audioText: {
     color: '#fff',
   },
-  description: {
-    color: 'white',
-    padding: 10,
-    paddingHorizontal: 20,
-    fontFamily: sizes.fontFamily,
-    fontSize: sizes.title,
-    textAlign: 'justify',
-  },
+
   picture: {
     flex: 1,
     aspectRatio: 1.2,

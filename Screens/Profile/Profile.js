@@ -11,7 +11,7 @@ import {ProgressTab} from './tabs/ProgressTab';
 import {MoodReportTab} from './tabs/MoodReportTab';
 import {YourPlanTab} from './tabs/YourPlanTab';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getUserProfileData} from '../Auth/auth';
+import {getUserProfileData, userSocialLoginInfo} from '../Auth/auth';
 import {useFocusEffect} from '@react-navigation/core';
 
 const Profile = ({navigation}) => {
@@ -30,6 +30,8 @@ const Profile = ({navigation}) => {
   const [editProfileIsOpen, seteditProfileIsOpen] = useState(false);
   const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(true);
   const [activeProfileTab, setactiveProfileTab] = useState('tab2');
+  const [isSocialLogin, setIsSocialLogin] = useState(null);
+  const [profilePic, setProfilePic] = useState(null);
   const closeAllTab = () => {
     // class all tabs
     setTab1(ProfileStyle.profileTab);
@@ -39,6 +41,16 @@ const Profile = ({navigation}) => {
     setProfileTabIsOpen(false);
     setactiveProfileTab(null);
   };
+  useEffect(() => {
+    userSocialLoginInfo().then((data) => {
+      setIsSocialLogin(data.user);
+      setProfilePic(data.user.photoURL.slice(0, -6));
+      console.log(data.user.photoURL.slice(0, -6));
+    });
+
+    return () => {};
+  }, []);
+
   const handleTabChange = (e) => {
     // to open, close or navigate in different tabs
     closeAllTab();
@@ -93,7 +105,7 @@ const Profile = ({navigation}) => {
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [editProfileIsOpen, ProfileTabIsOpen]),
+    }, [navigation, editProfileIsOpen, ProfileTabIsOpen]),
   );
 
   useEffect(() => {
@@ -120,14 +132,25 @@ const Profile = ({navigation}) => {
       </View>
       <View showsVerticalScrollIndicator={false} style={ProfileStyle.body}>
         <View style={ProfileStyle.AvatarView}>
-          <Avatar
-            size="xlarge"
-            overlayContainerStyle={ProfileStyle.AvatarBody}
-            containerStyle={ProfileStyle.AvatarImg}
-            rounded
-            // source={{uri: UserData.user.avatar}}
-            icon={{name: 'user', type: 'font-awesome'}}
-          />
+          {isSocialLogin ? (
+            <Avatar
+              size="xlarge"
+              overlayContainerStyle={ProfileStyle.AvatarBody}
+              containerStyle={ProfileStyle.AvatarImg}
+              rounded
+              source={{uri: profilePic || null}}
+              // source={{uri: UserData.user.avatar}}
+            />
+          ) : (
+            <Avatar
+              size="xlarge"
+              overlayContainerStyle={ProfileStyle.AvatarBody}
+              containerStyle={ProfileStyle.AvatarImg}
+              rounded
+              // source={{uri: UserData.user.avatar}}
+              icon={{name: 'user', type: 'font-awesome'}}
+            />
+          )}
         </View>
         <View style={ProfileStyle.profileBodyHeading}>
           <Text style={ProfileStyle.PrifileName}>{UserData?.user?.name}</Text>
@@ -135,7 +158,9 @@ const Profile = ({navigation}) => {
             onPress={() => {
               seteditProfileIsOpen(true);
             }}>
-            <Text style={ProfileStyle.editProfile}>Edit&nbsp;Profile</Text>
+            {!isSocialLogin && (
+              <Text style={ProfileStyle.editProfile}>Edit&nbsp;Profile</Text>
+            )}
           </TouchableOpacity>
         </View>
         {editProfileIsOpen ? (

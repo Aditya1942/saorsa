@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -18,30 +17,31 @@ import Step from './Screens/steps/Step';
 import StepCourse from './Screens/steps/StepCourse';
 import PlayerScreen from './Screens/steps/Player';
 import {useFocusEffect} from '@react-navigation/core';
-import {BackHandler} from 'react-native';
+import {BackHandler, StyleSheet} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const HomeStack = createStackNavigator();
 
-function CustomDrawerContent({navigation}) {
-  return (
-    <Button
-      title="Go somewhere"
-      onPress={() => {
-        // Navigate using the `navigation` prop that you received
-        navigation.navigate('SomeScreen');
-      }}
-    />
-  );
-}
+// function CustomDrawerContent({navigation}) {
+//   return (
+//     <Button
+//       title="Go somewhere"
+//       onPress={() => {
+//         // Navigate using the `navigation` prop that you received
+//         navigation.navigate('SomeScreen');
+//       }}
+//     />
+//   );
+// }
 const AppDrawer = () => {
   return (
     <Drawer.Navigator
       drawerPosition={'right'}
-      drawerStyle={{backgroundColor: colors.primary, width: 200}}
+      drawerStyle={styles.drawer}
       drawerContent={(props) => <DrawerScreen {...props} />}>
       <Stack.Screen name="CustomeTab" component={CustomeTab} />
     </Drawer.Navigator>
@@ -66,7 +66,9 @@ const CustomeTab = ({navigation}) => {
       console.log('main stack');
       getUserAuthToken().then((token) => {
         console.log('From Home', token);
-        if (!token) navigation.replace('Login');
+        if (!token) {
+          navigation.replace('Login');
+        }
         axios({
           method: 'get',
           url: '/api/profile/me',
@@ -78,7 +80,9 @@ const CustomeTab = ({navigation}) => {
           .then(({data}) => {
             storetUserProfileData(data);
           })
-          .catch((err) => {});
+          .catch((err) => {
+            console.log(err);
+          });
       });
       const onBackPress = () => {
         BackHandler.exitApp();
@@ -87,7 +91,7 @@ const CustomeTab = ({navigation}) => {
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
+    }, [navigation]),
   );
 
   return (
@@ -147,5 +151,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  drawer: {backgroundColor: colors.primary, width: 200},
 });
 // "proxy":"http://192.168.1.172:4000",

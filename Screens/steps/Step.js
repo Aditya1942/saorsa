@@ -51,12 +51,11 @@ function Step({route, navigation}) {
           });
         }
         return true;
-        console.log('route', stepName);
       };
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
+    }, [navigation]),
   );
   useEffect(() => {}, []);
 

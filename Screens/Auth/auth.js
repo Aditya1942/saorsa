@@ -39,3 +39,22 @@ export const getUserProfileData = async () => {
     throw e;
   }
 };
+export const storetuserSocialLoginInfo = async (value) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem('@userSocialLoginInfo', jsonValue);
+  } catch (e) {
+    // saving error
+    throw e;
+  }
+};
+export const userSocialLoginInfo = async () => {
+  try {
+    const value = await AsyncStorage.getItem('@userSocialLoginInfo');
+    return value != null ? JSON.parse(value) : null;
+  } catch (e) {
+    // error reading value
+    console.log(e);
+    throw e;
+  }
+};

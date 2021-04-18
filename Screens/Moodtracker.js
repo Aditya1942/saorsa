@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   TouchableHighlight,
+  Alert,
 } from 'react-native';
 import {
   Menu,
@@ -20,17 +21,16 @@ import Header from '../Components/Header';
 import {colors, sizes, MoodImgs} from '../Constants';
 import FastImage from 'react-native-fast-image';
 import {BackHandler} from 'react-native';
-import {getUserAuthToken, getUserProfileData} from './Auth/auth';
+import {getUserAuthToken} from './Auth/auth';
 import axios from './Auth/axios';
 import {useFocusEffect} from '@react-navigation/core';
 
 const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
-  const {ContextMenu, SlideInMenu, Popover} = renderers;
+  const {ContextMenu} = renderers;
   const [openMenu, setopenMenu] = useState(false);
   // backpress
   useFocusEffect(
     React.useCallback(() => {
-      console.log('object', navigation);
       const onBackPress = () => {
         if (openMenu) {
           setopenMenu(false);
@@ -46,7 +46,7 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [openMenu]),
+    }, [navigation, openMenu]),
   );
   // this function will run when user add new mood
   const handleUpdateMoodStatus = (mood, rating) => {
@@ -65,7 +65,7 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
     })
       .then(({data}) => {
         if (data.errors) {
-          alert(data.errors[0].msg);
+          Alert.alert(data.errors[0].msg);
         } else {
           console.log('data', data);
           // this update fun will send update req to parent component
@@ -155,7 +155,8 @@ const Moodtracker = ({navigation}) => {
   const [triggerMoodUpdateFromMain, setTriggerMoodUpdateFromMain] = useState(
     '',
   );
-  const setTriggerMoodUpdateFromMainFun = async () => {
+
+  const setTriggerMoodUpdateFromMainFun = useCallback(async () => {
     function formatDate(date) {
       let day = date.getDate();
       if (day === 1) {
@@ -204,7 +205,7 @@ const Moodtracker = ({navigation}) => {
     }).then(({data}) => {
       // format date
 
-      var moodDateAndTime = new Array();
+      var moodDateAndTime = new Array(1);
       try {
         // add only last two mood history
         for (let i = 1; i < 3; i++) {
@@ -226,18 +227,16 @@ const Moodtracker = ({navigation}) => {
         console.log('error', error);
       }
       setTriggerMoodUpdateFromMain('0');
-      console.log('MoodHistory', MoodHistory);
       setMoodHistory(moodDateAndTime);
     });
-  };
-
+  }, [loginToken]);
   useEffect(() => {
     getUserAuthToken().then((token) => {
       setLoginToken(token);
       console.log('loginToken', loginToken);
       setTriggerMoodUpdateFromMainFun();
     });
-  }, [loginToken]);
+  }, [loginToken, setTriggerMoodUpdateFromMainFun]);
   return (
     <MenuProvider customStyles={menuProviderStyles}>
       <SafeAreaView

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 
 import {BottomMenuItem} from './BottomMenuItem';
 
@@ -8,23 +8,25 @@ import {
   Dimensions,
   Animated,
   StyleSheet,
-  Text,
 } from 'react-native';
 
 const MyTabBar = ({state, descriptors, navigation}) => {
   const [translateValue] = useState(new Animated.Value(0));
   const totalWidth = Dimensions.get('window').width;
   const tabWidth = totalWidth / state.routes.length;
-  const animateSlider = (index) => {
-    Animated.spring(translateValue, {
-      toValue: index * tabWidth,
-      velocity: 10,
-      useNativeDriver: true,
-    }).start();
-  };
+  const animateSlider = useCallback(
+    (index) => {
+      Animated.spring(translateValue, {
+        toValue: index * tabWidth,
+        velocity: 10,
+        useNativeDriver: true,
+      }).start();
+    },
+    [tabWidth, translateValue],
+  );
   useEffect(() => {
     animateSlider(state.index);
-  }, [state.index]);
+  }, [animateSlider, state.index]);
   return (
     <View style={[styles.tabContainer, {width: totalWidth}]}>
       <View style={{flexDirection: 'row'}}>
@@ -56,6 +58,7 @@ const MyTabBar = ({state, descriptors, navigation}) => {
           const isFocused = state.index === index;
 
           const onPress = () => {
+            console.log('tab navigation');
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,

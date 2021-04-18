@@ -6,26 +6,19 @@ import {
   Image,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-import {Button, Input} from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import {TextInput} from 'react-native-paper';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import {colors, sizes} from '../../Constants';
-import {getUserAuthToken, storeUserAuthToken} from './auth';
+import {getUserAuthToken} from './auth';
 import axios from './axios';
-import {
-  AccessToken,
-  LoginManager,
-  GraphRequest,
-  GraphRequestManager,
-} from 'react-native-fbsdk';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 const Register = ({navigation}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setpassword] = useState('');
   const [error, seterror] = useState('');
-  const [loginToken, setLoginToken] = useState('');
+  // const [loginToken, setLoginToken] = useState('');
 
   const handleRegister = () => {
     console.log(name, email, password);
@@ -42,7 +35,7 @@ const Register = ({navigation}) => {
         if (data.errors) {
           seterror(data.errors[0].msg);
         } else {
-          alert('Verification email is sent');
+          Alert.alert('Verification email is sent');
         }
       })
       .catch((err) => {
@@ -58,91 +51,13 @@ const Register = ({navigation}) => {
           });
         }
       })
-      .catch((err) => {});
-  }, []);
-  const storeFbLogin = (fbData, email, name) => {
-    axios({
-      method: 'post',
-      url: '/api/user/social',
-      data: {
-        name: name,
-        email: email,
-        confirmed: true,
-      },
-      headers: {'Content-Type': 'application/json'},
-    }).then(async ({data}) => {
-      // body of the function
-      try {
-        const jsonValue = JSON.stringify(fbData);
-        await AsyncStorage.setItem('@userFbInfo', jsonValue);
-        console.log('successfully');
-        console.log(data);
-        setLoginToken(data?.token);
-        storeUserAuthToken(data?.token).then(() => {
-          navigation.reset({
-            routes: [{name: 'AppDrawer'}],
-          });
-        });
-      } catch (e) {
-        // saving error
-        throw e;
-      }
-    });
-  };
-
-  const HandleFbLogin = () => {
-    LoginManager.logInWithPermissions(['public_profile', 'email']).then(
-      function (result) {
-        if (result.isCancelled) {
-          console.log('Login cancelled');
-        } else {
-          console.log(
-            'Login success with permissions: ' +
-              result.grantedPermissions.toString(),
-          );
-          AccessToken.getCurrentAccessToken().then((data) => {
-            let {accessToken} = data;
-            console.log(data);
-            let PROFILE_REQUEST_PARAMS = {
-              fields: {
-                string: 'name,email,profile_picture',
-              },
-            };
-            const infoRequest = new GraphRequest(
-              '/me?fields=email,name,picture',
-              {
-                accessToken: accessToken,
-                parameters: {
-                  fields: {
-                    string: 'email,name,picture.height(480)',
-                  },
-                },
-              },
-              _responseInfoCallback,
-            );
-            // Start the graph request.
-            new GraphRequestManager().addRequest(infoRequest).start();
-          });
-        }
-      },
-      function (error) {
-        console.log('Login fail with error: ' + error);
-      },
-    );
-  };
-
-  const _responseInfoCallback = (error, result) => {
-    if (error) {
-      console.log(error);
-    } else {
-      // alert('Result Name: ' + result.name);
-      console.log(result);
-      storeFbLogin(result, result.email, result.name);
-    }
-  };
-
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [navigation]);
   const emailRef = useRef();
   const passwordRef = useRef();
+
   return (
     <View>
       <View style={registerStyle.body}>
@@ -152,7 +67,7 @@ const Register = ({navigation}) => {
           <View style={registerStyle.headerImageContainer}>
             <Image
               source={require('../../assets/logo.png')}
-              style={{width: '100%', height: '100%'}}
+              style={registerStyle.logo}
               resizeMode={'cover'}
             />
           </View>
@@ -163,7 +78,7 @@ const Register = ({navigation}) => {
             </Text>
           </View>
           <Text style={registerStyle.error}>{error}</Text>
-          <View style={{padding: 10, paddingHorizontal: 40}}>
+          <View style={registerStyle.form}>
             <TextInput
               value={name}
               onChangeText={(value) => setName(value)}
@@ -177,10 +92,7 @@ const Register = ({navigation}) => {
               onSubmitEditing={() => {
                 emailRef.current.focus();
               }}
-              style={{
-                backgroundColor: colors.primary,
-                marginTop: 0,
-              }}
+              style={registerStyle.nameInput}
               theme={{
                 colors: {
                   placeholder: 'white',
@@ -207,10 +119,7 @@ const Register = ({navigation}) => {
                 passwordRef.current.focus();
               }}
               secureTextEntry={true}
-              style={{
-                backgroundColor: colors.primary,
-                marginTop: 20,
-              }}
+              style={registerStyle.emailInput}
               theme={{
                 colors: {
                   placeholder: 'white',
@@ -234,11 +143,7 @@ const Register = ({navigation}) => {
               secureTextEntry={true}
               ref={passwordRef}
               onSubmitEditing={handleRegister}
-              style={{
-                backgroundColor: colors.primary,
-                marginTop: 20,
-                marginBottom: 40,
-              }}
+              style={registerStyle.passwordInput}
               theme={{
                 colors: {
                   placeholder: 'white',
@@ -251,37 +156,10 @@ const Register = ({navigation}) => {
             />
             <Button
               buttonStyle={{backgroundColor: colors.secondary}}
-              containerStyle={{
-                width: sizes.ITEM_WIDTH * 2.7,
-                borderRadius: 10,
-              }}
-              title={`Sign Up`}
+              containerStyle={registerStyle.signup}
+              title={'Sign Up'}
               onPress={handleRegister}
             />
-            {/* <Button
-              title="CONNECT WITH FACEBOOK"
-              titleStyle={{color: 'black'}}
-              buttonStyle={{backgroundColor: '#fff'}}
-              mode="outlined
-            "
-              containerStyle={{
-                width: sizes.ITEM_WIDTH * 2.7,
-                borderRadius: 10,
-                marginTop: 20,
-                color: 'black',
-              }}
-              onPress={() => {
-                HandleFbLogin();
-              }}
-              icon={
-                <Icon
-                  name="facebook-square"
-                  style={{paddingHorizontal: 10}}
-                  size={24}
-                  color={colors.primary}
-                />
-              }
-            /> */}
           </View>
         </KeyboardAvoidingView>
 
@@ -324,8 +202,9 @@ const registerStyle = StyleSheet.create({
   headerImageContainer: {
     width: 120,
     height: 80,
-    marginBottom: 10,
+    marginBottom: 20,
   },
+  logo: {width: '100%', height: '100%'},
   title: {
     padding: 25,
     marginBottom: 0,
@@ -345,24 +224,22 @@ const registerStyle = StyleSheet.create({
     fontSize: 20,
     color: 'red',
   },
+  form: {padding: 10, paddingHorizontal: 40},
+  signup: {
+    width: sizes.ITEM_WIDTH * 2.7,
+    borderRadius: 10,
+  },
+  nameInput: {
+    backgroundColor: colors.primary,
+    marginTop: 0,
+  },
+  emailInput: {
+    backgroundColor: colors.primary,
+    marginTop: 20,
+  },
+  passwordInput: {
+    backgroundColor: colors.primary,
+    marginTop: 20,
+    marginBottom: 40,
+  },
 });
-
-// <Input
-// placeholder="Full Name"
-// value={name}
-// onChangeText={(value) => setName(value)}
-// leftIcon={<Icon name="user" size={24} color="black" />}
-// />
-// <Input
-// placeholder="Email"
-// value={email}
-// onChangeText={(value) => setEmail(value)}
-// leftIcon={<Icon name="envelope" size={24} color="black" />}
-// />
-// <Input
-// placeholder="Password"
-// value={password}
-// onChangeText={(value) => setpassword(value)}
-// secureTextEntry={true}
-// leftIcon={<Icon name="lock" size={24} color="black" />}
-// />

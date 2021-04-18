@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
 import {
   BackHandler,
@@ -7,16 +8,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Button, Input} from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {colors, sizes} from '../../Constants';
-import {storeUserAuthToken, getUserAuthToken} from './auth';
+import {
+  storeUserAuthToken,
+  getUserAuthToken,
+  storetuserSocialLoginInfo,
+} from './auth';
 import axios from './axios';
 import {useFocusEffect} from '@react-navigation/core';
 import {TextInput} from 'react-native-paper';
 import {KeyboardAvoidingView} from 'react-native';
 import {
-  LoginButton,
   AccessToken,
   LoginManager,
   GraphRequest,
@@ -29,7 +33,6 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginToken, setLoginToken] = useState('');
   const [error, seterror] = useState('');
   const passwordRef = useRef();
   // login with google
@@ -44,24 +47,22 @@ const Login = ({navigation}) => {
     return auth().signInWithCredential(googleCredential);
   }
   // add login details in database from social login
-  const storeSoclialLogin = (fbData, email, name) => {
+  const storeSoclialLogin = (fbData, socialemail, socialname) => {
     axios({
       method: 'post',
       url: '/api/user/social',
       data: {
-        name: name,
-        email: email,
+        name: socialname,
+        email: socialemail,
         confirmed: true,
       },
       headers: {'Content-Type': 'application/json'},
     }).then(async ({data}) => {
       // body of the function
       try {
-        const jsonValue = JSON.stringify(fbData);
-        await AsyncStorage.setItem('@userFbInfo', jsonValue);
+        storetuserSocialLoginInfo(fbData);
         console.log('successfully');
         console.log(data);
-        setLoginToken(data?.token);
         storeUserAuthToken(data?.token).then(() => {
           navigation.reset({
             routes: [{name: 'AppDrawer'}],
@@ -102,7 +103,8 @@ const Login = ({navigation}) => {
             seterror('This email is not verified. Please Check your email');
           });
         } else if (data.token) {
-          setLoginToken(data?.token);
+          AsyncStorage.removeItem('@userSocialLoginInfo');
+
           storeUserAuthToken(data?.token).then(() => {
             navigation.reset({
               routes: [{name: 'AppDrawer'}],
@@ -156,8 +158,8 @@ const Login = ({navigation}) => {
     );
   };
   // get data from after login facebook
-  function _responseInfoCallback(error, result) {
-    if (error) {
+  function _responseInfoCallback(err, result) {
+    if (err) {
       console.log(error);
     } else {
       // alert('Result Name: ' + result.name);
@@ -193,8 +195,10 @@ const Login = ({navigation}) => {
           });
         }
       })
-      .catch((err) => {});
-  }, []);
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [navigation]);
   return (
     <View style={loginStyle.container}>
       <View style={loginStyle.body}>
@@ -202,7 +206,7 @@ const Login = ({navigation}) => {
           <View style={loginStyle.headerImageContainer}>
             <Image
               source={require('../../assets/logo.png')}
-              style={{width: '100%', height: '100%'}}
+              style={loginStyle.logo}
               resizeMode={'cover'}
             />
           </View>
@@ -252,10 +256,7 @@ const Login = ({navigation}) => {
               secureTextEntry={true}
               ref={passwordRef}
               onSubmitEditing={handleLogin}
-              style={{
-                backgroundColor: colors.primary,
-                marginTop: 20,
-              }}
+              style={loginStyle.passwordInput}
               theme={{
                 colors: {
                   placeholder: 'white',
@@ -266,24 +267,15 @@ const Login = ({navigation}) => {
                 },
               }}
             />
-            <View
-              style={{
-                width: sizes.width,
-                justifyContent: 'flex-start',
-                marginBottom: 40,
-                paddingHorizontal: 90,
-              }}>
-              <TouchableOpacity style={{alignSelf: 'flex-end'}}>
+            <View style={loginStyle.forgotpasswords}>
+              {/* <TouchableOpacity style={{alignSelf: 'flex-end'}}>
                 <Text style={{color: '#fff'}}>Forgot Password?</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <Button
               title="Login"
               buttonStyle={{backgroundColor: colors.secondary}}
-              containerStyle={{
-                width: sizes.ITEM_WIDTH * 2.7,
-                borderRadius: 10,
-              }}
+              containerStyle={loginStyle.loginBtn}
               onPress={handleLogin}
             />
 
@@ -296,12 +288,7 @@ const Login = ({navigation}) => {
               buttonStyle={{backgroundColor: '#fff'}}
               mode="outlined
             "
-              containerStyle={{
-                width: sizes.ITEM_WIDTH * 2.7,
-                borderRadius: 10,
-                marginTop: 20,
-                color: 'black',
-              }}
+              containerStyle={loginStyle.socialLoginBtn}
               icon={
                 <Icon
                   name="facebook-square"
@@ -316,10 +303,10 @@ const Login = ({navigation}) => {
               onPress={() => {
                 onGoogleButtonPress().then((data) => {
                   const {additionalUserInfo} = data;
-                  const email = additionalUserInfo.profile.email;
-                  const name = additionalUserInfo.profile.name;
-                  console.log(email, name);
-                  storeSoclialLogin(data, email, name);
+                  const gemail = additionalUserInfo.profile.email;
+                  const gname = additionalUserInfo.profile.name;
+                  console.log(gemail, gname);
+                  storeSoclialLogin(data, gemail, gname);
                 });
               }}
               title="SIGN IN WITH GOOGLE"
@@ -327,12 +314,7 @@ const Login = ({navigation}) => {
               buttonStyle={{backgroundColor: '#fff'}}
               mode="outlined
             "
-              containerStyle={{
-                width: sizes.ITEM_WIDTH * 2.7,
-                borderRadius: 10,
-                marginTop: 20,
-                color: 'black',
-              }}
+              containerStyle={loginStyle.socialLoginBtn}
               icon={
                 <Icon
                   name="google"
@@ -390,6 +372,7 @@ const loginStyle = StyleSheet.create({
     height: 80,
     marginBottom: 10,
   },
+  logo: {width: '100%', height: '100%'},
   title: {
     padding: 25,
     marginBottom: 20,
@@ -406,19 +389,37 @@ const loginStyle = StyleSheet.create({
     fontSize: 20,
     color: 'red',
   },
+  passwordInput: {
+    backgroundColor: colors.primary,
+    marginTop: 20,
+  },
+  forgotpasswords: {
+    width: sizes.width,
+    justifyContent: 'flex-start',
+    marginBottom: 40,
+    paddingHorizontal: 90,
+  },
+  login: {
+    width: sizes.ITEM_WIDTH * 2.7,
+    borderRadius: 10,
+  },
+  socialLoginBtn: {
+    width: sizes.ITEM_WIDTH * 2.7,
+    borderRadius: 10,
+    marginTop: 20,
+    color: 'black',
+  },
 });
 
-{
-  /* <Input
+/* <Input
             placeholder="Email"
             value={email}
             onChangeText={(value) => setEmail(value)}
             inputStyle={{color: '#fff'}}
             leftIcon={<Icon name="envelope" size={24} color="white" />}
           /> */
-}
-{
-  /* <Input
+
+/* <Input
             placeholder="Password"
             value={password}
             textContentType={'password'}
@@ -431,4 +432,3 @@ const loginStyle = StyleSheet.create({
             inputStyle={{color: '#fff'}}
             leftIcon={<Icon name="lock" size={24} color="white" />}
           /> */
-}
