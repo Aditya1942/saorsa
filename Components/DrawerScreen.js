@@ -34,7 +34,6 @@ export default function DrawerScreen({navigation}) {
     try {
       AccessToken.getCurrentAccessToken()
         .then((data) => {
-          console.log(data);
           current_access_token = data.accessToken.toString();
         })
         .then(() => {
@@ -46,7 +45,7 @@ export default function DrawerScreen({navigation}) {
             },
             (error, result) => {
               if (error) {
-                console.log('Error fetching data: ' + error.toString());
+                console.error('Error fetching data: ' + error.toString());
               } else {
                 LoginManager.logOut();
               }
@@ -58,7 +57,7 @@ export default function DrawerScreen({navigation}) {
           navigation.navigate('Login');
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
           navigation.navigate('Login');
         });
     } catch (error) {

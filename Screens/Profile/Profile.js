@@ -10,19 +10,10 @@ import EditProfile from './EditProfile';
 import {ProgressTab} from './tabs/ProgressTab';
 import {MoodReportTab} from './tabs/MoodReportTab';
 import {YourPlanTab} from './tabs/YourPlanTab';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserProfileData, userSocialLoginInfo} from '../Auth/auth';
 import {useFocusEffect} from '@react-navigation/core';
 
 const Profile = ({navigation}) => {
-  const getUserData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('@userInfo');
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch (e) {
-      // error reading value
-    }
-  };
   const [UserData, setUserData] = useState({});
   const [Tab1, setTab1] = useState(ProfileStyle.profileTab);
   const [Tab2, setTab2] = useState(ProfileStyle.profileTabActive);
@@ -31,7 +22,6 @@ const Profile = ({navigation}) => {
   const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(true);
   const [activeProfileTab, setactiveProfileTab] = useState('tab2');
   const [isSocialLogin, setIsSocialLogin] = useState(null);
-  const [profilePic, setProfilePic] = useState(null);
   const closeAllTab = () => {
     // class all tabs
     setTab1(ProfileStyle.profileTab);
@@ -44,8 +34,6 @@ const Profile = ({navigation}) => {
   useEffect(() => {
     userSocialLoginInfo().then((data) => {
       setIsSocialLogin(data.user);
-      setProfilePic(data.user.photoURL.slice(0, -6));
-      console.log(data.user.photoURL.slice(0, -6));
     });
 
     return () => {};
@@ -110,8 +98,8 @@ const Profile = ({navigation}) => {
 
   useEffect(() => {
     getUserProfileData().then((data) => {
-      console.log(data);
       setUserData(data);
+      console.log('ÚSER DATA', data.user);
     });
   }, []);
   const getDataFromEditProfile = (val) => {
@@ -132,14 +120,14 @@ const Profile = ({navigation}) => {
       </View>
       <View showsVerticalScrollIndicator={false} style={ProfileStyle.body}>
         <View style={ProfileStyle.AvatarView}>
-          {isSocialLogin ? (
+          {UserData?.coverImage !== undefined ? (
             <Avatar
               size="xlarge"
               overlayContainerStyle={ProfileStyle.AvatarBody}
               containerStyle={ProfileStyle.AvatarImg}
               rounded
-              source={{uri: profilePic || null}}
-              // source={{uri: UserData.user.avatar}}
+              // source={{uri: profilePic || null}}
+              source={{uri: UserData?.coverImage || null}}
             />
           ) : (
             <Avatar
@@ -211,16 +199,12 @@ const Profile = ({navigation}) => {
                   margin: 10,
                   overflow: 'hidden',
                 }}>
-                {activeProfileTab === 'tab1' ? <ProgressTab /> : <View></View>}
-                {activeProfileTab === 'tab2' ? (
-                  <MoodReportTab />
-                ) : (
-                  <View></View>
-                )}
-                {activeProfileTab === 'tab3' ? <YourPlanTab /> : <View></View>}
+                {activeProfileTab === 'tab1' ? <ProgressTab /> : <View />}
+                {activeProfileTab === 'tab2' ? <MoodReportTab /> : <View />}
+                {activeProfileTab === 'tab3' ? <YourPlanTab /> : <View />}
               </View>
             ) : (
-              <View></View>
+              <View />
             )}
           </View>
         )}

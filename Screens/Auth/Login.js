@@ -47,20 +47,21 @@ const Login = ({navigation}) => {
     return auth().signInWithCredential(googleCredential);
   }
   // add login details in database from social login
-  const storeSoclialLogin = (fbData, socialemail, socialname) => {
+  const storeSoclialLogin = (loginData, socialemail, socialname, avatar) => {
     axios({
       method: 'post',
       url: '/api/user/social',
       data: {
         name: socialname,
         email: socialemail,
+        avatar: avatar,
         confirmed: true,
       },
       headers: {'Content-Type': 'application/json'},
     }).then(async ({data}) => {
       // body of the function
       try {
-        storetuserSocialLoginInfo(fbData);
+        storetuserSocialLoginInfo(loginData);
         console.log('successfully');
         console.log(data);
         storeUserAuthToken(data?.token).then(() => {
@@ -164,19 +165,12 @@ const Login = ({navigation}) => {
     } else {
       // alert('Result Name: ' + result.name);
       console.log(result);
-      storeSoclialLogin(result, result.email, result.name);
+      console.log(result.picture.url);
+      storeSoclialLogin(result, result.email, result.name, result.picture.url);
     }
   }
   useFocusEffect(
     React.useCallback(() => {
-      axios({
-        method: 'get',
-        url: '/api/step',
-      })
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((err) => console.log('err', err));
       const onBackPress = () => {
         BackHandler.exitApp();
         return true;
@@ -305,8 +299,13 @@ const Login = ({navigation}) => {
                   const {additionalUserInfo} = data;
                   const gemail = additionalUserInfo.profile.email;
                   const gname = additionalUserInfo.profile.name;
-                  console.log(gemail, gname);
-                  storeSoclialLogin(data, gemail, gname);
+                  const gpicture = additionalUserInfo.profile.picture.slice(
+                    0,
+                    -6,
+                  );
+                  console.log('SIGN IN WITH GOOGLE', data);
+                  console.log(additionalUserInfo.profile.picture.slice(0, -6));
+                  storeSoclialLogin(data, gemail, gname, gpicture);
                 });
               }}
               title="SIGN IN WITH GOOGLE"

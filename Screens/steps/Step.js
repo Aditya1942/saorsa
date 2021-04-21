@@ -37,6 +37,7 @@ function Step({route, navigation}) {
       getStepData()
         .then((data) => {
           setStepData(data);
+          console.log(data);
         })
         .catch((err) => {
           console.error(err);
@@ -83,14 +84,16 @@ function Step({route, navigation}) {
         </Text>
 
         <View style={StepStyles.stepBtns}>
-          {StepData[index]?.courses.map((course, index) => (
+          {StepData[index]?.courses.map((course, i) => (
             <StepBtn
               navigation={navigation}
               key={course._id}
-              id={course.id}
+              id={i}
               name={course.name}
               courseimage={course.img}
               data={course}
+              stepId={index}
+              stepName={StepData[index]?.name}
             />
           ))}
         </View>
@@ -125,7 +128,15 @@ function Step({route, navigation}) {
   );
 }
 
-export const StepBtn = ({courseimage, name, id, navigation, data}) => {
+export const StepBtn = ({
+  courseimage,
+  name,
+  id,
+  navigation,
+  data,
+  stepName,
+  stepId,
+}) => {
   return (
     <TouchableOpacity
       style={StepStyles.StepBtn}
@@ -134,6 +145,8 @@ export const StepBtn = ({courseimage, name, id, navigation, data}) => {
           id: id,
           Coursename: name,
           data: data,
+          stepName: stepName,
+          stepId: stepId,
         });
       }}>
       <View>
@@ -233,9 +246,9 @@ const StepStyles = StyleSheet.create({
   StepBtnText: {
     color: 'black',
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     fontSize: 12,
-    width: 170,
+    // width: 170,
     fontWeight: 'bold',
     textAlign: 'center',
     textAlignVertical: 'bottom',

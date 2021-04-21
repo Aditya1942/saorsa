@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,15 @@ import {
   TouchableOpacity,
   ScrollView,
   BackHandler,
-  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Header from '../../Components/Header';
 import {colors, sizes} from '../../Constants';
 import {useFocusEffect} from '@react-navigation/core';
-import FastImage from 'react-native-fast-image';
+import AutoHeightImage from 'react-native-auto-height-image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {StepBtn} from './Step';
 
 const Audio = ({navigation, audio}) => {
   return (
@@ -101,28 +102,30 @@ const Title = ({audio, titleText, navigation}) => {
   );
 };
 const Course = ({title, audio, navigation, img, description}) => {
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     console.log('This will run after 5 second!');
-  //   }, 5000);
-  //   return () => clearTimeout(timer);
-  // }, []);
   function WordCount(str) {
     var lengthyTitle = [];
     let titleStr = '';
     str = str.split(' ');
     str.forEach((word, i) => {
       titleStr = titleStr.concat(word + ' ');
-      if (i === 5) {
+      // console.log('word', word, word.length);
+      // if (lengthyTitle.length >= 20) {
+      if (i === 4 || i === 8) {
         lengthyTitle.push(titleStr);
         titleStr = '';
       }
+      // }
     });
-    lengthyTitle.push(titleStr);
+    if (titleStr !== '') {
+      lengthyTitle.push(titleStr);
+    }
     return lengthyTitle;
   }
-
-  var titles = WordCount(title);
+  var titles = [];
+  if (title) {
+    titles = WordCount(title);
+    // console.log(titles);
+  }
   return (
     <View>
       {title &&
@@ -138,17 +141,40 @@ const Course = ({title, audio, navigation, img, description}) => {
         <Text style={StepCourseStyles.description}>{description}</Text>
       )}
       <View style={{paddingHorizontal: 10}}>
-        <FastImage style={StepCourseStyles.picture} source={{uri: img}} />
+        <AutoHeightImage width={350} source={{uri: img}} />
+        {/* <FastImage style={StepCourseStyles.picture} source={{uri: img}} /> */}
       </View>
     </View>
   );
 };
 const StepCourse = ({route, navigation}) => {
   const {data} = route.params;
-  console.log(route.params);
+  const Coursedata = route.params;
+  const [StepData, setStepData] = React.useState([]);
+  const [nextCourse, setnextCourse] = React.useState([]);
 
+  console.log('route', route.params);
+  const getStepData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@StepData');
+      // console.log('axios'.data);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+      throw e;
+    }
+  };
   useFocusEffect(
     React.useCallback(() => {
+      getStepData()
+        .then((steps) => {
+          setStepData(steps);
+          setnextCourse(steps[Coursedata.stepId]?.courses[Coursedata.id + 1]);
+          console.log(steps);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
       const onBackPress = () => {
         if (navigation.canGoBack()) {
           navigation.goBack();
@@ -162,7 +188,7 @@ const StepCourse = ({route, navigation}) => {
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
+    }, [Coursedata, navigation]),
   );
 
   return (
@@ -178,7 +204,7 @@ const StepCourse = ({route, navigation}) => {
           <Header navigation={navigation} />
         </View>
         <View style={StepCourseStyles.headerText}>
-          <Text style={StepCourseStyles.title}>Step 1</Text>
+          <Text style={StepCourseStyles.title}>{route.params.stepName}</Text>
           <Text style={StepCourseStyles.description}>{data.name}</Text>
         </View>
       </ImageBackground>
@@ -194,6 +220,25 @@ const StepCourse = ({route, navigation}) => {
             navigation={navigation}
           />
         ))}
+        <View
+          style={{
+            marginTop: 50,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          {nextCourse && (
+            <StepBtn
+              navigation={navigation}
+              key={nextCourse._id}
+              id={Coursedata.id + 1}
+              name={'CLICK HERE TO LEARN MORE ABOUT ' + nextCourse.name}
+              courseimage={nextCourse.img}
+              data={nextCourse}
+              stepId={Coursedata.stepId}
+              stepName={Coursedata.stepName}
+            />
+          )}
+        </View>
         <View style={{marginTop: 100}} />
       </ScrollView>
     </SafeAreaView>
@@ -225,7 +270,7 @@ const StepCourseStyles = StyleSheet.create({
     paddingHorizontal: 20,
     fontFamily: sizes.fontFamily,
     fontSize: sizes.title,
-    textAlign: 'justify',
+    textAlign: 'center',
   },
   body: {},
   audio: {
@@ -233,7 +278,6 @@ const StepCourseStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 10,
-
     // float: 'right',
   },
   audioText: {
@@ -242,7 +286,11 @@ const StepCourseStyles = StyleSheet.create({
 
   picture: {
     flex: 1,
-    aspectRatio: 1.2,
-    resizeMode: 'contain',
+    aspectRatio: 1,
+    width: 360,
+    height: 'auto',
+    backgroundColor: 'red',
+    // resizeMode: 'contain',
+    // alignSelf: 'center',
   },
 });

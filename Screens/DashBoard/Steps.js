@@ -22,7 +22,6 @@ const Steps = ({navigation}) => {
   useEffect(() => {
     setTimeout(() => {
       getUserAuthToken().then((token) => {
-        console.log('From Home', token);
         if (!token) navigation.navigate('Login');
         axios({
           method: 'get',
@@ -33,14 +32,13 @@ const Steps = ({navigation}) => {
           },
         })
           .then(({data}) => {
-            console.log(data);
             setStepData(data);
           })
           .catch((err) => {});
       });
       setstepDataLoaded(true);
     }, 1000);
-  }, []);
+  }, [navigation]);
   return (
     <FlatList
       data={coursesImages}

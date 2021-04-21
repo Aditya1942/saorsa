@@ -18,7 +18,6 @@ import Steps from './Steps';
 const Home = ({navigation}) => {
   useFocusEffect(
     React.useCallback(() => {
-      console.log('object', navigation.canGoBack());
       const onBackPress = () => {
         if (navigation.canGoBack()) navigation.goBack();
         else BackHandler.exitApp();
@@ -27,7 +26,7 @@ const Home = ({navigation}) => {
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
+    }, [navigation]),
   );
   return (
     <SafeAreaView

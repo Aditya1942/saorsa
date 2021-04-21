@@ -18,6 +18,8 @@ target 'saorsa' do
 
   pod 'RNFBApp', :path => '../node_modules/@react-native-firebase/app'
 
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
   target 'saorsaTests' do
     inherit! :complete
     # Pods for testing

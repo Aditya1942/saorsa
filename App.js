@@ -20,23 +20,52 @@ import {useFocusEffect} from '@react-navigation/core';
 import {BackHandler, StyleSheet} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ImgUpload from './Screens/ImgUpload';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const HomeStack = createStackNavigator();
 
-// function CustomDrawerContent({navigation}) {
-//   return (
-//     <Button
-//       title="Go somewhere"
-//       onPress={() => {
-//         // Navigate using the `navigation` prop that you received
-//         navigation.navigate('SomeScreen');
-//       }}
-//     />
-//   );
-// }
+// const requestCameraPermission = async () => {
+//   if (Platform.OS === 'android') {
+//     try {
+//       const granted = await PermissionsAndroid.request(
+//         PermissionsAndroid.PERMISSIONS.CAMERA,
+//         {
+//           title: 'Camera Permission',
+//           message: 'App needs camera permission',
+//         },
+//       );
+//       // If CAMERA Permission is granted
+//       return granted === PermissionsAndroid.RESULTS.GRANTED;
+//     } catch (err) {
+//       console.warn(err);
+//       return false;
+//     }
+//   } else return true;
+// };
+
+// const requestExternalWritePermission = async () => {
+//   if (Platform.OS === 'android') {
+//     try {
+//       const granted = await PermissionsAndroid.request(
+//         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+//         {
+//           title: 'External Storage Write Permission',
+//           message: 'App needs write permission',
+//         },
+//       );
+//       // If WRITE_EXTERNAL_STORAGE Permission is granted
+//       return granted === PermissionsAndroid.RESULTS.GRANTED;
+//     } catch (err) {
+//       console.warn(err);
+//       alert('Write permission err', err);
+//     }
+//     return false;
+//   } else return true;
+// };
+
 const AppDrawer = () => {
   return (
     <Drawer.Navigator
@@ -57,15 +86,14 @@ const HomeStackScreen = () => {
       <HomeStack.Screen name="Step" component={Step} />
       <HomeStack.Screen name="StepCourse" component={StepCourse} />
       <HomeStack.Screen name="PlayerScreen" component={PlayerScreen} />
+      <HomeStack.Screen name="ImgUpload" component={ImgUpload} />
     </HomeStack.Navigator>
   );
 };
 const CustomeTab = ({navigation}) => {
   useFocusEffect(
     React.useCallback(() => {
-      console.log('main stack');
       getUserAuthToken().then((token) => {
-        console.log('From Home', token);
         if (!token) {
           navigation.replace('Login');
         }
@@ -78,6 +106,7 @@ const CustomeTab = ({navigation}) => {
           },
         })
           .then(({data}) => {
+            console.log('USER DATA', data);
             storetUserProfileData(data);
           })
           .catch((err) => {
