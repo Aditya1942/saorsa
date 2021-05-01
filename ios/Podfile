@@ -20,6 +20,8 @@ target 'saorsa' do
 
   pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
 
+  pod 'react-native-video', :path => '../node_modules/react-native-video'
+
   target 'saorsaTests' do
     inherit! :complete
     # Pods for testing

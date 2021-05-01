@@ -16,6 +16,7 @@ import {useFocusEffect} from '@react-navigation/core';
 import AutoHeightImage from 'react-native-auto-height-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StepBtn} from './Step';
+import Video from 'react-native-video';
 
 const Audio = ({navigation, audio}) => {
   return (
@@ -101,7 +102,7 @@ const Title = ({audio, titleText, navigation}) => {
     </View>
   );
 };
-const Course = ({title, audio, navigation, img, description}) => {
+const Course = ({title, audio, video, navigation, img, description}) => {
   function WordCount(str) {
     var lengthyTitle = [];
     let titleStr = '';
@@ -126,6 +127,9 @@ const Course = ({title, audio, navigation, img, description}) => {
     titles = WordCount(title);
     // console.log(titles);
   }
+  console.log('==================================');
+  console.log('Video', video || null);
+  console.log('==================================');
   return (
     <View>
       {title &&
@@ -137,6 +141,15 @@ const Course = ({title, audio, navigation, img, description}) => {
             navigation={navigation}
           />
         ))}
+      {video !== undefined && (
+        <TouchableOpacity
+          style={{margin: 30}}
+          onPress={() => {
+            navigation.navigate('VideoPlayer', {video});
+          }}>
+          <Text>{video}</Text>
+        </TouchableOpacity>
+      )}
       {description && (
         <Text style={StepCourseStyles.description}>{description}</Text>
       )}
@@ -213,10 +226,11 @@ const StepCourse = ({route, navigation}) => {
         {data.data.map((course, index) => (
           <Course
             key={index}
-            title={course.title}
-            description={course.description}
-            img={course.img}
-            audio={course.audio}
+            title={course?.title}
+            description={course?.description}
+            img={course?.img}
+            audio={course?.audio}
+            video={course.video}
             navigation={navigation}
           />
         ))}

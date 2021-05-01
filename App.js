@@ -21,6 +21,7 @@ import {BackHandler, StyleSheet} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImgUpload from './Screens/ImgUpload';
+import VideoPlayerView from './Screens/steps/VideoPlayer';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -73,6 +74,7 @@ const AppDrawer = () => {
       drawerStyle={styles.drawer}
       drawerContent={(props) => <DrawerScreen {...props} />}>
       <Stack.Screen name="CustomeTab" component={CustomeTab} />
+      <Stack.Screen name="VideoPlayer" component={VideoPlayerView} />
     </Drawer.Navigator>
   );
 };
@@ -86,7 +88,6 @@ const HomeStackScreen = () => {
       <HomeStack.Screen name="Step" component={Step} />
       <HomeStack.Screen name="StepCourse" component={StepCourse} />
       <HomeStack.Screen name="PlayerScreen" component={PlayerScreen} />
-      <HomeStack.Screen name="ImgUpload" component={ImgUpload} />
     </HomeStack.Navigator>
   );
 };
