@@ -8,12 +8,10 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from 'react-native';
 import Header from '../../Components/Header';
 import FastImage from 'react-native-fast-image';
-import {colors, sizes, coursesImages} from '../../Constants';
-import {steps} from './stepData.js';
+import {colors, sizes} from '../../Constants';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useFocusEffect} from '@react-navigation/core';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -87,7 +85,7 @@ function Step({route, navigation}) {
           {StepData[index]?.courses.map((course, i) => (
             <StepBtn
               navigation={navigation}
-              key={course._id}
+              key={i}
               id={i}
               name={course.name}
               courseimage={course.img}
@@ -228,16 +226,16 @@ const StepStyles = StyleSheet.create({
   stepBtns: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     marginBottom: 30,
     flexWrap: 'wrap',
   },
   StepBtn: {
     alignItems: 'center',
-    width: sizes.ITEM_WIDTH * 1.65,
+    width: sizes.ITEM_WIDTH * 1.62,
     // width: sizes.width,
-    height: sizes.ITEM_HEIGHT * 1.2,
-    flexGrow: 1,
+    height: sizes.ITEM_HEIGHT * 1.25,
+    // flexGrow: 1,
   },
   StepBtnBody: {
     backgroundColor: '#fff',

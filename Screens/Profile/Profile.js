@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Text, View, BackHandler} from 'react-native';
+import {Text, View, BackHandler, Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../../Components/Header';
 import {colors, sizes, MoodImgs} from '../../Constants';
@@ -10,8 +10,14 @@ import EditProfile from './EditProfile';
 import {ProgressTab} from './tabs/ProgressTab';
 import {MoodReportTab} from './tabs/MoodReportTab';
 import {YourPlanTab} from './tabs/YourPlanTab';
-import {getUserProfileData, userSocialLoginInfo} from '../Auth/auth';
+import {
+  getUserAuthToken,
+  getUserProfileData,
+  userSocialLoginInfo,
+} from '../Auth/auth';
 import {useFocusEffect} from '@react-navigation/core';
+import {launchImageLibrary} from 'react-native-image-picker';
+import axios from '../Auth/axios';
 
 const Profile = ({navigation}) => {
   const [UserData, setUserData] = useState({});
@@ -22,6 +28,7 @@ const Profile = ({navigation}) => {
   const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(true);
   const [activeProfileTab, setactiveProfileTab] = useState('tab2');
   const [isSocialLogin, setIsSocialLogin] = useState(null);
+  const [ProfilePic, setProfilePic] = useState(null);
   const closeAllTab = () => {
     // class all tabs
     setTab1(ProfileStyle.profileTab);
@@ -35,7 +42,6 @@ const Profile = ({navigation}) => {
     userSocialLoginInfo().then((data) => {
       setIsSocialLogin(data.user);
     });
-
     return () => {};
   }, []);
 
@@ -100,12 +106,51 @@ const Profile = ({navigation}) => {
     getUserProfileData().then((data) => {
       setUserData(data);
       console.log('ÚSER DATA', data.user);
+      setProfilePic(data?.coverImage);
     });
   }, []);
   const getDataFromEditProfile = (val) => {
     seteditProfileIsOpen(val);
   };
-
+  const updateProfilePicture = () => {
+    let options = {
+      // rest of the properties remain same
+      mediaType: 'photo', // other values 'video', 'mixed'
+    };
+    launchImageLibrary(options, (response) => {
+      console.log({response});
+      if (response.didCancel) {
+        console.log('User cancelled photo picker');
+        Alert.alert('You did not select any image');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        let source = {uri: response.uri};
+        console.log(response);
+        setProfilePic(response.uri);
+        let formData = new FormData();
+        formData.append({image: response.uri});
+        console.log('formData', formData);
+        getUserAuthToken().then((token) => {
+          console.log('token', token);
+          axios({
+            method: 'post',
+            url: '/api/profile',
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'x-auth-token': token,
+            },
+            data: JSON.stringify(formData),
+          }).then((e) => {
+            console.log('POST PHOTO', e);
+          });
+        });
+      }
+      console.log('CHANGE DP');
+    });
+  };
   return (
     <SafeAreaView
       style={{
@@ -115,19 +160,23 @@ const Profile = ({navigation}) => {
       <View style={ProfileStyle.header}>
         <Header navigation={navigation} />
       </View>
-      <View style={{justifyContent: 'flex-end', alignItems: 'flex-end'}}>
-        <Text>+</Text>
-      </View>
+      <TouchableOpacity
+        style={{justifyContent: 'flex-end', alignItems: 'flex-end'}}
+        onPress={updateProfilePicture}>
+        <Text style={{fontSize: 30, fontWeight: 'bold', paddingHorizontal: 10}}>
+          +
+        </Text>
+      </TouchableOpacity>
       <View showsVerticalScrollIndicator={false} style={ProfileStyle.body}>
         <View style={ProfileStyle.AvatarView}>
-          {UserData?.coverImage !== undefined ? (
+          {ProfilePic ? (
             <Avatar
               size="xlarge"
               overlayContainerStyle={ProfileStyle.AvatarBody}
               containerStyle={ProfileStyle.AvatarImg}
               rounded
               // source={{uri: profilePic || null}}
-              source={{uri: UserData?.coverImage || null}}
+              source={{uri: ProfilePic || null}}
             />
           ) : (
             <Avatar

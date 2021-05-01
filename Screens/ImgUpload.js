@@ -38,7 +38,9 @@ const ImagePicker = () => {
         console.warn(err);
         return false;
       }
-    } else return true;
+    } else {
+      return true;
+    }
   };
 
   const requestExternalWritePermission = async () => {
