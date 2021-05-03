@@ -15,7 +15,6 @@ import {colors, sizes} from '../../Constants';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useFocusEffect} from '@react-navigation/core';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from '../Auth/axios';
 
 function Step({route, navigation}) {
   const [StepData, setStepData] = useState([]);
@@ -194,11 +193,15 @@ const StepStyles = StyleSheet.create({
     height: sizes.ITEM_HEIGHT * 1.3,
     justifyContent: 'flex-start',
   },
-  header: {},
+  header: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0,0.3)',
+  },
   headerText: {
     paddingHorizontal: 10,
+    paddingBottom: 15,
     justifyContent: 'center',
-    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0,0.3)',
     alignContent: 'flex-end',
   },
   title: {

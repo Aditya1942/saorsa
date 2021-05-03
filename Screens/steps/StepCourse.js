@@ -17,6 +17,7 @@ import AutoHeightImage from 'react-native-auto-height-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StepBtn} from './Step';
 import Video from 'react-native-video';
+import FastImage from 'react-native-fast-image';
 
 const Audio = ({navigation, audio}) => {
   return (
@@ -102,7 +103,15 @@ const Title = ({audio, titleText, navigation}) => {
     </View>
   );
 };
-const Course = ({title, audio, video, navigation, img, description}) => {
+const Course = ({
+  title,
+  audio,
+  video,
+  navigation,
+  img,
+  description,
+  thumbnail,
+}) => {
   function WordCount(str) {
     var lengthyTitle = [];
     let titleStr = '';
@@ -143,11 +152,19 @@ const Course = ({title, audio, video, navigation, img, description}) => {
         ))}
       {video !== undefined && (
         <TouchableOpacity
-          style={{margin: 30}}
+          style={StepCourseStyles.videoPicture}
           onPress={() => {
             navigation.navigate('VideoPlayer', {video});
           }}>
-          <Text>{video}</Text>
+          <FastImage
+            style={StepCourseStyles.picture}
+            source={{uri: thumbnail}}
+            blurRadius={50}
+          />
+          <FastImage
+            style={StepCourseStyles.playpicture}
+            source={require('../../assets/playButton.png')}
+          />
         </TouchableOpacity>
       )}
       {description && (
@@ -218,7 +235,7 @@ const StepCourse = ({route, navigation}) => {
         </View>
         <View style={StepCourseStyles.headerText}>
           <Text style={StepCourseStyles.title}>{route.params.stepName}</Text>
-          <Text style={StepCourseStyles.description}>{data.name}</Text>
+          <Text style={StepCourseStyles.titleDescription}>{data.name}</Text>
         </View>
       </ImageBackground>
       <ScrollView style={StepCourseStyles.body}>
@@ -231,6 +248,7 @@ const StepCourse = ({route, navigation}) => {
             img={course?.img}
             audio={course?.audio}
             video={course.video}
+            thumbnail={course.thumbnail}
             navigation={navigation}
           />
         ))}
@@ -265,21 +283,35 @@ const StepCourseStyles = StyleSheet.create({
     height: sizes.ITEM_HEIGHT * 1.3,
     justifyContent: 'flex-start',
   },
-  header: {},
+  header: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0,0.3)',
+  },
   headerText: {
     paddingHorizontal: 10,
     justifyContent: 'center',
-    height: '100%',
+    color: 'black',
+    backgroundColor: 'rgba(0, 0, 0,0.3)',
     alignContent: 'flex-end',
   },
   title: {
+    // color: 'black',
     color: '#fff',
     fontFamily: 'AvenirLTStd-Black',
     fontSize: 30,
     fontWeight: 'bold',
   },
+  titleDescription: {
+    color: '#fff',
+    padding: 10,
+    paddingHorizontal: 20,
+    fontFamily: sizes.fontFamily,
+    fontSize: sizes.title,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   description: {
-    color: 'white',
+    color: '#fff',
     padding: 10,
     paddingHorizontal: 20,
     fontFamily: sizes.fontFamily,
@@ -301,10 +333,22 @@ const StepCourseStyles = StyleSheet.create({
   picture: {
     flex: 1,
     aspectRatio: 1,
-    width: 360,
+    width: 300,
     height: 'auto',
     backgroundColor: 'red',
     // resizeMode: 'contain',
     // alignSelf: 'center',
+  },
+  videoPicture: {
+    justifyContent: 'center',
+    margin: 30,
+  },
+  playpicture: {
+    position: 'absolute',
+    justifyContent: 'center',
+    aspectRatio: 1,
+    width: 100,
+    flex: 1,
+    alignSelf: 'center',
   },
 });
