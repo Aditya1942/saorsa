@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -54,12 +55,13 @@ const Login = ({navigation}) => {
       data: {
         name: socialname,
         email: socialemail,
-        avatar: avatar,
         confirmed: true,
       },
       headers: {'Content-Type': 'application/json'},
-    }).then(async ({data}) => {
+    }).then(async (response) => {
       // body of the function
+      console.log(response);
+      let {data} = response;
       try {
         storetuserSocialLoginInfo(loginData);
         console.log('successfully');
@@ -71,6 +73,7 @@ const Login = ({navigation}) => {
         });
       } catch (e) {
         // saving error
+        console.log('error', e);
         throw e;
       }
     });
@@ -131,11 +134,7 @@ const Login = ({navigation}) => {
           AccessToken.getCurrentAccessToken().then((data) => {
             let {accessToken} = data;
             console.log(data);
-            let PROFILE_REQUEST_PARAMS = {
-              fields: {
-                string: 'name,email,profile_picture',
-              },
-            };
+
             const infoRequest = new GraphRequest(
               '/me?fields=email,name,picture',
               {
@@ -266,63 +265,69 @@ const Login = ({navigation}) => {
                 <Text style={{color: '#fff'}}>Forgot Password?</Text>
               </TouchableOpacity> */}
             </View>
-            <Button
-              title="Login"
-              buttonStyle={{backgroundColor: colors.secondary}}
-              containerStyle={loginStyle.loginBtn}
-              onPress={handleLogin}
-            />
-
-            <Button
-              onPress={() => {
-                HandleFbLogin();
-              }}
-              title="CONNECT WITH FACEBOOK"
-              titleStyle={{color: 'black'}}
-              buttonStyle={{backgroundColor: '#fff'}}
-              mode="outlined
-            "
-              containerStyle={loginStyle.socialLoginBtn}
-              icon={
-                <Icon
-                  name="facebook-square"
-                  style={{paddingHorizontal: 10}}
-                  size={24}
-                  color={colors.primary}
+            {Platform.OS === 'android' && (
+              <>
+                <Button
+                  title="Login"
+                  buttonStyle={{backgroundColor: colors.secondary}}
+                  containerStyle={loginStyle.loginBtn}
+                  onPress={handleLogin}
                 />
-              }
-            />
 
-            <Button
-              onPress={() => {
-                onGoogleButtonPress().then((data) => {
-                  const {additionalUserInfo} = data;
-                  const gemail = additionalUserInfo.profile.email;
-                  const gname = additionalUserInfo.profile.name;
-                  const gpicture = additionalUserInfo.profile.picture.slice(
-                    0,
-                    -6,
-                  );
-                  console.log('SIGN IN WITH GOOGLE', data);
-                  console.log(additionalUserInfo.profile.picture.slice(0, -6));
-                  storeSoclialLogin(data, gemail, gname, gpicture);
-                });
-              }}
-              title="SIGN IN WITH GOOGLE"
-              titleStyle={{color: 'black'}}
-              buttonStyle={{backgroundColor: '#fff'}}
-              mode="outlined
-            "
-              containerStyle={loginStyle.socialLoginBtn}
-              icon={
-                <Icon
-                  name="google"
-                  style={{paddingHorizontal: 10}}
-                  size={24}
-                  color={'#ea4335'}
+                <Button
+                  onPress={() => {
+                    HandleFbLogin();
+                  }}
+                  title="CONNECT WITH FACEBOOK"
+                  titleStyle={{color: 'black'}}
+                  buttonStyle={{backgroundColor: '#fff'}}
+                  mode="outlined
+              "
+                  containerStyle={loginStyle.socialLoginBtn}
+                  icon={
+                    <Icon
+                      name="facebook-square"
+                      style={{paddingHorizontal: 10}}
+                      size={24}
+                      color={colors.primary}
+                    />
+                  }
                 />
-              }
-            />
+
+                <Button
+                  onPress={() => {
+                    onGoogleButtonPress().then((data) => {
+                      const {additionalUserInfo} = data;
+                      const gemail = additionalUserInfo.profile.email;
+                      const gname = additionalUserInfo.profile.name;
+                      const gpicture = additionalUserInfo.profile.picture.slice(
+                        0,
+                        -6,
+                      );
+                      console.log('SIGN IN WITH GOOGLE', data);
+                      console.log(
+                        additionalUserInfo.profile.picture.slice(0, -6),
+                      );
+                      storeSoclialLogin(data, gemail, gname, gpicture);
+                    });
+                  }}
+                  title="SIGN IN WITH GOOGLE"
+                  titleStyle={{color: 'black'}}
+                  buttonStyle={{backgroundColor: '#fff'}}
+                  mode="outlined
+              "
+                  containerStyle={loginStyle.socialLoginBtn}
+                  icon={
+                    <Icon
+                      name="google"
+                      style={{paddingHorizontal: 10}}
+                      size={24}
+                      color={'#ea4335'}
+                    />
+                  }
+                />
+              </>
+            )}
           </View>
         </KeyboardAvoidingView>
 

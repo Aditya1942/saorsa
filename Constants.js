@@ -38,16 +38,19 @@ export const MoodImgs = [
       id: 1,
       name: 'happy',
       img: require('./assets/Moods/happy.png'),
+      score: 16,
     },
     {
       id: 2,
       name: 'excited',
       img: require('./assets/Moods/excited.png'),
+      score: 15,
     },
     {
       id: 3,
       name: 'grateful',
       img: require('./assets/Moods/grateful.png'),
+      score: 14,
     },
   ],
   [
@@ -55,16 +58,19 @@ export const MoodImgs = [
       id: 4,
       name: 'relaxed',
       img: require('./assets/Moods/relaxed.png'),
+      score: 13,
     },
     {
       id: 5,
       name: 'content',
       img: require('./assets/Moods/content.png'),
+      score: 12,
     },
     {
       id: 6,
       name: 'tired',
       img: require('./assets/Moods/tired.png'),
+      score: 11,
     },
   ],
   [
@@ -72,16 +78,19 @@ export const MoodImgs = [
       id: 7,
       name: 'unsure',
       img: require('./assets/Moods/unsure.png'),
+      score: 10,
     },
     {
       id: 8,
       name: 'bored',
       img: require('./assets/Moods/bored.png'),
+      score: 9,
     },
     {
       id: 9,
       name: 'anxious',
       img: require('./assets/Moods/anxious.png'),
+      score: 8,
     },
   ],
   [
@@ -89,16 +98,19 @@ export const MoodImgs = [
       id: 10,
       name: 'angry',
       img: require('./assets/Moods/angry.png'),
+      score: 7,
     },
     {
       id: 11,
       name: 'stressed',
       img: require('./assets/Moods/stressed.png'),
+      score: 6,
     },
     {
       id: 12,
       name: 'sad',
       img: require('./assets/Moods/sad.png'),
+      score: 5,
     },
   ],
 ];

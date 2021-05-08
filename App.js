@@ -19,8 +19,6 @@ import PlayerScreen from './Screens/steps/Player';
 import {useFocusEffect} from '@react-navigation/core';
 import {BackHandler, StyleSheet} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import ImgUpload from './Screens/ImgUpload';
 import VideoPlayerView from './Screens/steps/VideoPlayer';
 
 const Stack = createStackNavigator();

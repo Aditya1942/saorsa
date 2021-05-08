@@ -25,7 +25,7 @@ import {getUserAuthToken} from './Auth/auth';
 import axios from './Auth/axios';
 import {useFocusEffect} from '@react-navigation/core';
 
-const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
+const MoodIcons = ({id, img, name, score, navigation, loginToken, update}) => {
   const {ContextMenu} = renderers;
   const [openMenu, setopenMenu] = useState(false);
   // backpress
@@ -49,13 +49,37 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
     }, [navigation, openMenu]),
   );
   // this function will run when user add new mood
-  const handleUpdateMoodStatus = (mood, rating) => {
+  const handleUpdateMoodStatus = (mood, rating, Score, id) => {
+    let score = Score;
+    if (id <= 6) {
+      switch (rating) {
+        case 4:
+          score -= 0;
+          break;
+        case 3:
+          score -= 1;
+          break;
+        case 2:
+          score -= 2;
+          break;
+        case 1:
+          score -= 3;
+          break;
+
+        default:
+          break;
+      }
+    } else {
+      score -= rating;
+    }
+    console.log('score', score, id);
     axios({
       method: 'post',
       url: '/api/mood/new',
       data: {
         mood: mood,
         rating: rating,
+        score: score,
         moodImage: `${mood} image`,
       },
       headers: {
@@ -67,15 +91,11 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
         if (data.errors) {
           Alert.alert(data.errors[0].msg);
         } else {
-          console.log('data', data);
           // this update fun will send update req to parent component
           update();
         }
       })
-      .catch((err) => {
-        console.error(err);
-      });
-    console.log(mood, rating, loginToken);
+      .catch((err) => {});
     setopenMenu(false);
   };
 
@@ -86,10 +106,8 @@ const MoodIcons = ({id, img, name, navigation, loginToken, update}) => {
       onBackdropPress={() => setopenMenu(false)}
       onSelect={(value) => {
         try {
-          handleUpdateMoodStatus(name, value);
-        } catch (error) {
-          console.log(error);
-        }
+          handleUpdateMoodStatus(name, value, score, id);
+        } catch (error) {}
       }}>
       <MenuTrigger
         children={
@@ -149,7 +167,6 @@ const MoodOptionCustomStyle = (props) => {
   );
 };
 const Moodtracker = ({navigation}) => {
-  console.log(MoodImgs);
   const [loginToken, setLoginToken] = useState('');
   const [MoodHistory, setMoodHistory] = useState([]);
   const [triggerMoodUpdateFromMain, setTriggerMoodUpdateFromMain] = useState(
@@ -204,6 +221,7 @@ const Moodtracker = ({navigation}) => {
       },
     }).then(({data}) => {
       // format date
+      console.log('MOOD HISTORRY', data);
 
       var moodDateAndTime = new Array(1);
       try {
@@ -223,9 +241,7 @@ const Moodtracker = ({navigation}) => {
           moodDateAndTime.push(moodDateAndTimeObject);
           console.log('moodDateAndTimeObject', moodDateAndTime);
         }
-      } catch (error) {
-        console.log('error', error);
-      }
+      } catch (error) {}
       setTriggerMoodUpdateFromMain('0');
       setMoodHistory(moodDateAndTime);
     });
@@ -233,7 +249,6 @@ const Moodtracker = ({navigation}) => {
   useEffect(() => {
     getUserAuthToken().then((token) => {
       setLoginToken(token);
-      console.log('loginToken', loginToken);
       setTriggerMoodUpdateFromMainFun();
     });
   }, [loginToken, setTriggerMoodUpdateFromMainFun]);
@@ -264,6 +279,7 @@ const Moodtracker = ({navigation}) => {
                     id={MoodImgObject.id}
                     img={MoodImgObject.img}
                     name={MoodImgObject.name}
+                    score={MoodImgObject.score}
                     navigation={navigation}
                     loginToken={loginToken}
                     update={setTriggerMoodUpdateFromMainFun}

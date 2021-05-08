@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useState, useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
@@ -11,6 +11,19 @@ import {useFocusEffect} from '@react-navigation/core';
 export const MoodReportTab = ({navigation}) => {
   const [MoodhistoryData, setMoodhistoryData] = useState([]);
   const [loginToken, setLoginToken] = useState('');
+  const [GraphData, setGraphData] = useState([]);
+  const [GraphData2, setGraphData2] = useState({});
+  var data = {
+    labels: ['1', '2', '3', '4', '5', '6', '7', '8'],
+    datasets: [
+      {
+        data: [2, 4, 6, 8, 10, 12, 14, 16],
+        color: (opacity = 1) => 'black', // optional
+        strokeWidth: 2, // optional
+      },
+    ],
+    legend: ['Mood Report'], // optional
+  };
   const chartConfig = {
     backgroundColor: '#fff',
     backgroundGradientFrom: '#fff',
@@ -36,19 +49,25 @@ export const MoodReportTab = ({navigation}) => {
       fill: 'white',
     },
   };
-  const data = {
-    labels: ['1', '2', '3', '4', '5', '6', '7', '8'],
-    datasets: [
-      {
-        data: [10, 30, 20, 40, 45, 35, 48, 50],
-        color: (opacity = 1) => 'black', // optional
-        strokeWidth: 2, // optional
-      },
-    ],
-    legend: ['Mood Report'], // optional
-  };
+
+  useEffect(() => {
+    console.log('object', GraphData.length);
+
+    if (GraphData.length > 0) {
+      setGraphData2({
+        datasets: [
+          {
+            data: GraphData,
+            color: (opacity = 1) => 'black',
+            strokeWidth: 2,
+          },
+        ],
+        legend: ['Mood Report'],
+      });
+    }
+  }, [GraphData]);
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       const setTriggerMoodUpdateFromMainFun = async () => {
         // format date
         function formatDate(date) {
@@ -98,6 +117,7 @@ export const MoodReportTab = ({navigation}) => {
           },
         }).then((Mdata) => {
           var Mooddata = Mdata.data;
+          var graphdata = [];
           var moodDateAndTime = new Array(11);
           try {
             // add only last two mood history
@@ -108,17 +128,19 @@ export const MoodReportTab = ({navigation}) => {
               // date object
               let moodDateAndTimeObject = {
                 id: Mooddata[Mooddata.length - i]._id,
+                score: Mooddata[Mooddata.length - i]?.score,
                 moodType: Mooddata[Mooddata.length - i].mood.toUpperCase(),
                 rating: Mooddata[Mooddata.length - i].rating,
                 dateAndTime: dateAndTime,
                 date: Mooddata[Mooddata.length - i].date,
               };
               moodDateAndTime.push(moodDateAndTimeObject);
+              graphdata.push(Mooddata[Mooddata.length - i]?.score || 1);
             }
-          } catch (error) {
-            console.log('error', error);
-          }
+          } catch (error) {}
+          console.log(graphdata.reverse());
           setMoodhistoryData(moodDateAndTime);
+          setGraphData(graphdata);
         });
       };
       getUserAuthToken().then((token) => {
@@ -132,13 +154,27 @@ export const MoodReportTab = ({navigation}) => {
       <View style={MoodReportStyle.body}>
         <View style={MoodReportStyle.graph}>
           <TouchableOpacity>
-            <LineChart
-              data={data}
-              width={sizes.width / 1.15}
-              height={220}
-              chartConfig={chartConfig}
-              style={{backgroundColor: 'grey'}}
-            />
+            {GraphData.length > 0 ? (
+              <LineChart
+                data={{
+                  labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                  datasets: [
+                    {
+                      data: GraphData,
+                      color: (opacity = 1) => 'black', // optional
+                      strokeWidth: 2, // optional
+                    },
+                  ],
+                  legend: ['Mood Report'], // optional
+                }}
+                width={sizes.width / 1.15}
+                height={220}
+                chartConfig={chartConfig}
+                style={{backgroundColor: 'grey'}}
+              />
+            ) : (
+              <View />
+            )}
           </TouchableOpacity>
         </View>
         {MoodhistoryData.map((mood) => (
