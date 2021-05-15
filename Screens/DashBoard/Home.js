@@ -69,38 +69,15 @@ const Home = ({navigation}) => {
 
         <Steps navigation={navigation} />
 
-        <View style={styles.description}>
-          <Text
-            style={{
-              fontSize: sizes.body,
-              color: 'black',
-              fontWeight: 'bold',
-              fontFamily: 'AvenirLTStd-Black',
-            }}>
-            What is Emotional Regulation ?
-          </Text>
-          <Text
-            style={{
-              fontSize: sizes.caption,
-              color: 'black',
-              fontFamily: 'AvenirLTStd-Book',
-              marginTop: 10,
-            }}>
-            Emotional Regulation is the ability to sit with and manage pleasant
-            and unpleasant emotions. Emotional Regulation is a coping strategy
-            which allows us to confront intentse emotions and difficult
-            situations. When we can’t regulate our emotions (also known as
-            Emotional dysregulation) we use unhelpful coping strategies to
-            manage emotions. Dysregulation results in difficulties coping and
-            processing the emotion. Which can resulting in us using unhelpful
-            coping strategies (such as taking substances, binge eating, saying
-            things we regret, self criticising or self harming).
-          </Text>
-        </View>
         {courses.map((item, index) => {
           return (
             <Pressable key={item.id}>
-              <Courseslist image={item.img} title={item.title} />
+              <Courseslist
+                image={item.img}
+                onPress={item.onPress}
+                title={item.title}
+                navigation={navigation}
+              />
             </Pressable>
           );
         })}

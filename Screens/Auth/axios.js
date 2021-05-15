@@ -7,6 +7,8 @@ const instance = axios.create({
     return status >= 200 && status <= 500; // default
   },
 });
+export const CancelToken = axios.CancelToken;
+
 export default instance;
 
 // https://mighty-bastion-04883.herokuapp.com

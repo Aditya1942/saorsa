@@ -5,7 +5,7 @@ import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
 import {colors, sizes} from '../../../Constants';
 import {getUserAuthToken} from '../../Auth/auth';
-import axios from '../../Auth/axios';
+import axios, {CancelToken} from '../../Auth/axios';
 import {useFocusEffect} from '@react-navigation/core';
 
 export const MoodReportTab = ({navigation}) => {
@@ -68,6 +68,7 @@ export const MoodReportTab = ({navigation}) => {
   }, [GraphData]);
   useFocusEffect(
     useCallback(() => {
+      const source = CancelToken.source();
       const setTriggerMoodUpdateFromMainFun = async () => {
         // format date
         function formatDate(date) {
@@ -111,6 +112,8 @@ export const MoodReportTab = ({navigation}) => {
         await axios({
           method: 'get',
           url: 'api/mood/all',
+          cancelToken: source.token,
+
           headers: {
             'Content-Type': 'application/json',
             'x-auth-token': loginToken,
@@ -147,6 +150,9 @@ export const MoodReportTab = ({navigation}) => {
         setLoginToken(token);
         setTriggerMoodUpdateFromMainFun();
       });
+      return () => {
+        source.cancel('hey yo! going too fast. take it easy');
+      };
     }, [loginToken, navigation]),
   );
   return (
@@ -173,7 +179,25 @@ export const MoodReportTab = ({navigation}) => {
                 style={{backgroundColor: 'grey'}}
               />
             ) : (
-              <View />
+              <LineChart
+                withVerticalLabels={false}
+                withHorizontalLabels={false}
+                data={{
+                  labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                  datasets: [
+                    {
+                      data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                      color: (opacity = 1) => 'black', // optional
+                      strokeWidth: 2, // optional
+                    },
+                  ],
+                  legend: ['Mood Report'], // optional
+                }}
+                width={sizes.width / 1.15}
+                height={220}
+                chartConfig={chartConfig}
+                style={{backgroundColor: 'grey'}}
+              />
             )}
           </TouchableOpacity>
         </View>

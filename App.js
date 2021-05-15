@@ -20,6 +20,8 @@ import {useFocusEffect} from '@react-navigation/core';
 import {BackHandler, StyleSheet} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import VideoPlayerView from './Screens/steps/VideoPlayer';
+import PaidCourse from './Screens/course/PaidCourse';
+import PaidSubCourse from './Screens/course/PaidSubCourse';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -85,7 +87,8 @@ const HomeStackScreen = () => {
       <HomeStack.Screen name="Home" component={Home} />
       <HomeStack.Screen name="Step" component={Step} />
       <HomeStack.Screen name="StepCourse" component={StepCourse} />
-      <HomeStack.Screen name="PlayerScreen" component={PlayerScreen} />
+      <HomeStack.Screen name="PaidCourse" component={PaidCourse} />
+      <HomeStack.Screen name="PaidSubCourse" component={PaidSubCourse} />
     </HomeStack.Navigator>
   );
 };

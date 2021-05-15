@@ -20,7 +20,7 @@ const Steps = ({navigation}) => {
     }
   };
   useEffect(() => {
-    setTimeout(() => {
+    let a = setTimeout(() => {
       getUserAuthToken().then((token) => {
         if (!token) navigation.navigate('Login');
         axios({
@@ -38,6 +38,9 @@ const Steps = ({navigation}) => {
       });
       setstepDataLoaded(true);
     }, 1000);
+    return () => {
+      clearTimeout(a);
+    };
   }, [navigation]);
   return (
     <FlatList
@@ -55,11 +58,15 @@ const Steps = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               if (stepDataLoaded) {
-                navigation.navigate('Step', {
-                  id: index + 1,
-                  index: index,
-                  stepName: item.id,
-                });
+                if (item.id === 'Step 6') {
+                  navigation.navigate('Profile', {activeTab: 'tab3'});
+                } else {
+                  navigation.navigate('Step', {
+                    id: index + 1,
+                    index: index,
+                    stepName: item.id,
+                  });
+                }
               }
             }}>
             <View style={styles.courseItems}>

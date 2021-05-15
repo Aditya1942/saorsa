@@ -19,7 +19,7 @@ import {useFocusEffect} from '@react-navigation/core';
 import {launchImageLibrary} from 'react-native-image-picker';
 import axios from '../Auth/axios';
 
-const Profile = ({navigation}) => {
+const Profile = ({navigation, route}) => {
   const [UserData, setUserData] = useState({});
   const [Tab1, setTab1] = useState(ProfileStyle.profileTab);
   const [Tab2, setTab2] = useState(ProfileStyle.profileTabActive);
@@ -80,10 +80,39 @@ const Profile = ({navigation}) => {
       return null;
     }
   };
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Profile navigation', route);
+      const handleTabChange2 = (e) => {
+        // to open, close or navigate in different tabs
+        closeAllTab();
+        if (e === 'tab1') {
+          setTab1(ProfileStyle.profileTabActive);
+          setactiveProfileTab('tab1');
+          setProfileTabIsOpen(true);
+          return null;
+        } else if (e === 'tab2') {
+          setTab2(ProfileStyle.profileTabActive);
+          setactiveProfileTab('tab2');
+          setProfileTabIsOpen(true);
+          return null;
+        } else if (e === 'tab3') {
+          setTab3(ProfileStyle.profileTabActive);
+          setactiveProfileTab('tab3');
+          setProfileTabIsOpen(true);
+          return null;
+        }
+      };
+      if (route.params.activeTab) {
+        handleTabChange2(route.params.activeTab);
+      }
+    }, [route]),
+  );
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('object', navigation);
+      console.log('Profile navigation', navigation);
+
       const onBackPress = () => {
         if (editProfileIsOpen || ProfileTabIsOpen) {
           closeAllTab();
@@ -99,7 +128,7 @@ const Profile = ({navigation}) => {
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [navigation, editProfileIsOpen, ProfileTabIsOpen]),
+    }, [editProfileIsOpen, ProfileTabIsOpen, navigation]),
   );
 
   useEffect(() => {
@@ -195,9 +224,9 @@ const Profile = ({navigation}) => {
             onPress={() => {
               seteditProfileIsOpen(true);
             }}>
-            {!isSocialLogin && (
+            {/* {!isSocialLogin && (
               <Text style={ProfileStyle.editProfile}>Edit&nbsp;Profile</Text>
-            )}
+            )} */}
           </TouchableOpacity>
         </View>
         {editProfileIsOpen ? (

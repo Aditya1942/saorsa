@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {colors, sizes} from '../../../Constants';
+import {colors} from '../../../Constants';
 import headingImg from '../../../assets/yourPlaneHeadingPic.png';
 import FastImage from 'react-native-fast-image';
 const SmallBox = ({title, body, footer}) => {
@@ -8,7 +8,7 @@ const SmallBox = ({title, body, footer}) => {
     <View style={YourPlanTabStyle.smallBox}>
       <Text style={YourPlanTabStyle.smallBoxTitle}>{title}</Text>
       <Text style={YourPlanTabStyle.smallBoxbody}>{body}</Text>
-      <Text style={YourPlanTabStyle.smallBoxFooter}>{footer}</Text>
+      {/* <Text style={YourPlanTabStyle.smallBoxFooter}>{footer}</Text> */}
     </View>
   );
 };
@@ -16,11 +16,8 @@ const BigBox = ({title, body, footer}) => {
   return (
     <View style={YourPlanTabStyle.bigBox}>
       <Text style={YourPlanTabStyle.bigBoxTitle}>{title}</Text>
-      <Text style={YourPlanTabStyle.bigBoxbody}>
-        <View></View>
-        {body}
-      </Text>
-      <Text style={YourPlanTabStyle.bigBoxFooter}>{footer}</Text>
+      <Text style={YourPlanTabStyle.bigBoxbody}>{body}</Text>
+      {/* <Text style={YourPlanTabStyle.bigBoxFooter}>{footer}</Text> */}
     </View>
   );
 };

@@ -85,7 +85,10 @@ export default function DrawerScreen({navigation}) {
         <TouchableOpacity>
           <Text style={DrawerStyle.bodyText}>Privacy Policy</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('AboutUs');
+          }}>
           <Text style={DrawerStyle.bodyText}>About</Text>
         </TouchableOpacity>
         <TouchableOpacity>

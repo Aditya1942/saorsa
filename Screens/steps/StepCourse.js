@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   BackHandler,
+  FlatList,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -16,8 +17,9 @@ import {useFocusEffect} from '@react-navigation/core';
 import AutoHeightImage from 'react-native-auto-height-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StepBtn} from './Step';
-import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image';
+import axios from '../Auth/axios';
+import {getUserAuthToken} from '../Auth/auth';
 
 const Audio = ({navigation, audio}) => {
   return (
@@ -60,7 +62,7 @@ const Title = ({audio, titleText, navigation}) => {
     },
 
     title: {
-      width: sizes.width * 0.65,
+      width: sizes.width * 0.68,
       paddingVertical: 10,
       paddingLeft: 5,
       justifyContent: 'center',
@@ -73,7 +75,7 @@ const Title = ({audio, titleText, navigation}) => {
       fontWeight: 'bold',
       fontFamily: 'AvenirLTStd-Black',
       textTransform: 'uppercase',
-      fontSize: 12,
+      fontSize: 14,
     },
     after: {
       width: 0,
@@ -118,13 +120,28 @@ const Course = ({
     str = str.split(' ');
     str.forEach((word, i) => {
       titleStr = titleStr.concat(word + ' ');
-      // console.log('word', word, word.length);
-      // if (lengthyTitle.length >= 20) {
-      if (i === 4 || i === 8) {
+      let join = false;
+      let n = str[i + 1];
+      // if string length is greater then 23
+      if (titleStr.length >= 24) {
+        join = true;
+        if (n) {
+          if (titleStr.length >= 10 && titleStr.length <= 26 && n.length <= 4) {
+            join = false;
+          }
+          if (n.length < 2) {
+            join = false;
+          }
+        }
+      }
+      if (titleStr.length >= 20 && titleStr.length <= 25 && word.length <= 10) {
+        join = true;
+      }
+
+      if (join) {
         lengthyTitle.push(titleStr);
         titleStr = '';
       }
-      // }
     });
     if (titleStr !== '') {
       lengthyTitle.push(titleStr);
@@ -136,9 +153,7 @@ const Course = ({
     titles = WordCount(title);
     // console.log(titles);
   }
-  console.log('==================================');
-  console.log('Video', video || null);
-  console.log('==================================');
+
   return (
     <View>
       {title &&
@@ -170,9 +185,10 @@ const Course = ({
       {description && (
         <Text style={StepCourseStyles.description}>{description}</Text>
       )}
+
       <View style={{paddingHorizontal: 10}}>
         <AutoHeightImage width={350} source={{uri: img}} />
-        {/* <FastImage style={StepCourseStyles.picture} source={{uri: img}} /> */}
+        {/* <FastImage width={350} source={{uri: img}} /> */}
       </View>
     </View>
   );
@@ -194,6 +210,32 @@ const StepCourse = ({route, navigation}) => {
       throw e;
     }
   };
+  useEffect(() => {
+    var myVar = setTimeout(function () {
+      let step = route.params.stepName;
+      let course = data.name;
+      getUserAuthToken().then((token) => {
+        console.log('token', token);
+        axios({
+          url: '/api/progress',
+          data: JSON.stringify({step, course}),
+          method: 'put',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
+        }).then((e) => {
+          console.log(e);
+        });
+      });
+
+      console.log('Hello', step, course);
+    }, 60000);
+    return () => {
+      clearTimeout(myVar);
+    };
+  }, [data.name, route]);
+
   useFocusEffect(
     React.useCallback(() => {
       getStepData()
@@ -239,19 +281,20 @@ const StepCourse = ({route, navigation}) => {
         </View>
       </ImageBackground>
       <ScrollView style={StepCourseStyles.body}>
-        <View style={{marginTop: 30}} />
-        {data.data.map((course, index) => (
-          <Course
-            key={index}
-            title={course?.title}
-            description={course?.description}
-            img={course?.img}
-            audio={course?.audio}
-            video={course.video}
-            thumbnail={course.thumbnail}
-            navigation={navigation}
-          />
-        ))}
+        <View style={{marginTop: 30}}>
+          {data.data.map((course, index) => (
+            <Course
+              key={index}
+              title={course?.title}
+              description={course?.description}
+              img={course?.img}
+              audio={course?.audio}
+              video={course.video}
+              thumbnail={course.thumbnail}
+              navigation={navigation}
+            />
+          ))}
+        </View>
         <View
           style={{
             marginTop: 50,
@@ -271,7 +314,7 @@ const StepCourse = ({route, navigation}) => {
             />
           )}
         </View>
-        <View style={{marginTop: 100}} />
+        <View style={{height: 100}} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -333,15 +376,21 @@ const StepCourseStyles = StyleSheet.create({
   picture: {
     flex: 1,
     aspectRatio: 1,
-    width: 300,
-    height: 'auto',
-    backgroundColor: 'red',
-    // resizeMode: 'contain',
-    // alignSelf: 'center',
+    // backgroundColor: 'red',
+    resizeMode: 'cover',
+    height: sizes.ITEM_HEIGHT * 1.7,
+    borderRadius: 20,
+    width: '100%',
   },
   videoPicture: {
+    // backgroundColor: '#fff',
+    // height: sizes.ITEM_HEIGHT * 1.3,
+    borderRadius: 20,
+    flex: 0.8,
+    marginHorizontal: 10,
+    marginBottom: 50,
+    alignItems: 'center',
     justifyContent: 'center',
-    margin: 30,
   },
   playpicture: {
     position: 'absolute',
@@ -352,3 +401,25 @@ const StepCourseStyles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
+
+/* <FlatList
+            data={data.data}
+            keyExtractor={({index}) => index}
+            pagingEnabled
+            contentContainerStyle={{marginTop: 30}}
+            renderItem={({item, index}) => {
+              console.log(item);
+              return (
+                <Course
+                  key={index}
+                  title={item?.title}
+                  description={item?.description}
+                  img={item?.img}
+                  audio={item?.audio}
+                  video={item?.video}
+                  thumbnail={item?.thumbnail}
+                  navigation={navigation}
+                />
+              );
+            }}
+          /> */

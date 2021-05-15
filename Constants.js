@@ -162,32 +162,86 @@ export const courses = [
     title: 'RELAXATION',
     img: require('./assets/Relax.png'),
     Component: 'Relaxation',
+    onPress: false,
   },
   {
     id: '2',
     title: 'MINDFULLNESS',
     img: require('./assets/Mindfull.png'),
     Component: 'Mindfullness',
+    onPress: false,
   },
   {
     id: '3',
     title: 'SLEEP',
     img: require('./assets/Sleep.png'),
     Component: 'Sleep',
+    onPress: false,
   },
   {
     id: '4',
     title: 'DEPRESSION',
     img: require('./assets/Depression.png'),
     Component: 'Depression',
+    onPress: true,
   },
   {
     id: '5',
     title: 'ANXIETY & STRESS',
     img: require('./assets/Stress.png'),
     Component: 'Anxiety',
+    onPress: false,
   },
 ];
+export const paidCourse = [
+  {
+    id: 1,
+    name: 'PATIENT HEALTH QUESTIONNAIRE',
+    courseimage:
+      'http://res.cloudinary.com/adarshsingh/image/upload/v1618010966/a7pelrhwgu3ij1dta2ov.png',
+    locked: false,
+    courses: {
+      image:
+        'http://res.cloudinary.com/adarshsingh/image/upload/v1618010966/a7pelrhwgu3ij1dta2ov.png',
 
+      CourseTitle: 'PATIENT HEALTH QUESTIONNAIRE',
+      data: [
+        {question: 'Feeling Despairing or Hopeless?', id: 1},
+        {question: 'Feeling Tired or having Little Energy?', id: 2},
+        {question: ' Feeling Unhappy?', id: 3},
+        {
+          question: 'Experienced Little interest or Pleasure in doing things?',
+          id: 4,
+        },
+        {
+          question:
+            'Experienced difficulty getting to Sleep or Staying Asleep?',
+          id: 5,
+        },
+        {
+          question:
+            'I have felt I have someone to turn to for support when needed?',
+          id: 6,
+        },
+      ],
+    },
+  },
+  {
+    id: 1,
+    name: 'PATIENT HEALTH QUESTIONNAIRE',
+    courseimage:
+      'http://res.cloudinary.com/adarshsingh/image/upload/v1618010966/a7pelrhwgu3ij1dta2ov.png',
+    locked: false,
+    courses: {},
+  },
+  {
+    id: 1,
+    name: 'PATIENT HEALTH QUESTIONNAIRE',
+    courseimage:
+      'http://res.cloudinary.com/adarshsingh/image/upload/v1618010966/a7pelrhwgu3ij1dta2ov.png',
+    locked: true,
+    courses: {},
+  },
+];
 // login
 // http://localhost:4000/api/auth/ {email:"email",password:"password"}

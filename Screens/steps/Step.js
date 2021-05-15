@@ -107,7 +107,7 @@ function Step({route, navigation}) {
           ) : (
             <View />
           )}
-          {id !== 6 ? (
+          {id !== 5 ? (
             <NextStep
               navigationData={{
                 id: index + 2,
@@ -117,7 +117,15 @@ function Step({route, navigation}) {
               navigation={navigation}
             />
           ) : (
-            <View />
+            <NextStep
+              navigationData={{
+                id: index + 2,
+                index: index + 1,
+                stepName: StepData[index + 1]?.name,
+              }}
+              navigation={navigation}
+              navigateToStep6={true}
+            />
           )}
         </View>
       </ScrollView>
@@ -155,11 +163,15 @@ export const StepBtn = ({
     </TouchableOpacity>
   );
 };
-const NextStep = ({navigationData, navigation}) => {
+const NextStep = ({navigationData, navigation, navigateToStep6 = false}) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('Step', navigationData);
+        if (!navigateToStep6) {
+          navigation.navigate('Step', navigationData);
+        } else {
+          navigation.navigate('Profile', {activeTab: 'tab3'});
+        }
       }}>
       <View style={StepStyles.nextStep}>
         <Text style={StepStyles.nextStepText}>
@@ -242,6 +254,7 @@ const StepStyles = StyleSheet.create({
   },
   StepBtnBody: {
     backgroundColor: '#fff',
+    height: sizes.ITEM_HEIGHT + 10,
     borderRadius: 20,
   },
   StepBtnText: {

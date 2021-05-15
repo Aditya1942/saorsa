@@ -1,58 +1,118 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, View, Text} from 'react-native';
 import {PieChart} from 'react-native-svg-charts';
 import {Text as SvgText} from 'react-native-svg';
 import {colors, sizes} from '../../../Constants';
 import {BarChart} from 'react-native-chart-kit';
 import {StyleSheet} from 'react-native';
-import {FlatList} from 'react-native';
-const PieChartSteps = () => {
+import axios from '../../Auth/axios';
+import {getUserAuthToken} from '../../Auth/auth';
+
+const PieChartSteps = ({PieChartStepsData}) => {
+  var completedStep = 0;
+  PieChartStepsData.forEach((e, i) => {
+    if (e.percentage >= 100) {
+      completedStep = i + 1;
+    }
+  });
   const data = [
     {
       key: 1,
       amount: 1,
-      svg: {fill: colors.secondary},
-      arc: {outerRadius: '125%', innerRadius: '100%'},
+      svg: {
+        fill:
+          PieChartStepsData[0].percentage === 100
+            ? colors.secondary
+            : colors.primary,
+      },
+      arc:
+        PieChartStepsData[0].percentage === 100
+          ? {
+              outerRadius: '125%',
+              innerRadius: '100%',
+            }
+          : {},
       step: 'Step 1',
       name: 'Emotinal Awareness',
     },
     {
       key: 2,
       amount: 1,
-      svg: {fill: colors.primary},
+      svg: {
+        fill:
+          PieChartStepsData[1].percentage === 100
+            ? colors.secondary
+            : colors.primary,
+      },
+      arc:
+        PieChartStepsData[1].percentage === 100
+          ? {
+              outerRadius: '125%',
+              innerRadius: '100%',
+            }
+          : {},
       step: 'Step 2',
-      name: 'Emotinal Awareness',
+      name: 'Managing Uncertainty,Worry & Anxiety',
     },
     {
       key: 3,
       amount: 1,
-      svg: {fill: colors.primary},
+      svg: {
+        fill:
+          PieChartStepsData[2].percentage === 100
+            ? colors.secondary
+            : colors.primary,
+      },
+      arc:
+        PieChartStepsData[2].percentage === 100
+          ? {
+              outerRadius: '125%',
+              innerRadius: '100%',
+            }
+          : {},
       step: 'Step 3',
-      name: 'Emotinal Awareness',
+      name: 'Learning to Self Soothe',
     },
     {
       key: 4,
       amount: 1,
-      svg: {fill: colors.primary},
+      svg: {
+        fill:
+          PieChartStepsData[3].percentage === 100
+            ? colors.secondary
+            : colors.primary,
+      },
+      arc:
+        PieChartStepsData[3].percentage === 100
+          ? {
+              outerRadius: '125%',
+              innerRadius: '100%',
+            }
+          : {},
       step: 'Step 4',
-      name: 'Emotinal Awareness',
+      name: 'Changing Unhealthy Behaviour',
     },
     {
       key: 5,
       amount: 1,
-      svg: {fill: colors.primary},
+      svg: {
+        fill:
+          PieChartStepsData[4].percentage === 100
+            ? colors.secondary
+            : colors.primary,
+      },
+      arc:
+        PieChartStepsData[4].percentage === 100
+          ? {
+              outerRadius: '125%',
+              innerRadius: '100%',
+            }
+          : {},
       step: 'Step 5',
-      name: 'Emotinal Awareness',
-    },
-    {
-      key: 6,
-      amount: 1,
-      svg: {fill: colors.primary},
-      step: 'Step 6',
-      name: 'Emotinal Awareness',
+      name: 'Sleep Better',
     },
   ];
-  const Labels = ({data}) => {
+  const Labels = (lableData) => {
     return (
       <View key={1}>
         <SvgText
@@ -63,7 +123,7 @@ const PieChartSteps = () => {
           fontSize={24}
           stroke={'black'}
           strokeWidth={0.2}>
-          {data[0].step}
+          {`${PieChartStepsData[completedStep].step}`}
         </SvgText>
         <SvgText
           y={10}
@@ -73,7 +133,7 @@ const PieChartSteps = () => {
           fontSize={14}
           stroke={'black'}
           strokeWidth={0.2}>
-          {data[0].name}
+          {`${PieChartStepsData[completedStep].percentage}% Completed`}
         </SvgText>
       </View>
     );
@@ -92,28 +152,20 @@ const PieChartSteps = () => {
     </View>
   );
 };
-const BarChartProgress = () => {
+const BarChartProgress = ({data}) => {
   const data2 = {
-    labels: [
-      'sunday',
-      'monday',
-      'tuesday',
-      'wednesday',
-      'thusday',
-      'friday',
-      'today',
-    ],
+    labels: ['STEP 1', 'STEP 2', 'STEP 3', 'STEP 4', 'STEP 5'],
     datasets: [
       {
-        data: [80, 45, 55, 80, 99, 43, 50],
+        data: data,
         colors: [
-          (opacity = 1) => `red`,
-          (opacity = 1) => `blue`,
-          (opacity = 1) => `green`,
-          (opacity = 1) => `purple`,
-          (opacity = 1) => `#500000`,
-          (opacity = 1) => `yellow`,
-          (opacity = 1) => `grey`,
+          (opacity = 1) => 'red',
+          (opacity = 1) => 'blue',
+          (opacity = 1) => 'green',
+          (opacity = 1) => 'purple',
+          (opacity = 1) => 'grey',
+          (opacity = 1) => 'yellow',
+          (opacity = 1) => '#500000',
         ],
       },
     ],
@@ -125,10 +177,10 @@ const BarChartProgress = () => {
     backgroundGradientTo: '#ffffff',
     backgroundGradientFromOpacity: 1,
     backgroundGradientToOpacity: 5,
-    color: (opacity = 1) => `black`,
+    color: (opacity = 1) => 'black',
     strokeWidth: 2, // optional, default 3
     barPercentage: 0.5,
-    labelColor: (opacity = 1) => `black`,
+    labelColor: (opacity = 1) => 'black',
     useShadowColorFromDataset: false, // optional
     propsForLabels: {
       fontSize: '9',
@@ -141,12 +193,13 @@ const BarChartProgress = () => {
         data={data2}
         chartConfig={chartConfig}
         width={sizes.width}
-        withVerticalLabels={true}
+        withVerticalLabels
         withHorizontalLabels={false}
-        withCustomBarColorFromData={true}
-        flatColor={true}
+        withCustomBarColorFromData
+        showBarTops
+        flatColor
         height={220}
-        fromZero={true}
+        fromZero
       />
     </View>
   );
@@ -157,11 +210,12 @@ const StepDetails = ({title, percentage, list}) => {
       <Text style={ProgressTabStyle.StepDetailsTitle}>{title}</Text>
       <Text style={ProgressTabStyle.StepDetailsPr}>{percentage}</Text>
       <View>
-        {list.map((item) => (
-          <Text key={item.id} style={ProgressTabStyle.StepDetailsList}>
-            {`\u2022  ${item.value}`}
-          </Text>
-        ))}
+        {list.length > 0 &&
+          list.map((item) => (
+            <Text key={item.id} style={ProgressTabStyle.StepDetailsList}>
+              {`\u2022  ${item.value}`}
+            </Text>
+          ))}
         {/* <FlatList
           data={list}
           renderItem={({item}) => (
@@ -172,25 +226,86 @@ const StepDetails = ({title, percentage, list}) => {
   );
 };
 export const ProgressTab = () => {
+  const [ProgressData, setProgressData] = useState([]);
+  const [StepDetailsData, setStepDetailsData] = useState([]);
+  const [barGraphData, setBarGraphData] = useState([]);
+  const StepName = [
+    {name: 'Step 1', title: 'Emotional Awareness'},
+    {name: 'Step 2', title: 'Managing Uncertainty,Worry & Anxiety'},
+    {name: 'Step 3', title: 'Learning to Self Soothe'},
+    {name: 'Step 4', title: 'Changing Unhealthy Behaviour'},
+    {name: 'Step 5', title: 'Sleep Better'},
+  ];
+  useEffect(() => {
+    const barGraphDataFunction = (data) => {
+      let temp = [];
+      data.progressArray.forEach((e) => {
+        // if (e.step === 'STEP 1' ||) temp.push((e.percentage = 100));
+        // else
+        temp.push(e.percentage);
+      });
+      console.log(temp);
+      return temp;
+    };
+    const StepDetailsFunction = (data) => {
+      let temp = [];
+      data.progressArray.forEach((e) => {
+        let tempstep = {
+          Step: e.step,
+          percentage: e.percentage,
+          courses: [],
+        };
+        e.courses.forEach((c) => {
+          let lettempCourse = {id: c._id, value: c.course};
+          if (c.done > 0) {
+            tempstep.courses.push(lettempCourse);
+          }
+        });
+        temp.push(tempstep);
+      });
+      console.log(temp);
+      return temp;
+    };
+    getUserAuthToken().then((token) => {
+      console.log('token', token);
+      axios({
+        method: 'get',
+        url: '/api/progress',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+      }).then((e) => {
+        console.log(e.data.progressArray);
+
+        setProgressData(e.data.progressArray);
+        setBarGraphData(barGraphDataFunction(e.data));
+        setStepDetailsData(StepDetailsFunction(e.data));
+      });
+    });
+  }, []);
   return (
     <ScrollView style={ProgressTabStyle.mainContainer}>
       <Text style={{position: 'absolute', top: 0}}>Progress Report</Text>
       {/* Circular progress steps  */}
-      <PieChartSteps />
+      {ProgressData.length > 0 && (
+        <PieChartSteps PieChartStepsData={ProgressData} />
+      )}
       {/* Bar graph multi color  */}
-      <BarChartProgress />
+      {barGraphData.length > 0 && <BarChartProgress data={barGraphData} />}
       <View style={ProgressTabStyle.StepDetailsMain}>
         {/* progress StepDetails */}
-        <StepDetails
-          title="Step&nbsp;1:&nbsp;Emotinal&nbsp;Awareness"
-          percentage="80%&nbsp;Completed"
-          list={[
-            {id: 1, value: 'Feelings Wheel'},
-            {id: 2, value: 'Feelings Wheel 2'},
-          ]}
-        />
+        {ProgressData.length > 0 &&
+          StepDetailsData?.map((progress, i) => (
+            <StepDetails
+              key={i}
+              title={`${progress.Step}: ${StepName[i].title}`}
+              percentage={`${progress.percentage}% Completed`}
+              list={progress.courses}
+            />
+          ))}
       </View>
-      <View style={{paddingBottom: 400}}></View>
+      <View style={{paddingBottom: 400}} />
     </ScrollView>
   );
 };
@@ -205,7 +320,7 @@ const ProgressTabStyle = StyleSheet.create({
     padding: 20,
   },
   StepDetailsTitle: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: 'bold',
     marginBottom: 10,
   },
