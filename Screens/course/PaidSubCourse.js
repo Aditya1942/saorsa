@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import {
+  Button,
+  Dimensions,
   ImageBackground,
   SafeAreaView,
   ScrollView,
@@ -12,14 +14,10 @@ import {LineChart} from 'react-native-chart-kit';
 import FastImage from 'react-native-fast-image';
 import Header from '../../Components/Header';
 import {colors, sizes} from '../../Constants';
+import BottomSheet from 'react-native-bottomsheet-reanimated';
 
-const Questions = ({data}) => {
+const Questions = ({data, onOpenBottomSheetHandler}) => {
   const QuestionsInput = data;
-  const bottomSheet = React.useRef();
-  const onOpenBottomSheetHandler = (index) => {
-    console.log(bottomSheet);
-    bottomSheet.current.snapTo(index);
-  };
 
   const Question = ({q, index}) => {
     const Options = [
@@ -88,6 +86,78 @@ const Questions = ({data}) => {
       </View>
     );
   };
+
+  return (
+    <View>
+      {data.map((q, index) => (
+        <Question key={index} q={q} index={index} />
+      ))}
+      <View
+        style={{alignItems: 'center', justifyContent: 'center', marginTop: 50}}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log(QuestionsInput);
+          }}
+          style={{
+            backgroundColor: colors.secondary,
+            width: 200,
+            height: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 20,
+            marginBottom: 10,
+          }}>
+          <Text style={{color: '#fff', fontSize: 16}}>SUBMIT</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            onOpenBottomSheetHandler(2);
+          }}
+          style={{
+            backgroundColor: '#fff',
+            width: 200,
+            height: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 20,
+          }}>
+          <Text style={{color: colors.secondary, fontSize: 16}}>
+            VIEW GRAPH
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+const MoodHistory = ({name, dateAndTime}) => {
+  return (
+    <View style={Styles.MoodHistory}>
+      <Text
+        style={{
+          ...Styles.MoodHistoryText,
+          ...Styles.MoodHistoryNameText,
+        }}>
+        {name}
+      </Text>
+      <Text style={Styles.MoodHistoryText}>{dateAndTime}</Text>
+    </View>
+  );
+};
+const PaidSubCourse = ({navigation, route}) => {
+  const CourseTitle = route.params.CourseTitle;
+  const image = route.params.image;
+  const CourseData = route.params.data;
+  console.log(route.params);
+  // bottom
+  const bottomSheet = React.useRef();
+  const onOpenBottomSheetHandler = (index) => {
+    console.log(bottomSheet);
+    bottomSheet.current.snapTo(index);
+  };
+
+  const snapPoints = [0, sizes.height / 2, '70%', '100%'];
+  // bottom
+  // graph elements
   const chartConfig = {
     backgroundColor: '#fff',
     backgroundGradientFrom: '#fff',
@@ -133,66 +203,6 @@ const Questions = ({data}) => {
   };
 
   return (
-    <View>
-      {data.map((q, index) => (
-        <Question key={index} q={q} index={index} />
-      ))}
-      <View
-        style={{alignItems: 'center', justifyContent: 'center', marginTop: 50}}>
-        <TouchableOpacity
-          onPress={() => {
-            console.log(QuestionsInput);
-          }}
-          style={{
-            backgroundColor: colors.secondary,
-            width: 200,
-            height: 30,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 20,
-            marginBottom: 10,
-          }}>
-          <Text style={{color: '#fff', fontSize: 16}}>SUBMIT</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            onOpenBottomSheetHandler(3);
-          }}
-          style={{
-            backgroundColor: '#fff',
-            width: 200,
-            height: 30,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 20,
-          }}>
-          <Text style={{color: colors.secondary, fontSize: 16}}>
-            VIEW GRAPH
-          </Text>
-        </TouchableOpacity>
-        <View style={{marginTop: 50}}>
-          <LineChart
-            withHorizontalLines={false}
-            withVerticalLabels={false}
-            withHorizontalLabels={false}
-            // withOuterLines={false}
-            data={GraphData}
-            width={sizes.width}
-            height={220}
-            chartConfig={chartConfig}
-          />
-        </View>
-      </View>
-    </View>
-  );
-};
-
-const PaidSubCourse = ({navigation, route}) => {
-  const CourseTitle = route.params.CourseTitle;
-  const image = route.params.image;
-  const CourseData = route.params.data;
-  console.log(route.params);
-  return (
     <SafeAreaView
       style={{
         flex: 1,
@@ -216,7 +226,10 @@ const PaidSubCourse = ({navigation, route}) => {
           nulla aliquid repellat?
         </Text>
         {CourseData?.data[0]?.question ? (
-          <Questions data={CourseData.data} />
+          <Questions
+            onOpenBottomSheetHandler={onOpenBottomSheetHandler}
+            data={CourseData.data}
+          />
         ) : (
           <View>
             <TouchableOpacity style={Styles.introvideo}>
@@ -227,8 +240,63 @@ const PaidSubCourse = ({navigation, route}) => {
             </TouchableOpacity>
           </View>
         )}
+
         <View style={{margin: 60}} />
       </ScrollView>
+      <BottomSheet
+        bottomSheerColor="#FFFFFF"
+        // backDropColor="red"
+        ref={bottomSheet}
+        initialPosition={'0%'}
+        snapPoints={snapPoints}
+        isBackDrop={true}
+        isBackDropDismissByPress={true}
+        isRoundBorderWithTipHeader={true}
+        keyboardAware
+        // isModal
+        containerStyle={{
+          backgroundColor: '#fff',
+          marginHorizontal: 10,
+        }}
+        // tipStyle={{backgroundColor: 'red'}}
+        // headerStyle={{backgroundColor:"red"}}
+        // bodyStyle={{backgroundColor:"red",flex:1}}
+        header={
+          <View>
+            <Text style={{fontSize: 20, fontWeight: 'bold'}}>Header</Text>
+          </View>
+        }
+        body={
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <LineChart
+              withHorizontalLines={false}
+              withVerticalLabels={false}
+              withHorizontalLabels={false}
+              // withOuterLines={false}
+              data={GraphData}
+              width={sizes.width * 0.92}
+              height={220}
+              chartConfig={chartConfig}
+            />
+            <View
+              style={{
+                zIndex: 10,
+                marginTop: 10,
+                marginLeft: 50,
+                alignSelf: 'flex-start',
+              }}>
+              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
+            </View>
+          </View>
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -282,5 +350,22 @@ const Styles = StyleSheet.create({
     width: 100,
     flex: 1,
     alignSelf: 'center',
+  },
+  MoodHistory: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  MoodHistoryText: {
+    marginHorizontal: 3,
+    fontWeight: 'bold',
+    textAlignVertical: 'bottom',
+    fontSize: 14,
+  },
+  MoodHistoryNameText: {
+    textTransform: 'uppercase',
+    borderBottomWidth: 3,
+    borderColor: colors.secondary,
+    padding: 0,
   },
 });

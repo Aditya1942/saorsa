@@ -22,6 +22,7 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import VideoPlayerView from './Screens/steps/VideoPlayer';
 import PaidCourse from './Screens/course/PaidCourse';
 import PaidSubCourse from './Screens/course/PaidSubCourse';
+import BottomMenu from './Screens/course/BottomMenu';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -89,6 +90,7 @@ const HomeStackScreen = () => {
       <HomeStack.Screen name="StepCourse" component={StepCourse} />
       <HomeStack.Screen name="PaidCourse" component={PaidCourse} />
       <HomeStack.Screen name="PaidSubCourse" component={PaidSubCourse} />
+      <HomeStack.Screen name="BottomMenu" component={BottomMenu} />
     </HomeStack.Navigator>
   );
 };
