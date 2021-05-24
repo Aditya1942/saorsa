@@ -211,13 +211,33 @@ export const MoodReportTab = ({navigation}) => {
   );
 };
 const MoodHistory = ({name, dateAndTime}) => {
+  const [BColor, setBColor] = useState(colors.secondary);
+  useEffect(() => {
+    switch (name) {
+      case 'HAPPY' || 'EXCITED' || 'GRATEFUL':
+        setBColor('greenyellow');
+        break;
+      case 'RELAXED' || 'CONTENT' || 'TIRED':
+        setBColor('yellowgreen');
+        break;
+      case 'UNSURE' || 'BORED' || 'ANXIOUS':
+        setBColor('#ffc703');
+        break;
+      case 'ANGRY' || 'STRESSED' || 'SAD':
+        setBColor('red');
+        break;
+      default:
+        break;
+    }
+  }, []);
   return (
     <View style={MoodReportStyle.MoodHistory}>
       <Text
-        style={{
-          ...MoodReportStyle.MoodHistoryText,
-          ...MoodReportStyle.MoodHistoryNameText,
-        }}>
+        style={[
+          MoodReportStyle.MoodHistoryText,
+          MoodReportStyle.MoodHistoryNameText,
+          {borderColor: BColor},
+        ]}>
         {name}
       </Text>
       <Text style={MoodReportStyle.MoodHistoryText}>{dateAndTime}</Text>
@@ -254,7 +274,6 @@ const MoodReportStyle = StyleSheet.create({
   MoodHistoryNameText: {
     textTransform: 'uppercase',
     borderBottomWidth: 3,
-    borderColor: colors.secondary,
     padding: 0,
   },
 });

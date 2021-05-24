@@ -227,7 +227,7 @@ export const paidCourse = [
     },
   },
   {
-    id: 1,
+    id: 2,
     name: 'PATIENT HEALTH QUESTIONNAIRE',
     courseimage:
       'http://res.cloudinary.com/adarshsingh/image/upload/v1618010966/a7pelrhwgu3ij1dta2ov.png',
@@ -235,7 +235,7 @@ export const paidCourse = [
     courses: {},
   },
   {
-    id: 1,
+    id: 3,
     name: 'PATIENT HEALTH QUESTIONNAIRE',
     courseimage:
       'http://res.cloudinary.com/adarshsingh/image/upload/v1618010966/a7pelrhwgu3ij1dta2ov.png',

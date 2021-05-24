@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
   ImageBackground,
   SafeAreaView,
@@ -10,13 +11,16 @@ import {
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Header from '../../Components/Header';
-import {colors, sizes, paidCourse} from '../../Constants';
+import {colors, sizes} from '../../Constants';
+import axios, {CancelToken} from '../Auth/axios';
+
 export const PaidCourseBtn = ({
   navigation,
   courseimage,
   name,
   locked,
   courses,
+  mcq,
 }) => {
   return (
     <TouchableOpacity
@@ -25,9 +29,10 @@ export const PaidCourseBtn = ({
         if (!locked) {
           navigation.navigate('PaidSubCourse', {
             // id: id,
-            CourseTitle: courses.name,
-            image: courses.img,
+            CourseTitle: name,
+            image: courseimage,
             data: courses,
+            mcq: mcq,
           });
         }
       }}>
@@ -52,16 +57,36 @@ export const PaidCourseBtn = ({
   );
 };
 const PaidCourse = ({navigation, route}) => {
-  const CourseName = route.params.CourseName;
-  const image = route.params.image;
-  console.log(paidCourse);
+  const [CourseData, setCourseData] = React.useState([]);
+  console.log(route.params.CourseName);
+  React.useEffect(() => {
+    const source = CancelToken.source();
+    axios({
+      method: 'get',
+      url: 'api/courses/one/' + route.params.CourseName,
+      cancelToken: source.token,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((data) => {
+      console.log(data);
+      setCourseData(data.data);
+    });
+
+    return () => {
+      source.cancel('Get req canceled');
+    };
+  }, [route.params.CourseName]);
+
+  const CourseName = CourseData[0]?.name;
+  const image = CourseData[0]?.image;
   return (
     <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: colors.primary,
       }}>
-      <ImageBackground source={image} style={Styles.headerImg}>
+      <ImageBackground source={{uri: image}} style={Styles.headerImg}>
         <View style={Styles.header}>
           <Header navigation={navigation} />
         </View>
@@ -85,14 +110,15 @@ const PaidCourse = ({navigation, route}) => {
           />
         </TouchableOpacity>
         <View style={Styles.stepBtns}>
-          {paidCourse.map((e) => (
+          {CourseData[0]?.courses?.map((e, i) => (
             <PaidCourseBtn
-              key={e.id}
+              key={i}
               name={e.name}
               navigation={navigation}
-              courseimage={e.courseimage}
-              locked={e.locked}
-              courses={e.courses}
+              courseimage={e.img}
+              locked={false}
+              mcq={e.mcq}
+              courses={e.data}
             />
           ))}
         </View>

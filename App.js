@@ -23,6 +23,7 @@ import VideoPlayerView from './Screens/steps/VideoPlayer';
 import PaidCourse from './Screens/course/PaidCourse';
 import PaidSubCourse from './Screens/course/PaidSubCourse';
 import BottomMenu from './Screens/course/BottomMenu';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -111,6 +112,12 @@ const CustomeTab = ({navigation}) => {
         })
           .then(({data}) => {
             console.log('USER DATA', data);
+            if (data?.msg === 'Token is not valid') {
+              navigation.replace('Login');
+              AsyncStorage.removeItem('@loginToken');
+              AsyncStorage.removeItem('@userInfo');
+              AsyncStorage.removeItem('@userSocialLoginInfo');
+            }
             storetUserProfileData(data);
           })
           .catch((err) => {

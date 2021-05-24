@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Button,
   Dimensions,
@@ -18,14 +18,8 @@ import BottomSheet from 'react-native-bottomsheet-reanimated';
 
 const Questions = ({data, onOpenBottomSheetHandler}) => {
   const QuestionsInput = data;
-
+  console.log(QuestionsInput);
   const Question = ({q, index}) => {
-    const Options = [
-      'Not at All',
-      'Some Days',
-      'Lots of the Days',
-      'All the Time',
-    ];
     console.log(QuestionsInput);
 
     const QuestionStyles = StyleSheet.create({
@@ -64,22 +58,24 @@ const Questions = ({data, onOpenBottomSheetHandler}) => {
     const [ActiveQuestion, setActiveQuestion] = useState(0);
     return (
       <View style={QuestionStyles.container}>
-        <Text style={QuestionStyles.question}>{`${q.id}. ${q.question}`}</Text>
+        <Text style={QuestionStyles.question}>{`${index + 1}. ${
+          q.question
+        }`}</Text>
         <View style={QuestionStyles.options}>
-          {Options.map((o, i) => (
+          {q.options.map((o, i) => (
             <TouchableOpacity
               key={i}
               onPress={() => {
                 setActiveQuestion(i + 1);
                 console.log(i);
-                QuestionsInput[index].answer = o;
+                QuestionsInput[index].answer = o.value;
               }}
               style={[
                 QuestionStyles.option,
                 parseInt(ActiveQuestion) === i + 1 &&
                   QuestionStyles.activeOption,
               ]}>
-              <Text style={QuestionStyles.optionText}>{o}</Text>
+              <Text style={QuestionStyles.optionText}>{o.option}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -130,13 +126,33 @@ const Questions = ({data, onOpenBottomSheetHandler}) => {
   );
 };
 const MoodHistory = ({name, dateAndTime}) => {
+  const [BColor, setBColor] = useState(colors.secondary);
+  useEffect(() => {
+    switch (name) {
+      case 'HAPPY' || 'EXCITED' || 'GRATEFUL':
+        setBColor('greenyellow');
+        break;
+      case 'RELAXED' || 'CONTENT' || 'TIRED':
+        setBColor('yellowgreen');
+        break;
+      case 'UNSURE' || 'BORED' || 'ANXIOUS':
+        setBColor('#ffc703');
+        break;
+      case 'ANGRY' || 'STRESSED' || 'SAD':
+        setBColor('red');
+        break;
+      default:
+        break;
+    }
+  }, [name]);
   return (
     <View style={Styles.MoodHistory}>
       <Text
-        style={{
-          ...Styles.MoodHistoryText,
-          ...Styles.MoodHistoryNameText,
-        }}>
+        style={[
+          Styles.MoodHistoryText,
+          Styles.MoodHistoryNameText,
+          {borderColor: BColor},
+        ]}>
         {name}
       </Text>
       <Text style={Styles.MoodHistoryText}>{dateAndTime}</Text>
@@ -144,10 +160,12 @@ const MoodHistory = ({name, dateAndTime}) => {
   );
 };
 const PaidSubCourse = ({navigation, route}) => {
+  console.log(route.params);
   const CourseTitle = route.params.CourseTitle;
   const image = route.params.image;
   const CourseData = route.params.data;
-  console.log(route.params);
+  const MCQS = route.params.mcq;
+  console.log(MCQS.length);
   // bottom
   const bottomSheet = React.useRef();
   const onOpenBottomSheetHandler = (index) => {
@@ -217,30 +235,40 @@ const PaidSubCourse = ({navigation, route}) => {
         </View>
       </ImageBackground>
       <ScrollView style={Styles.body}>
-        <Text style={Styles.bodyTitles}>
+        {/* <Text style={Styles.bodyTitles}>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit, error
           dolor repudiandae magnam consequatur iusto laborum reiciendis! Esse
           veniam labore nulla assumenda? Quos modi quo, nisi deserunt id esse
           sed adipisci dolores? Debitis molestias nostrum facilis ullam
           distinctio magni maiores neque dolore explicabo id, nam odio unde
           nulla aliquid repellat?
-        </Text>
-        {CourseData?.data[0]?.question ? (
+        </Text> */}
+        {MCQS?.mcqs.length > 0 ? (
           <Questions
             onOpenBottomSheetHandler={onOpenBottomSheetHandler}
-            data={CourseData.data}
+            data={MCQS.mcqs}
           />
         ) : (
           <View>
-            <TouchableOpacity style={Styles.introvideo}>
-              <FastImage
-                style={Styles.playBtn}
-                source={require('../../assets/playButton.png')}
-              />
-            </TouchableOpacity>
+            {CourseData?.map((course, i) => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('VideoPlayer', {video: course.video});
+                }}
+                key={i}
+                style={Styles.introvideo}>
+                <FastImage
+                  style={Styles.playBtn}
+                  source={require('../../assets/playButton.png')}
+                />
+                <FastImage
+                  style={Styles.VideoThumbnail}
+                  source={{uri: course.thumbnail}}
+                />
+              </TouchableOpacity>
+            ))}
           </View>
         )}
-
         <View style={{margin: 60}} />
       </ScrollView>
       <BottomSheet
@@ -290,9 +318,9 @@ const PaidSubCourse = ({navigation, route}) => {
                 alignSelf: 'flex-start',
               }}>
               <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
-              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
-              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
-              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'RELAXED'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'UNSURE'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'ANGRY'} dateAndTime={'12th May 9:09pm'} />
             </View>
           </View>
         }
@@ -339,7 +367,7 @@ const Styles = StyleSheet.create({
     backgroundColor: '#fff',
     height: sizes.ITEM_HEIGHT * 1.3,
     borderRadius: 20,
-    marginHorizontal: 10,
+    margin: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -349,6 +377,17 @@ const Styles = StyleSheet.create({
     aspectRatio: 1,
     width: 100,
     flex: 1,
+    alignSelf: 'center',
+    zIndex: 2,
+  },
+  VideoThumbnail: {
+    position: 'absolute',
+    justifyContent: 'center',
+    aspectRatio: 1,
+    height: sizes.ITEM_HEIGHT * 1.3,
+    width: '100%',
+    flex: 1,
+    borderRadius: 20,
     alignSelf: 'center',
   },
   MoodHistory: {
@@ -364,8 +403,8 @@ const Styles = StyleSheet.create({
   },
   MoodHistoryNameText: {
     textTransform: 'uppercase',
-    borderBottomWidth: 3,
-    borderColor: colors.secondary,
+    borderBottomWidth: 2,
+
     padding: 0,
   },
 });

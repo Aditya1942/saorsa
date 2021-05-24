@@ -14,20 +14,37 @@ import Header from '../../Components/Header';
 import {colors, sizes, coursesImages, courses} from '../../Constants';
 import Courseslist from './Courseslist';
 import Steps from './Steps';
+import axios, {CancelToken} from '../Auth/axios';
 
 const Home = ({navigation}) => {
+  const [CourseData, setCourseData] = React.useState([]);
   useFocusEffect(
     React.useCallback(() => {
+      const source = CancelToken.source();
+      axios({
+        method: 'get',
+        url: 'api/courses/all',
+        cancelToken: source.token,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((data) => {
+        console.log(data);
+        setCourseData(data.data);
+      });
       const onBackPress = () => {
         if (navigation.canGoBack()) navigation.goBack();
         else BackHandler.exitApp();
         return true;
       };
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () =>
+      return () => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        source.cancel('Get req canceled');
+      };
     }, [navigation]),
   );
+
   return (
     <SafeAreaView
       style={{

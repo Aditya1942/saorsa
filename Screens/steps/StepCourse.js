@@ -8,6 +8,7 @@ import {
   ScrollView,
   BackHandler,
   FlatList,
+  TextInput,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -20,6 +21,7 @@ import {StepBtn} from './Step';
 import FastImage from 'react-native-fast-image';
 import axios from '../Auth/axios';
 import {getUserAuthToken} from '../Auth/auth';
+import {Input} from 'react-native-elements';
 
 const Audio = ({navigation, audio}) => {
   return (
@@ -32,6 +34,133 @@ const Audio = ({navigation, audio}) => {
         Audio <Icon name="headphones" size={15} color="#fff" />
       </Text>
     </TouchableOpacity>
+  );
+};
+const Forms = ({formData}) => {
+  const formStyle = {
+    smallBox: {
+      flex: 0.5,
+      flexDirection: 'column',
+      backgroundColor: '#fff',
+      height: '100%',
+      width: sizes.width * 0.48,
+      marginVertical: 5,
+      padding: 10,
+      paddingTop: 15,
+      borderRadius: 10,
+    },
+    smallBoxTitle: {
+      alignSelf: 'center',
+      fontSize: 15,
+      fontWeight: 'bold',
+      textTransform: 'uppercase',
+      fontFamily: 'AvenirLTStd-Book',
+      marginBottom: 5,
+      color: colors.primary,
+    },
+    smallBoxbody: {
+      marginTop: 5,
+      textAlign: 'center',
+      fontSize: 12,
+      color: 'black',
+      flex: 1,
+      lineHeight: 13,
+      // fontFamily: 'AvenirLTStd-Book',
+    },
+    bigBox: {
+      flex: 1,
+      width: sizes.width * 0.99,
+      backgroundColor: '#fff',
+      marginVertical: 5,
+      paddingVertical: 10,
+      paddingTop: 15,
+      paddingHorizontal: 20,
+      borderRadius: 10,
+    },
+    bigBoxTitle: {
+      alignSelf: 'flex-start',
+      fontSize: 15,
+      fontWeight: 'bold',
+      textTransform: 'uppercase',
+      fontFamily: 'AvenirLTStd-Book',
+    },
+    bigBoxbody: {
+      marginTop: 5,
+      textAlign: 'center',
+      fontSize: 12,
+      color: 'black',
+      lineHeight: 17,
+      // fontFamily: 'AvenirLTStd-Book',
+    },
+  };
+  const SmallBox = ({title, placeholder, footer}) => {
+    return (
+      <View style={formStyle.smallBox}>
+        <Text style={formStyle.smallBoxTitle}>{title}</Text>
+        <View
+          style={{
+            backgroundColor: 'rgb(230,230,230)',
+            borderRadius: 20,
+            paddingBottom: 80,
+          }}>
+          <TextInput
+            placeholder={placeholder}
+            style={{
+              backgroundColor: 'rgb(230,230,230)',
+              borderRadius: 20,
+              padding: 7,
+            }}
+            multiline={true}
+          />
+        </View>
+        {/* <Text style={YourPlanTabStyle.smallBoxFooter}>{footer}</Text> */}
+      </View>
+    );
+  };
+  const BigBox = ({title, placeholder, footer}) => {
+    return (
+      <View style={formStyle.bigBox}>
+        <Text style={formStyle.bigBoxTitle}>{title}</Text>
+        <View
+          style={{
+            backgroundColor: 'rgb(230,230,230)',
+            borderRadius: 20,
+            paddingBottom: 80,
+          }}>
+          <TextInput
+            placeholder={placeholder}
+            style={{
+              backgroundColor: 'rgb(230,230,230)',
+              borderRadius: 20,
+              padding: 7,
+            }}
+            multiline={true}
+          />
+        </View>
+        {/* <Text style={YourPlanTabStyle.bigBoxFooter}>{footer}</Text> */}
+      </View>
+    );
+  };
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+      }}>
+      {formData.map((f) => {
+        var {form} = f;
+        return (
+          <View>
+            {form.size === 'small' ? (
+              <SmallBox title={form.label} placeholder={form.placeholder} />
+            ) : (
+              <BigBox title={form.label} placeholder={form.placeholder} />
+            )}
+          </View>
+        );
+      })}
+    </View>
   );
 };
 
@@ -282,18 +411,22 @@ const StepCourse = ({route, navigation}) => {
       </ImageBackground>
       <ScrollView style={StepCourseStyles.body}>
         <View style={{marginTop: 30}}>
-          {data.data.map((course, index) => (
-            <Course
-              key={index}
-              title={course?.title}
-              description={course?.description}
-              img={course?.img}
-              audio={course?.audio}
-              video={course.video}
-              thumbnail={course.thumbnail}
-              navigation={navigation}
-            />
-          ))}
+          {data.data[0].form === undefined ? (
+            data.data.map((course, index) => (
+              <Course
+                key={index}
+                title={course?.title}
+                description={course?.description}
+                img={course?.img}
+                audio={course?.audio}
+                video={course.video}
+                thumbnail={course.thumbnail}
+                navigation={navigation}
+              />
+            ))
+          ) : (
+            <Forms formData={data.data} />
+          )}
         </View>
         <View
           style={{
