@@ -162,21 +162,21 @@ export const courses = [
     title: 'RELAXATION',
     img: require('./assets/Relax.png'),
     Component: 'Relaxation',
-    onPress: false,
+    onPress: true,
   },
   {
     id: '2',
     title: 'MINDFULLNESS',
     img: require('./assets/Mindfull.png'),
     Component: 'Mindfullness',
-    onPress: false,
+    onPress: true,
   },
   {
     id: '3',
     title: 'SLEEP',
     img: require('./assets/Sleep.png'),
     Component: 'Sleep',
-    onPress: false,
+    onPress: true,
   },
   {
     id: '4',
@@ -190,7 +190,7 @@ export const courses = [
     title: 'ANXIETY & STRESS',
     img: require('./assets/Stress.png'),
     Component: 'Anxiety',
-    onPress: false,
+    onPress: true,
   },
 ];
 export const paidCourse = [

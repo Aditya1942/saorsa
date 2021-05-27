@@ -15,10 +15,15 @@ import FastImage from 'react-native-fast-image';
 import Header from '../../Components/Header';
 import {colors, sizes} from '../../Constants';
 import BottomSheet from 'react-native-bottomsheet-reanimated';
-import axios from '../Auth/axios';
+import axios, {CancelToken} from '../Auth/axios';
 import {getUserAuthToken} from '../Auth/auth';
 
-const Questions = ({data, onOpenBottomSheetHandler, CourseTitle}) => {
+const Questions = ({
+  data,
+  onOpenBottomSheetHandler,
+  setUpdateGraph,
+  CourseTitle,
+}) => {
   const QuestionsInput = data;
   const [AnswerError, setAnswerError] = useState(false);
   const SumMcqs = [];
@@ -116,6 +121,7 @@ const Questions = ({data, onOpenBottomSheetHandler, CourseTitle}) => {
         })
           .then((res) => {
             console.log(res);
+            setUpdateGraph('update');
           })
           .catch((err) => {
             console.log(err);
@@ -156,7 +162,7 @@ const Questions = ({data, onOpenBottomSheetHandler, CourseTitle}) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            onOpenBottomSheetHandler(2);
+            onOpenBottomSheetHandler(1);
           }}
           style={{
             backgroundColor: '#fff',
@@ -214,6 +220,7 @@ const PaidSubCourse = ({navigation, route}) => {
   const image = route.params.image;
   const CourseData = route.params.data;
   const MCQS = route.params.mcq;
+  const [UpdateGraph, setUpdateGraph] = useState('');
   console.log(MCQS.length);
   // bottom
   const bottomSheet = React.useRef();
@@ -251,24 +258,131 @@ const PaidSubCourse = ({navigation, route}) => {
     },
     propsForVerticalLabels: {},
   };
-  const GraphData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-    datasets: [
-      {
-        data: [20, 45, 28, 80, 99, 43],
-        datasets: [
-          {
-            data: GraphData,
-            color: (opacity = 1) => colors.primary, // optional
-            strokeWidth: 2, // optional
-          },
-        ],
-        color: (opacity = 1) => colors.primary, // optional
-        strokeWidth: 2, // optional
-      },
-    ],
-  };
+  const Graph = ({UpdateGraph}) => {
+    const [graphData, setGraphData] = useState([]);
+    const GraphData = {
+      labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+      datasets: [
+        {
+          data: [0, 0, 0, 0, 0, 0],
+          datasets: [
+            {
+              data: GraphData,
+              color: (opacity = 1) => colors.primary, // optional
+              strokeWidth: 2, // optional
+            },
+          ],
+          color: (opacity = 1) => colors.primary, // optional
+          strokeWidth: 2, // optional
+        },
+      ],
+    };
+    useEffect(() => {
+      const source = CancelToken.source();
+      getUserAuthToken().then((token) => {
+        axios({
+          method: 'get',
+          url: 'api/mcq/' + CourseTitle,
+          cancelToken: source.token,
+          headers: {'Content-Type': 'application/json', 'x-auth-token': token},
+        }).then(({data}) => {
+          let gdata = data.sumArray;
+          console.log(gdata);
+          console.log(gdata.slice(-10));
 
+          setGraphData(gdata.slice(-10));
+        });
+      });
+      return () => {
+        source.cancel('Get req canceled');
+      };
+    }, [UpdateGraph]);
+    return (
+      <BottomSheet
+        bottomSheerColor="#FFFFFF"
+        // backDropColor="red"
+        ref={bottomSheet}
+        initialPosition={'0%'}
+        snapPoints={snapPoints}
+        isBackDrop={true}
+        isBackDropDismissByPress={true}
+        isRoundBorderWithTipHeader={true}
+        keyboardAware
+        // isModal
+        containerStyle={{
+          backgroundColor: '#fff',
+          marginHorizontal: 10,
+        }}
+        // tipStyle={{backgroundColor: 'red'}}
+        // headerStyle={{backgroundColor:"red"}}
+        // bodyStyle={{backgroundColor:"red",flex:1}}
+        header={
+          <View>
+            <Text style={{fontSize: 20, fontWeight: 'bold'}}>Report</Text>
+          </View>
+        }
+        body={
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {graphData.length <= 0 ? (
+              <LineChart
+                withHorizontalLines={false}
+                withVerticalLabels={false}
+                withHorizontalLabels={false}
+                // withOuterLines={false}
+                data={GraphData}
+                width={sizes.width * 0.92}
+                height={220}
+                chartConfig={chartConfig}
+              />
+            ) : (
+              <LineChart
+                withHorizontalLines={false}
+                withVerticalLabels={false}
+                withHorizontalLabels={false}
+                // withOuterLines={false}
+                data={{
+                  labels: [],
+                  datasets: [
+                    {
+                      data: graphData,
+                      datasets: [
+                        {
+                          data: GraphData,
+                          color: (opacity = 1) => colors.primary, // optional
+                          strokeWidth: 2, // optional
+                        },
+                      ],
+                      color: (opacity = 1) => colors.primary, // optional
+                      strokeWidth: 2, // optional
+                    },
+                  ],
+                }}
+                width={sizes.width * 0.92}
+                height={220}
+                chartConfig={chartConfig}
+              />
+            )}
+            <View
+              style={{
+                zIndex: 10,
+                marginTop: 10,
+                marginLeft: 50,
+                alignSelf: 'flex-start',
+              }}>
+              {/* <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'RELAXED'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'UNSURE'} dateAndTime={'12th May 9:09pm'} />
+              <MoodHistory name={'ANGRY'} dateAndTime={'12th May 9:09pm'} /> */}
+            </View>
+          </View>
+        }
+      />
+    );
+  };
   return (
     <SafeAreaView
       style={{
@@ -295,6 +409,7 @@ const PaidSubCourse = ({navigation, route}) => {
         {MCQS?.mcqs.length > 0 ? (
           <Questions
             onOpenBottomSheetHandler={onOpenBottomSheetHandler}
+            setUpdateGraph={setUpdateGraph}
             data={MCQS.mcqs}
             CourseTitle={CourseTitle}
           />
@@ -321,60 +436,7 @@ const PaidSubCourse = ({navigation, route}) => {
         )}
         <View style={{margin: 60}} />
       </ScrollView>
-      <BottomSheet
-        bottomSheerColor="#FFFFFF"
-        // backDropColor="red"
-        ref={bottomSheet}
-        initialPosition={'0%'}
-        snapPoints={snapPoints}
-        isBackDrop={true}
-        isBackDropDismissByPress={true}
-        isRoundBorderWithTipHeader={true}
-        keyboardAware
-        // isModal
-        containerStyle={{
-          backgroundColor: '#fff',
-          marginHorizontal: 10,
-        }}
-        // tipStyle={{backgroundColor: 'red'}}
-        // headerStyle={{backgroundColor:"red"}}
-        // bodyStyle={{backgroundColor:"red",flex:1}}
-        header={
-          <View>
-            <Text style={{fontSize: 20, fontWeight: 'bold'}}>Header</Text>
-          </View>
-        }
-        body={
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <LineChart
-              withHorizontalLines={false}
-              withVerticalLabels={false}
-              withHorizontalLabels={false}
-              // withOuterLines={false}
-              data={GraphData}
-              width={sizes.width * 0.92}
-              height={220}
-              chartConfig={chartConfig}
-            />
-            <View
-              style={{
-                zIndex: 10,
-                marginTop: 10,
-                marginLeft: 50,
-                alignSelf: 'flex-start',
-              }}>
-              <MoodHistory name={'HAPPY'} dateAndTime={'12th May 9:09pm'} />
-              <MoodHistory name={'RELAXED'} dateAndTime={'12th May 9:09pm'} />
-              <MoodHistory name={'UNSURE'} dateAndTime={'12th May 9:09pm'} />
-              <MoodHistory name={'ANGRY'} dateAndTime={'12th May 9:09pm'} />
-            </View>
-          </View>
-        }
-      />
+      {MCQS?.mcqs.length > 0 && <Graph UpdateGraph={UpdateGraph} />}
     </SafeAreaView>
   );
 };

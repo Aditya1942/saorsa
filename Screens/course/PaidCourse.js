@@ -58,12 +58,12 @@ export const PaidCourseBtn = ({
 };
 const PaidCourse = ({navigation, route}) => {
   const [CourseData, setCourseData] = React.useState([]);
-  console.log(route.params.CourseName);
+  console.log(route.params);
   React.useEffect(() => {
     const source = CancelToken.source();
     axios({
       method: 'get',
-      url: 'api/courses/one/' + route.params.CourseName,
+      url: 'api/courses/one/' + route.params.componentName.toUpperCase(),
       cancelToken: source.token,
       headers: {
         'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const PaidCourse = ({navigation, route}) => {
     return () => {
       source.cancel('Get req canceled');
     };
-  }, [route.params.CourseName]);
+  }, [route.params.componentName]);
 
   const CourseName = CourseData[0]?.name;
   const image = CourseData[0]?.image;
@@ -95,7 +95,7 @@ const PaidCourse = ({navigation, route}) => {
         </View>
       </ImageBackground>
       <ScrollView style={Styles.body}>
-        <Text style={Styles.bodyTitles}>
+        {/* <Text style={Styles.bodyTitles}>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit, error
           dolor repudiandae magnam consequatur iusto laborum reiciendis! Esse
           veniam labore nulla assumenda? Quos modi quo, nisi deserunt id esse
@@ -108,7 +108,7 @@ const PaidCourse = ({navigation, route}) => {
             style={Styles.playBtn}
             source={require('../../assets/playButton.png')}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View style={Styles.stepBtns}>
           {CourseData[0]?.courses?.map((e, i) => (
             <PaidCourseBtn
@@ -116,7 +116,7 @@ const PaidCourse = ({navigation, route}) => {
               name={e.name}
               navigation={navigation}
               courseimage={e.img}
-              locked={false}
+              locked={e?.isLocked}
               mcq={e.mcq}
               courses={e.data}
             />

@@ -93,6 +93,7 @@ const Home = ({navigation}) => {
                 image={item.img}
                 onPress={item.onPress}
                 title={item.title}
+                componentName={item.Component}
                 navigation={navigation}
               />
             </Pressable>

@@ -13,13 +13,17 @@ import {colors, sizes, coursesImages} from '../../Constants';
 // import { Fontisto } from '@expo/vector-icons';
 const {width, height} = Dimensions.get('window');
 
-const Courseslist = ({image, title, navigation, onPress}) => {
+const Courseslist = ({image, title, navigation, onPress, componentName}) => {
   return (
     <TouchableOpacity
       style={styles.courseItems}
       onPress={() => {
         if (onPress) {
-          navigation.navigate('PaidCourse', {CourseName: title, image: image});
+          navigation.navigate('PaidCourse', {
+            CourseName: title,
+            componentName: componentName,
+            image: image,
+          });
         }
         console.log(onPress);
       }}>
