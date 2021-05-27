@@ -20,18 +20,18 @@ const Home = ({navigation}) => {
   const [CourseData, setCourseData] = React.useState([]);
   useFocusEffect(
     React.useCallback(() => {
-      const source = CancelToken.source();
-      axios({
-        method: 'get',
-        url: 'api/courses/all',
-        cancelToken: source.token,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }).then((data) => {
-        console.log(data);
-        setCourseData(data.data);
-      });
+      // const source = CancelToken.source();
+      // axios({
+      //   method: 'get',
+      //   url: 'api/courses/all',
+      //   cancelToken: source.token,
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // }).then((data) => {
+      //   console.log(data);
+      //   setCourseData(data.data);
+      // });
       const onBackPress = () => {
         if (navigation.canGoBack()) navigation.goBack();
         else BackHandler.exitApp();
@@ -40,7 +40,7 @@ const Home = ({navigation}) => {
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-        source.cancel('Get req canceled');
+        // source.cancel('Get req canceled');
       };
     }, [navigation]),
   );

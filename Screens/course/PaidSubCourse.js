@@ -15,13 +15,15 @@ import FastImage from 'react-native-fast-image';
 import Header from '../../Components/Header';
 import {colors, sizes} from '../../Constants';
 import BottomSheet from 'react-native-bottomsheet-reanimated';
+import axios from '../Auth/axios';
+import {getUserAuthToken} from '../Auth/auth';
 
-const Questions = ({data, onOpenBottomSheetHandler}) => {
+const Questions = ({data, onOpenBottomSheetHandler, CourseTitle}) => {
   const QuestionsInput = data;
-  console.log(QuestionsInput);
+  const [AnswerError, setAnswerError] = useState(false);
+  const SumMcqs = [];
+  console.log('CourseTitle', CourseTitle);
   const Question = ({q, index}) => {
-    console.log(QuestionsInput);
-
     const QuestionStyles = StyleSheet.create({
       container: {
         margin: 20,
@@ -68,7 +70,8 @@ const Questions = ({data, onOpenBottomSheetHandler}) => {
               onPress={() => {
                 setActiveQuestion(i + 1);
                 console.log(i);
-                QuestionsInput[index].answer = o.value;
+                SumMcqs[QuestionsInput[index].question] = o.value;
+                // QuestionsInput[index].answer = o.value;
               }}
               style={[
                 QuestionStyles.option,
@@ -82,18 +85,64 @@ const Questions = ({data, onOpenBottomSheetHandler}) => {
       </View>
     );
   };
-
+  const submit = () => {
+    let mcqSum = 0;
+    let error = false;
+    let length = 0;
+    console.log(SumMcqs);
+    for (const key in SumMcqs) {
+      if (Object.hasOwnProperty.call(SumMcqs, key)) {
+        length++;
+        const element = SumMcqs[key];
+        console.log(element);
+        mcqSum += element;
+      }
+    }
+    if (length !== QuestionsInput.length) {
+      error = true;
+      setAnswerError(true);
+    } else {
+      error = false;
+    }
+    console.log(error);
+    if (!error) {
+      getUserAuthToken().then((token) => {
+        console.log(token);
+        axios({
+          url: '/api/mcq/',
+          method: 'post',
+          data: {mcq: CourseTitle, score: mcqSum},
+          headers: {'Content-Type': 'application/json', 'x-auth-token': token},
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+      setAnswerError(false);
+    }
+  };
   return (
     <View>
       {data.map((q, index) => (
         <Question key={index} q={q} index={index} />
       ))}
+      {AnswerError && (
+        <Text
+          style={{
+            fontSize: 18,
+            color: 'red',
+            alignSelf: 'center',
+          }}>
+          Please answer all questions
+        </Text>
+      )}
       <View
-        style={{alignItems: 'center', justifyContent: 'center', marginTop: 50}}>
+        style={{alignItems: 'center', justifyContent: 'center', marginTop: 25}}>
         <TouchableOpacity
-          onPress={() => {
-            console.log(QuestionsInput);
-          }}
+          onPress={submit}
           style={{
             backgroundColor: colors.secondary,
             width: 200,
@@ -247,6 +296,7 @@ const PaidSubCourse = ({navigation, route}) => {
           <Questions
             onOpenBottomSheetHandler={onOpenBottomSheetHandler}
             data={MCQS.mcqs}
+            CourseTitle={CourseTitle}
           />
         ) : (
           <View>
