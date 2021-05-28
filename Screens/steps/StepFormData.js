@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/core';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   BackHandler,
   ImageBackground,
@@ -12,50 +12,34 @@ import {
 } from 'react-native';
 import Header from '../../Components/Header';
 import {colors, sizes} from '../../Constants';
-
-const StepFormDataDetails = ({id}) => {
-  const Data = [
-    {
-      id: 1,
-      title: 'Title 1 ',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Hic quia ipsam nisi quam nihil veniam sed explicabo in? Consequuntur, aperiam?',
-    },
-    {
-      id: 2,
-      title: 'Title 2',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Hic quia ipsam nisi quam nihil veniam sed explicabo in? Consequuntur, aperiam?',
-    },
-    {
-      id: 3,
-      title: 'Title 3',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Hic quia ipsam nisi quam nihil veniam sed explicabo in? Consequuntur, aperiam?',
-    },
-  ];
-  console.log(Data[0].title.length);
+import {getUserAuthToken} from '../Auth/auth';
+import axios, {CancelToken} from '../Auth/axios';
+const StepFormDataDetails = ({id, Fdata}) => {
+  const loop = ['1', '2', '3', '4', '5', '6', '7'];
   return (
     <View>
-      {Data.map((data, i) => (
-        <View key={i} style={{marginVertical: 20}}>
-          <View style={{}}>
+      {loop.map((e) => (
+        <View key={e} style={{marginVertical: 20}}>
+          <View>
             <Text
               style={{
-                width: sizes.width * 0.7,
+                width: sizes.width * 0.75,
+                borderTopRightRadius: 20,
+                borderBottomRightRadius: 20,
                 color: 'white',
                 backgroundColor: colors.secondary,
                 paddingHorizontal: 20,
                 fontSize: 18,
               }}>
-              {data.title}
+              {Fdata[id]['q' + e]}
             </Text>
           </View>
           <Text style={{paddingHorizontal: 20, color: 'white', fontSize: 16}}>
-            {data.description}
+            {Fdata[id]['a' + e]}
           </Text>
         </View>
       ))}
+      <View style={{marginTop: 100}} />
     </View>
   );
 };
@@ -66,11 +50,64 @@ const StepFormData = ({navigation, route}) => {
   const image = route.params?.image;
   const [Detailpage, setDetailpage] = useState(false);
   const [DetailpageId, setDetailpageId] = useState(0);
-  const data = [
-    {id: 1, date: '20th may'},
-    {id: 2, date: '11th may'},
-    {id: 3, date: '10th may'},
-  ];
+  const [data, setdata] = useState([]);
+
+  function formatDate(date) {
+    let day = date.getDate();
+    if (day === 1) {
+      day = day + 'st';
+    } else if (day === 2) {
+      day = day + 'nd';
+    } else if (day === 3) {
+      day = day + 'rd';
+    } else {
+      day = day + 'th';
+    }
+    var month_names_short = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    const options = {month: 'short'};
+
+    let month = month_names_short[date.getMonth()];
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    var strTime = hours + ':' + minutes + ampm;
+    return day + ' ' + month;
+  }
+  useEffect(() => {
+    getUserAuthToken().then((token) => {
+      console.log(token);
+      axios({
+        url: '/api/formsubmit/',
+        method: 'get',
+        headers: {'Content-Type': 'application/json', 'x-auth-token': token},
+      })
+        .then((res) => {
+          console.log(res.data);
+          setdata(res.data.responses);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+    return () => {};
+  }, []);
   const viewDetailPage = (id) => {
     console.log(id);
     setDetailpageId(id);
@@ -110,31 +147,41 @@ const StepFormData = ({navigation, route}) => {
       <ScrollView style={StepCourseStyles.body}>
         <View style={{marginTop: 30}} />
         {Detailpage ? (
-          <StepFormDataDetails id={DetailpageId} />
+          <StepFormDataDetails id={DetailpageId} Fdata={data} />
         ) : (
           <View style={{paddingHorizontal: 10}}>
-            {data.map((e) => (
-              <TouchableOpacity
-                onPress={() => {
-                  viewDetailPage(e.id);
-                }}
-                key={e.id}
-                style={{
-                  height: 40,
-                  paddingHorizontal: 10,
-                  backgroundColor: colors.secondary,
-                  marginVertical: 5,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                }}>
-                <Text
-                  style={{color: 'white', alignSelf: 'center', fontSize: 18}}>
-                  {e.date.toUpperCase()}
-                  {': Action Plan'}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {data.length > 0 &&
+              data.map((e, index) => {
+                var dateObject = new Date(e.date);
+
+                let date = formatDate(dateObject);
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      viewDetailPage(index);
+                    }}
+                    key={e._id}
+                    style={{
+                      height: 40,
+                      paddingHorizontal: 10,
+                      backgroundColor: colors.secondary,
+                      marginVertical: 5,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                    }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        alignSelf: 'center',
+                        fontSize: 18,
+                      }}>
+                      {date.toUpperCase()}
+                      {': Action Plan'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
           </View>
         )}
       </ScrollView>

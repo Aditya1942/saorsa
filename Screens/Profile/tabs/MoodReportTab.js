@@ -13,17 +13,7 @@ export const MoodReportTab = ({navigation}) => {
   const [loginToken, setLoginToken] = useState('');
   const [GraphData, setGraphData] = useState([]);
   const [GraphData2, setGraphData2] = useState({});
-  var data = {
-    labels: ['1', '2', '3', '4', '5', '6', '7', '8'],
-    datasets: [
-      {
-        data: [2, 4, 6, 8, 10, 12, 14, 16],
-        color: (opacity = 1) => 'black', // optional
-        strokeWidth: 2, // optional
-      },
-    ],
-    legend: ['Mood Report'], // optional
-  };
+
   const chartConfig = {
     backgroundColor: '#fff',
     backgroundGradientFrom: '#fff',
