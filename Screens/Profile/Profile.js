@@ -40,6 +40,7 @@ const Profile = ({navigation, route}) => {
   };
   useEffect(() => {
     userSocialLoginInfo().then((data) => {
+      console.log('userSocialLoginInfo', data);
       setIsSocialLogin(data.user);
     });
     return () => {};
@@ -134,7 +135,7 @@ const Profile = ({navigation, route}) => {
   useEffect(() => {
     getUserProfileData().then((data) => {
       setUserData(data);
-      console.log('ÚSER DATA', data.user);
+      console.log('ÚSER DATA', data);
       setProfilePic(data?.coverImage);
     });
   }, []);
@@ -160,21 +161,24 @@ const Profile = ({navigation, route}) => {
         console.log(response);
         setProfilePic(response.uri);
         let formData = new FormData();
-        formData.append({image: response.uri});
+        formData.append({
+          uri: response.uri,
+          name: response.fileName,
+          type: response.type,
+        });
         console.log('formData', formData);
         getUserAuthToken().then((token) => {
           console.log('token', token);
-          axios({
-            method: 'post',
-            url: '/api/profile',
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              'x-auth-token': token,
-            },
-            data: JSON.stringify(formData),
-          }).then((e) => {
-            console.log('POST PHOTO', e);
-          });
+          axios
+            .post('/api/profile', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                'x-auth-token': token,
+              },
+            })
+            .then((e) => {
+              console.log('POST PHOTO', e);
+            });
         });
       }
       console.log('CHANGE DP');

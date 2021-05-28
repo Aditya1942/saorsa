@@ -121,7 +121,7 @@ const Questions = ({
         })
           .then((res) => {
             console.log(res);
-            setUpdateGraph('update');
+            setUpdateGraph((e) => (e += 1));
           })
           .catch((err) => {
             console.log(err);
@@ -220,7 +220,7 @@ const PaidSubCourse = ({navigation, route}) => {
   const image = route.params.image;
   const CourseData = route.params.data;
   const MCQS = route.params.mcq;
-  const [UpdateGraph, setUpdateGraph] = useState('');
+  const [UpdateGraph, setUpdateGraph] = useState(0);
   console.log(MCQS.length);
   // bottom
   const bottomSheet = React.useRef();

@@ -24,6 +24,7 @@ import PaidCourse from './Screens/course/PaidCourse';
 import PaidSubCourse from './Screens/course/PaidSubCourse';
 import BottomMenu from './Screens/course/BottomMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import StepFormData from './Screens/steps/StepFormData';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -91,6 +92,7 @@ const HomeStackScreen = () => {
       <HomeStack.Screen name="StepCourse" component={StepCourse} />
       <HomeStack.Screen name="PaidCourse" component={PaidCourse} />
       <HomeStack.Screen name="PaidSubCourse" component={PaidSubCourse} />
+      <HomeStack.Screen name="StepFormData" component={StepFormData} />
       <HomeStack.Screen name="BottomMenu" component={BottomMenu} />
     </HomeStack.Navigator>
   );

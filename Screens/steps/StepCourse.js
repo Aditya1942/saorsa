@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import {StepBtn} from './Step';
 import FastImage from 'react-native-fast-image';
 import axios from '../Auth/axios';
 import {getUserAuthToken} from '../Auth/auth';
-import {Input} from 'react-native-elements';
+import {Button} from 'react-native-elements';
 
 const Audio = ({navigation, audio}) => {
   return (
@@ -36,7 +36,7 @@ const Audio = ({navigation, audio}) => {
     </TouchableOpacity>
   );
 };
-const Forms = ({formData}) => {
+const Forms = ({formData, navigation, stepName, image, description}) => {
   const formStyle = {
     smallBox: {
       flex: 0.5,
@@ -51,7 +51,7 @@ const Forms = ({formData}) => {
     },
     smallBoxTitle: {
       alignSelf: 'center',
-      fontSize: 15,
+      fontSize: 13,
       fontWeight: 'bold',
       textTransform: 'uppercase',
       fontFamily: 'AvenirLTStd-Book',
@@ -79,10 +79,11 @@ const Forms = ({formData}) => {
     },
     bigBoxTitle: {
       alignSelf: 'flex-start',
-      fontSize: 15,
+      fontSize: 14,
       fontWeight: 'bold',
       textTransform: 'uppercase',
       fontFamily: 'AvenirLTStd-Book',
+      color: colors.primary,
     },
     bigBoxbody: {
       marginTop: 5,
@@ -93,7 +94,12 @@ const Forms = ({formData}) => {
       // fontFamily: 'AvenirLTStd-Book',
     },
   };
-  const SmallBox = ({title, placeholder, footer}) => {
+  var FormInput = [];
+  const SmallBox = ({title, placeholder}) => {
+    const handleChange = (e) => {
+      console.log(e);
+      FormInput[title] = e;
+    };
     return (
       <View style={formStyle.smallBox}>
         <Text style={formStyle.smallBoxTitle}>{title}</Text>
@@ -104,6 +110,7 @@ const Forms = ({formData}) => {
             paddingBottom: 80,
           }}>
           <TextInput
+            onChangeText={handleChange}
             placeholder={placeholder}
             style={{
               backgroundColor: 'rgb(230,230,230)',
@@ -117,7 +124,11 @@ const Forms = ({formData}) => {
       </View>
     );
   };
-  const BigBox = ({title, placeholder, footer}) => {
+  const BigBox = ({title, placeholder}) => {
+    const handleChange = (e) => {
+      console.log(e);
+      FormInput[title] = e;
+    };
     return (
       <View style={formStyle.bigBox}>
         <Text style={formStyle.bigBoxTitle}>{title}</Text>
@@ -129,6 +140,7 @@ const Forms = ({formData}) => {
           }}>
           <TextInput
             placeholder={placeholder}
+            onChangeText={handleChange}
             style={{
               backgroundColor: 'rgb(230,230,230)',
               borderRadius: 20,
@@ -141,6 +153,108 @@ const Forms = ({formData}) => {
       </View>
     );
   };
+  const [Error, setError] = useState(false);
+  const handleSubmit = () => {
+    let postData = {
+      q1: '',
+      q2: '',
+      q3: '',
+      q4: '',
+      q5: '',
+      q6: '',
+      q7: '',
+      a1: '',
+      a2: '',
+      a3: '',
+      a4: '',
+      a5: '',
+      a6: '',
+      a7: '',
+    };
+    let error = false;
+    console.log(FormInput);
+
+    for (let index = 0; index < formData.length; index++) {
+      const element = formData[index];
+      console.log(FormInput[element.section.label]);
+      if (FormInput[element.section.label] === undefined) {
+        setError(true);
+        error = true;
+        postData = {
+          q1: '',
+          q2: '',
+          q3: '',
+          q4: '',
+          q5: '',
+          q6: '',
+          q7: '',
+          a1: '',
+          a2: '',
+          a3: '',
+          a4: '',
+          a5: '',
+          a6: '',
+          a7: '',
+        };
+        break;
+      } else {
+        switch (index) {
+          case 0:
+            postData.q1 = element.section.label;
+            postData.a1 = FormInput[element.section.label];
+            break;
+          case 1:
+            postData.q2 = element.section.label;
+            postData.a2 = FormInput[element.section.label];
+            break;
+          case 2:
+            postData.q3 = element.section.label;
+            postData.a3 = FormInput[element.section.label];
+            break;
+          case 3:
+            postData.q4 = element.section.label;
+            postData.a4 = FormInput[element.section.label];
+            break;
+          case 4:
+            postData.q5 = element.section.label;
+            postData.a5 = FormInput[element.section.label];
+            break;
+          case 5:
+            postData.q6 = element.section.label;
+            postData.a6 = FormInput[element.section.label];
+            break;
+          case 6:
+            postData.q7 = element.section.label;
+            postData.a7 = FormInput[element.section.label];
+            break;
+          default:
+            break;
+        }
+
+        setError(false);
+      }
+    }
+    if (!error) {
+      console.log(postData);
+      getUserAuthToken().then((token) => {
+        console.log(token);
+        axios({
+          url: '/api/formsubmit/',
+          method: 'post',
+          data: postData,
+          headers: {'Content-Type': 'application/json', 'x-auth-token': token},
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+    }
+
+    // setError(!Error);
+  };
   return (
     <View
       style={{
@@ -149,17 +263,52 @@ const Forms = ({formData}) => {
         justifyContent: 'space-around',
       }}>
       {formData.map((f) => {
-        var {form} = f;
+        var {section} = f;
         return (
-          <View>
-            {form.size === 'small' ? (
-              <SmallBox title={form.label} placeholder={form.placeholder} />
+          <View key={section.label}>
+            {section.size === 'small' ? (
+              <SmallBox
+                title={section.label}
+                placeholder={section.placeholder}
+              />
             ) : (
-              <BigBox title={form.label} placeholder={form.placeholder} />
+              <BigBox title={section.label} placeholder={section.placeholder} />
             )}
           </View>
         );
       })}
+      <View>
+        {Error && (
+          <Text
+            style={{
+              fontSize: 18,
+              marginTop: 10,
+              color: 'red',
+              alignSelf: 'center',
+            }}>
+            Please fill all fields
+          </Text>
+        )}
+        <Button
+          containerStyle={{marginTop: 30}}
+          buttonStyle={{backgroundColor: colors.secondary}}
+          title="Submit"
+          onPress={handleSubmit}
+        />
+        <Button
+          containerStyle={{marginTop: 15}}
+          buttonStyle={{backgroundColor: 'white'}}
+          titleStyle={{color: colors.secondary}}
+          title="View your plans"
+          onPress={() => {
+            navigation.navigate('StepFormData', {
+              stepName,
+              description,
+              image,
+            });
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -325,10 +474,12 @@ const Course = ({
 const StepCourse = ({route, navigation}) => {
   const {data} = route.params;
   const Coursedata = route.params;
+  const FormData = route.params.data?.form;
   const [StepData, setStepData] = React.useState([]);
   const [nextCourse, setnextCourse] = React.useState([]);
 
   console.log('route', route.params);
+  console.log('FormData', FormData);
   const getStepData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('@StepData');
@@ -339,6 +490,7 @@ const StepCourse = ({route, navigation}) => {
       throw e;
     }
   };
+  // this function will post progress
   useEffect(() => {
     var myVar = setTimeout(function () {
       let step = route.params.stepName;
@@ -411,7 +563,7 @@ const StepCourse = ({route, navigation}) => {
       </ImageBackground>
       <ScrollView style={StepCourseStyles.body}>
         <View style={{marginTop: 30}}>
-          {data.data[0].form === undefined ? (
+          {data.data.length > 0 ? (
             data.data.map((course, index) => (
               <Course
                 key={index}
@@ -425,7 +577,13 @@ const StepCourse = ({route, navigation}) => {
               />
             ))
           ) : (
-            <Forms formData={data.data} />
+            <Forms
+              formData={FormData}
+              navigation={navigation}
+              stepName={route.params.stepName}
+              description={data.name}
+              image={data.img}
+            />
           )}
         </View>
         <View
