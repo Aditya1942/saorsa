@@ -261,9 +261,13 @@ const Login = ({navigation}) => {
               }}
             />
             <View style={loginStyle.forgotpasswords}>
-              {/* <TouchableOpacity style={{alignSelf: 'flex-end'}}>
+              <TouchableOpacity
+                style={{alignSelf: 'flex-end'}}
+                onPress={() => {
+                  navigation.navigate('forgotPassword');
+                }}>
                 <Text style={{color: '#fff'}}>Forgot Password?</Text>
-              </TouchableOpacity> */}
+              </TouchableOpacity>
             </View>
             {Platform.OS === 'android' && (
               <>
