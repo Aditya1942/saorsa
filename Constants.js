@@ -189,7 +189,7 @@ export const courses = [
     id: '5',
     title: 'ANXIETY & STRESS',
     img: require('./assets/Stress.png'),
-    Component: 'Anxiety',
+    Component: 'ANXIETY & STRESS',
     onPress: true,
   },
 ];
