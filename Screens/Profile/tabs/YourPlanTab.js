@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {colors} from '../../../Constants';
-import headingImg from '../../../assets/yourPlaneHeadingPic.png';
-import FastImage from 'react-native-fast-image';
+
 const SmallBox = ({title, body, footer}) => {
   return (
     <View style={YourPlanTabStyle.smallBox}>
@@ -40,9 +39,9 @@ export const YourPlanTab = () => {
     },
     {
       id: 3,
-      title: 'When things feet too much',
+      title: 'When things feel too much',
       body:
-        '112 in the EU emergency number Whick works in all EU countries (alongside any pre-existing country-specific emergency number) \n911 is the US emergency number Which works accross North Anmerica and many US territories. \n999 is the UK emergency number Which also Works and in Former British colones and British overseas territories',
+        '112 in the EU emergency number Which works in all EU countries (alongside any pre-existing country-specific emergency number) \n911 is the US emergency number Which works accross North America and many US territories. \n999 is the UK emergency number Which also Works and in Former British colones and British overseas territories',
       footer: 'Some footer text',
     },
   ]);
@@ -161,7 +160,7 @@ const YourPlanTabStyle = StyleSheet.create({
     color: 'black',
     flex: 1,
     lineHeight: 13,
-    // fontFamily: 'AvenirLTStd-Book',
+    fontFamily: 'AvenirLTStd-Book',
   },
   smallBoxFooter: {
     paddingHorizontal: 5,
@@ -181,6 +180,7 @@ const YourPlanTabStyle = StyleSheet.create({
   bigBox: {
     backgroundColor: '#fff',
     margin: 3,
+    marginBottom: 10,
     paddingVertical: 10,
     paddingTop: 15,
     paddingHorizontal: 20,
@@ -199,7 +199,7 @@ const YourPlanTabStyle = StyleSheet.create({
     fontSize: 12,
     color: 'black',
     lineHeight: 17,
-    // fontFamily: 'AvenirLTStd-Book',
+    fontFamily: 'AvenirLTStd-Book',
   },
   bigBoxFooter: {
     paddingHorizontal: 5,

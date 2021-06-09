@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Text, View, BackHandler, Alert} from 'react-native';
+import {Text, View, BackHandler, Alert, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../../Components/Header';
 import {colors, sizes, MoodImgs} from '../../Constants';
@@ -27,7 +27,6 @@ const Profile = ({navigation, route}) => {
   const [editProfileIsOpen, seteditProfileIsOpen] = useState(false);
   const [ProfileTabIsOpen, setProfileTabIsOpen] = useState(true);
   const [activeProfileTab, setactiveProfileTab] = useState('tab2');
-  const [isSocialLogin, setIsSocialLogin] = useState(null);
   const [ProfilePic, setProfilePic] = useState(null);
   const closeAllTab = () => {
     // class all tabs
@@ -38,13 +37,6 @@ const Profile = ({navigation, route}) => {
     setProfileTabIsOpen(false);
     setactiveProfileTab(null);
   };
-  useEffect(() => {
-    userSocialLoginInfo().then((data) => {
-      console.log('userSocialLoginInfo', data);
-      setIsSocialLogin(data.user);
-    });
-    return () => {};
-  }, []);
 
   const handleTabChange = (e) => {
     // to open, close or navigate in different tabs
@@ -159,16 +151,21 @@ const Profile = ({navigation, route}) => {
       } else {
         let source = {uri: response.uri};
         console.log(response);
-        setProfilePic(response.uri);
-        let formData = new FormData();
-        formData.append({
-          uri: response.uri,
-          name: response.fileName,
-          type: response.type,
-        });
-        console.log('formData', formData);
+        setProfilePic('');
+
         getUserAuthToken().then((token) => {
           console.log('token', token);
+          const formData = new FormData();
+          if (response != null) {
+            formData.append('image', {
+              uri: response.uri,
+              name: response.fileName,
+              type: response.type,
+            });
+          }
+          formData.append('bio', 'bio');
+          console.log('token', token);
+
           axios
             .post('/api/profile', formData, {
               headers: {
@@ -178,6 +175,7 @@ const Profile = ({navigation, route}) => {
             })
             .then((e) => {
               console.log('POST PHOTO', e);
+              setProfilePic(e.data.coverImage);
             });
         });
       }
