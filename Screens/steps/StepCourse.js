@@ -22,6 +22,7 @@ import FastImage from 'react-native-fast-image';
 import axios from '../Auth/axios';
 import {getUserAuthToken} from '../Auth/auth';
 import {Button} from 'react-native-elements';
+import SubmitBtn from '../../Components/SubmitBtn';
 
 const Audio = ({navigation, audio}) => {
   return (
@@ -153,6 +154,7 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
       </View>
     );
   };
+  console.log(formData);
   const [Error, setError] = useState(false);
   const handleSubmit = () => {
     let postData = {
@@ -176,8 +178,8 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
 
     for (let index = 0; index < formData.length; index++) {
       const element = formData[index];
-      console.log(FormInput[element.section.label]);
-      if (FormInput[element.section.label] === undefined) {
+      console.log(FormInput[element.label]);
+      if (FormInput[element.label] === undefined) {
         setError(true);
         error = true;
         postData = {
@@ -200,32 +202,32 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
       } else {
         switch (index) {
           case 0:
-            postData.q1 = element.section.label;
-            postData.a1 = FormInput[element.section.label];
+            postData.q1 = element.label;
+            postData.a1 = FormInput[element.label];
             break;
           case 1:
-            postData.q2 = element.section.label;
-            postData.a2 = FormInput[element.section.label];
+            postData.q2 = element.label;
+            postData.a2 = FormInput[element.label];
             break;
           case 2:
-            postData.q3 = element.section.label;
-            postData.a3 = FormInput[element.section.label];
+            postData.q3 = element.label;
+            postData.a3 = FormInput[element.label];
             break;
           case 3:
-            postData.q4 = element.section.label;
-            postData.a4 = FormInput[element.section.label];
+            postData.q4 = element.label;
+            postData.a4 = FormInput[element.label];
             break;
           case 4:
-            postData.q5 = element.section.label;
-            postData.a5 = FormInput[element.section.label];
+            postData.q5 = element.label;
+            postData.a5 = FormInput[element.label];
             break;
           case 5:
-            postData.q6 = element.section.label;
-            postData.a6 = FormInput[element.section.label];
+            postData.q6 = element.label;
+            postData.a6 = FormInput[element.label];
             break;
           case 6:
-            postData.q7 = element.section.label;
-            postData.a7 = FormInput[element.section.label];
+            postData.q7 = element.label;
+            postData.a7 = FormInput[element.label];
             break;
           default:
             break;
@@ -262,44 +264,33 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
         flexWrap: 'wrap',
         justifyContent: 'space-around',
       }}>
-      {formData.map((f) => {
-        var {section} = f;
+      {formData.map((f, i) => {
+        console.log(f.label);
         return (
-          <View key={section.label}>
-            {section.size === 'small' ? (
-              <SmallBox
-                title={section.label}
-                placeholder={section.placeholder}
-              />
+          <View key={i}>
+            {f.size === 'small' ? (
+              <SmallBox title={f.label} placeholder={f.placeholder} />
             ) : (
-              <BigBox title={section.label} placeholder={section.placeholder} />
+              <BigBox title={f.label} placeholder={f.placeholder} />
             )}
           </View>
         );
       })}
-      <View>
+      <View style={{marginTop: 30}}>
         {Error && (
           <Text
             style={{
               fontSize: 18,
-              marginTop: 10,
+              // marginTop: 10,
               color: 'red',
               alignSelf: 'center',
             }}>
             Please fill all fields
           </Text>
         )}
-        <Button
-          containerStyle={{marginTop: 30}}
-          buttonStyle={{backgroundColor: colors.secondary}}
-          title="Submit"
-          onPress={handleSubmit}
-        />
-        <Button
-          containerStyle={{marginTop: 15}}
-          buttonStyle={{backgroundColor: 'white'}}
-          titleStyle={{color: colors.secondary}}
-          title="View your plans"
+
+        <SubmitBtn onPress={handleSubmit} />
+        <TouchableOpacity
           onPress={() => {
             navigation.navigate('StepFormData', {
               stepName,
@@ -307,7 +298,18 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
               image,
             });
           }}
-        />
+          style={{
+            backgroundColor: '#fff',
+            width: 200,
+            height: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 20,
+          }}>
+          <Text style={{color: colors.secondary, fontSize: 16}}>
+            VIEW YOUR PLANS
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -474,7 +476,7 @@ const Course = ({
 const StepCourse = ({route, navigation}) => {
   const {data} = route.params;
   const Coursedata = route.params;
-  const FormData = route.params.data?.form;
+  const FormData = route.params.data?.data[0].questions;
   const [StepData, setStepData] = React.useState([]);
   const [nextCourse, setnextCourse] = React.useState([]);
 
@@ -563,7 +565,7 @@ const StepCourse = ({route, navigation}) => {
       </ImageBackground>
       <ScrollView style={StepCourseStyles.body}>
         <View style={{marginTop: 30}}>
-          {data.data.length > 0 ? (
+          {data.data[0].category !== 'basic_form' ? (
             data.data.map((course, index) => (
               <Course
                 key={index}

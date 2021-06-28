@@ -27,6 +27,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import StepFormData from './Screens/steps/StepFormData';
 import About from './Screens/pages/About';
 import ForgotPassword from './Screens/Auth/ForgotPassword';
+import DepressionForm1 from './Screens/course/depressionForms/DepressionForm1';
+import DepressionForm2 from './Screens/course/depressionForms/DepressionForm2';
+import DepressionForm3 from './Screens/course/depressionForms/DepressionForm3';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -94,6 +97,9 @@ const HomeStackScreen = () => {
       <HomeStack.Screen name="StepCourse" component={StepCourse} />
       <HomeStack.Screen name="PaidCourse" component={PaidCourse} />
       <HomeStack.Screen name="PaidSubCourse" component={PaidSubCourse} />
+      <HomeStack.Screen name="DepressionForm1" component={DepressionForm1} />
+      <HomeStack.Screen name="DepressionForm2" component={DepressionForm2} />
+      <HomeStack.Screen name="DepressionForm3" component={DepressionForm3} />
       <HomeStack.Screen name="StepFormData" component={StepFormData} />
       <HomeStack.Screen name="AboutUs" component={About} />
       <HomeStack.Screen name="BottomMenu" component={BottomMenu} />

@@ -10,7 +10,10 @@ import {
   View,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import {ActivityIndicator} from 'react-native-paper';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Header from '../../Components/Header';
+import Loader from '../../Components/Loader';
 import {colors, sizes} from '../../Constants';
 import axios, {CancelToken} from '../Auth/axios';
 
@@ -22,18 +25,30 @@ export const PaidCourseBtn = ({
   courses,
   mcq,
 }) => {
+  console.log(courses);
   return (
     <TouchableOpacity
       style={courseBtnStyle.StepBtn}
       onPress={() => {
         if (!locked) {
-          navigation.navigate('PaidSubCourse', {
-            // id: id,
-            CourseTitle: name,
-            image: courseimage,
-            data: courses,
-            mcq: mcq,
-          });
+          // "SMART GOALS"
+          // "ACTIVITY DIARY"
+          if (name === 'THOUGHT DIARY') {
+            navigation.navigate('DepressionForm1', {
+              // id: id,
+              CourseTitle: name,
+              image: courseimage,
+              data: courses,
+              mcq: mcq,
+            });
+          } else
+            navigation.navigate('PaidSubCourse', {
+              // id: id,
+              CourseTitle: name,
+              image: courseimage,
+              data: courses,
+              mcq: mcq,
+            });
         }
       }}>
       <View>
@@ -58,6 +73,7 @@ export const PaidCourseBtn = ({
 };
 const PaidCourse = ({navigation, route}) => {
   const [CourseData, setCourseData] = React.useState([]);
+  const [Loading, setLoading] = React.useState(true);
   console.log(route.params);
   React.useEffect(() => {
     const source = CancelToken.source();
@@ -71,6 +87,7 @@ const PaidCourse = ({navigation, route}) => {
     }).then((data) => {
       console.log(data);
       setCourseData(data.data);
+      setLoading(false);
     });
 
     return () => {
@@ -86,6 +103,7 @@ const PaidCourse = ({navigation, route}) => {
         flex: 1,
         backgroundColor: colors.primary,
       }}>
+      <Loader Loading={Loading} setLoading={setLoading} />
       <ImageBackground source={{uri: image}} style={Styles.headerImg}>
         <View style={Styles.header}>
           <Header navigation={navigation} />

@@ -17,6 +17,8 @@ import {colors, sizes} from '../../Constants';
 import BottomSheet from 'react-native-bottomsheet-reanimated';
 import axios, {CancelToken} from '../Auth/axios';
 import {getUserAuthToken} from '../Auth/auth';
+import AutoHeightImage from 'react-native-auto-height-image';
+import SubmitBtn from '../../Components/SubmitBtn';
 
 const Questions = ({
   data,
@@ -147,19 +149,7 @@ const Questions = ({
       )}
       <View
         style={{alignItems: 'center', justifyContent: 'center', marginTop: 25}}>
-        <TouchableOpacity
-          onPress={submit}
-          style={{
-            backgroundColor: colors.secondary,
-            width: 200,
-            height: 30,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 20,
-            marginBottom: 10,
-          }}>
-          <Text style={{color: '#fff', fontSize: 16}}>SUBMIT</Text>
-        </TouchableOpacity>
+        <SubmitBtn onPress={submit} />
         <TouchableOpacity
           onPress={() => {
             onOpenBottomSheetHandler(1);
@@ -180,40 +170,40 @@ const Questions = ({
     </View>
   );
 };
-const MoodHistory = ({name, dateAndTime}) => {
-  const [BColor, setBColor] = useState(colors.secondary);
-  useEffect(() => {
-    switch (name) {
-      case 'HAPPY' || 'EXCITED' || 'GRATEFUL':
-        setBColor('greenyellow');
-        break;
-      case 'RELAXED' || 'CONTENT' || 'TIRED':
-        setBColor('yellowgreen');
-        break;
-      case 'UNSURE' || 'BORED' || 'ANXIOUS':
-        setBColor('#ffc703');
-        break;
-      case 'ANGRY' || 'STRESSED' || 'SAD':
-        setBColor('red');
-        break;
-      default:
-        break;
-    }
-  }, [name]);
-  return (
-    <View style={Styles.MoodHistory}>
-      <Text
-        style={[
-          Styles.MoodHistoryText,
-          Styles.MoodHistoryNameText,
-          {borderColor: BColor},
-        ]}>
-        {name}
-      </Text>
-      <Text style={Styles.MoodHistoryText}>{dateAndTime}</Text>
-    </View>
-  );
-};
+// const MoodHistory = ({name, dateAndTime}) => {
+//   const [BColor, setBColor] = useState(colors.secondary);
+//   useEffect(() => {
+//     switch (name) {
+//       case 'HAPPY' || 'EXCITED' || 'GRATEFUL':
+//         setBColor('greenyellow');
+//         break;
+//       case 'RELAXED' || 'CONTENT' || 'TIRED':
+//         setBColor('yellowgreen');
+//         break;
+//       case 'UNSURE' || 'BORED' || 'ANXIOUS':
+//         setBColor('#ffc703');
+//         break;
+//       case 'ANGRY' || 'STRESSED' || 'SAD':
+//         setBColor('red');
+//         break;
+//       default:
+//         break;
+//     }
+//   }, [name]);
+//   return (
+//     <View style={Styles.MoodHistory}>
+//       <Text
+//         style={[
+//           Styles.MoodHistoryText,
+//           Styles.MoodHistoryNameText,
+//           {borderColor: BColor},
+//         ]}>
+//         {name}
+//       </Text>
+//       <Text style={Styles.MoodHistoryText}>{dateAndTime}</Text>
+//     </View>
+//   );
+// };
 const PaidSubCourse = ({navigation, route}) => {
   console.log(route.params);
   const CourseTitle = route.params.CourseTitle;
@@ -416,21 +406,31 @@ const PaidSubCourse = ({navigation, route}) => {
         ) : (
           <View>
             {CourseData?.map((course, i) => (
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('VideoPlayer', {video: course.video});
-                }}
-                key={i}
-                style={Styles.introvideo}>
-                <FastImage
-                  style={Styles.playBtn}
-                  source={require('../../assets/playButton.png')}
-                />
-                <FastImage
-                  style={Styles.VideoThumbnail}
-                  source={{uri: course.thumbnail}}
-                />
-              </TouchableOpacity>
+              <View key={i}>
+                {course?.video !== undefined && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('VideoPlayer', {video: course.video});
+                    }}
+                    key={i}
+                    style={Styles.introvideo}>
+                    <FastImage
+                      style={Styles.playBtn}
+                      source={require('../../assets/playButton.png')}
+                    />
+                    <FastImage
+                      style={Styles.VideoThumbnail}
+                      source={{uri: course.thumbnail}}
+                    />
+                  </TouchableOpacity>
+                )}
+                {course?.img !== undefined && (
+                  <View style={{paddingHorizontal: 10}}>
+                    <AutoHeightImage width={350} source={{uri: course.img}} />
+                    {/* <FastImage width={350} source={{uri: img}} /> */}
+                  </View>
+                )}
+              </View>
             ))}
           </View>
         )}
