@@ -98,7 +98,6 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
   var FormInput = [];
   const SmallBox = ({title, placeholder}) => {
     const handleChange = (e) => {
-      console.log(e);
       FormInput[title] = e;
     };
     return (
@@ -127,7 +126,6 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
   };
   const BigBox = ({title, placeholder}) => {
     const handleChange = (e) => {
-      console.log(e);
       FormInput[title] = e;
     };
     return (
@@ -154,96 +152,34 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
       </View>
     );
   };
-  console.log(formData);
   const [Error, setError] = useState(false);
-  const handleSubmit = () => {
-    let postData = {
-      q1: '',
-      q2: '',
-      q3: '',
-      q4: '',
-      q5: '',
-      q6: '',
-      q7: '',
-      a1: '',
-      a2: '',
-      a3: '',
-      a4: '',
-      a5: '',
-      a6: '',
-      a7: '',
+  const convertPostArrayy = (arr) => {
+    let questions = [];
+    let answers = [];
+    arr.forEach((element) => {
+      questions.push(element[0]);
+      answers.push(element[1]);
+    });
+    let result = {
+      questions,
+      answers,
+      name: formData[0].name,
     };
-    let error = false;
+    return result;
+  };
+  const handleSubmit = () => {
+    let data = Object.entries(FormInput);
+
+    let PostData = convertPostArrayy(data);
     console.log(FormInput);
 
-    for (let index = 0; index < formData.length; index++) {
-      const element = formData[index];
-      console.log(FormInput[element.label]);
-      if (FormInput[element.label] === undefined) {
-        setError(true);
-        error = true;
-        postData = {
-          q1: '',
-          q2: '',
-          q3: '',
-          q4: '',
-          q5: '',
-          q6: '',
-          q7: '',
-          a1: '',
-          a2: '',
-          a3: '',
-          a4: '',
-          a5: '',
-          a6: '',
-          a7: '',
-        };
-        break;
-      } else {
-        switch (index) {
-          case 0:
-            postData.q1 = element.label;
-            postData.a1 = FormInput[element.label];
-            break;
-          case 1:
-            postData.q2 = element.label;
-            postData.a2 = FormInput[element.label];
-            break;
-          case 2:
-            postData.q3 = element.label;
-            postData.a3 = FormInput[element.label];
-            break;
-          case 3:
-            postData.q4 = element.label;
-            postData.a4 = FormInput[element.label];
-            break;
-          case 4:
-            postData.q5 = element.label;
-            postData.a5 = FormInput[element.label];
-            break;
-          case 5:
-            postData.q6 = element.label;
-            postData.a6 = FormInput[element.label];
-            break;
-          case 6:
-            postData.q7 = element.label;
-            postData.a7 = FormInput[element.label];
-            break;
-          default:
-            break;
-        }
-
-        setError(false);
-      }
-    }
-    if (!error) {
-      console.log(postData);
+    if (data.length === formData[0].questions.length) {
+      console.log(PostData);
       getUserAuthToken().then((token) => {
-        console.log(token);
         axios({
           url: '/api/formsubmit/',
           method: 'post',
-          data: postData,
+          data: PostData,
           headers: {'Content-Type': 'application/json', 'x-auth-token': token},
         })
           .then((res) => {
@@ -253,8 +189,10 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
             console.log(err);
           });
       });
+      setError(false);
+    } else {
+      setError(true);
     }
-
     // setError(!Error);
   };
   return (
@@ -264,8 +202,7 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
         flexWrap: 'wrap',
         justifyContent: 'space-around',
       }}>
-      {formData.map((f, i) => {
-        console.log(f.label);
+      {formData[0].questions.map((f, i) => {
         return (
           <View key={i}>
             {f.size === 'small' ? (
@@ -476,16 +413,13 @@ const Course = ({
 const StepCourse = ({route, navigation}) => {
   const {data} = route.params;
   const Coursedata = route.params;
-  const FormData = route.params.data?.data[0].questions;
+  const FormData = route.params.data?.data;
   const [StepData, setStepData] = React.useState([]);
   const [nextCourse, setnextCourse] = React.useState([]);
 
-  console.log('route', route.params);
-  console.log('FormData', FormData);
   const getStepData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('@StepData');
-      // console.log('axios'.data);
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       // error reading value
@@ -498,7 +432,6 @@ const StepCourse = ({route, navigation}) => {
       let step = route.params.stepName;
       let course = data.name;
       getUserAuthToken().then((token) => {
-        console.log('token', token);
         axios({
           url: '/api/progress',
           data: JSON.stringify({step, course}),
@@ -511,8 +444,6 @@ const StepCourse = ({route, navigation}) => {
           console.log(e);
         });
       });
-
-      console.log('Hello', step, course);
     }, 60000);
     return () => {
       clearTimeout(myVar);
@@ -525,11 +456,8 @@ const StepCourse = ({route, navigation}) => {
         .then((steps) => {
           setStepData(steps);
           setnextCourse(steps[Coursedata.stepId]?.courses[Coursedata.id + 1]);
-          console.log(steps);
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => {});
       const onBackPress = () => {
         if (navigation.canGoBack()) {
           navigation.goBack();
@@ -694,25 +622,3 @@ const StepCourseStyles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
-
-/* <FlatList
-            data={data.data}
-            keyExtractor={({index}) => index}
-            pagingEnabled
-            contentContainerStyle={{marginTop: 30}}
-            renderItem={({item, index}) => {
-              console.log(item);
-              return (
-                <Course
-                  key={index}
-                  title={item?.title}
-                  description={item?.description}
-                  img={item?.img}
-                  audio={item?.audio}
-                  video={item?.video}
-                  thumbnail={item?.thumbnail}
-                  navigation={navigation}
-                />
-              );
-            }}
-          /> */

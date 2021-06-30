@@ -9,10 +9,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Button} from 'react-native-elements';
 import Header from '../../../Components/Header';
 import SubmitBtn from '../../../Components/SubmitBtn';
 import {colors, sizes} from '../../../Constants';
+import {getUserAuthToken} from '../../Auth/auth';
+import axios from '../../Auth/axios';
 
 const DepressionForm1 = ({navigation, route}) => {
   var FormInput = [];
@@ -20,12 +21,37 @@ const DepressionForm1 = ({navigation, route}) => {
   const image = route.params.image;
   const CourseData = route.params.data;
   const [Error, setError] = useState(false);
+  const convertPostArrayy = (arr) => {
+    let questions = [];
+    let answers = [];
+    arr.forEach((element) => {
+      questions.push(element[0]);
+      answers.push(element[1]);
+    });
+    let result = {
+      questions,
+      answers,
+      name: CourseData[0].name,
+    };
+    return result;
+  };
   const handleSubmit = () => {
     let data = Object.entries(FormInput);
 
     if (data.length === CourseData[0].questions.length) {
+      let PostData = convertPostArrayy(data);
+      console.log(PostData);
+      getUserAuthToken().then((token) => {
+        axios({
+          url: '/api/formsubmit/',
+          method: 'post',
+          data: PostData,
+          headers: {'Content-Type': 'application/json', 'x-auth-token': token},
+        }).then((res) => {
+          console.log(res);
+        });
+      });
       setError(false);
-      console.log(data);
     } else {
       setError(true);
     }
@@ -78,7 +104,7 @@ const DepressionForm1 = ({navigation, route}) => {
       </ImageBackground>
       <ScrollView style={Styles.body}>
         {CourseData[0].questions.map((c, i) => (
-          <FormInputFeild placeholder={c.placeholder} title={c.label} />
+          <FormInputFeild key={i} placeholder={c.placeholder} title={c.label} />
         ))}
         <View
           style={{
@@ -152,25 +178,7 @@ const Styles = StyleSheet.create({
     fontFamily: 'AvenirLTStd-Book',
     marginBottom: 10,
   },
-  textAreaContainer: {
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 5,
-    marginVertical: 10,
-    marginHorizontal: 20,
-    backgroundColor: 'white',
-  },
-  textAreaContainerTitle: {
-    marginTop: 5,
-    marginLeft: 10,
-  },
-  textArea: {
-    height: 150,
-    borderRadius: 10,
-    marginTop: 10,
-    justifyContent: 'flex-start',
-    backgroundColor: 'rgb(230,230,230)',
-  },
+
   bigBox: {
     flex: 1,
     width: sizes.width * 0.9,
@@ -190,6 +198,7 @@ const Styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontFamily: 'AvenirLTStd-Book',
     color: colors.primary,
+    marginLeft: 10,
   },
   bigBoxbody: {
     marginTop: 5,

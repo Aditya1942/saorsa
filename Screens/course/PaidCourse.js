@@ -25,7 +25,6 @@ export const PaidCourseBtn = ({
   courses,
   mcq,
 }) => {
-  console.log(courses);
   return (
     <TouchableOpacity
       style={courseBtnStyle.StepBtn}
@@ -41,7 +40,23 @@ export const PaidCourseBtn = ({
               data: courses,
               mcq: mcq,
             });
-          } else
+          } else if (name === 'SMART GOALS') {
+            navigation.navigate('DepressionForm2', {
+              // id: id,
+              CourseTitle: name,
+              image: courseimage,
+              data: courses,
+              mcq: mcq,
+            });
+          } else if (name === 'ACTIVITY DIARY') {
+            navigation.navigate('DepressionForm3', {
+              // id: id,
+              CourseTitle: name,
+              image: courseimage,
+              data: courses,
+              mcq: mcq,
+            });
+          } else {
             navigation.navigate('PaidSubCourse', {
               // id: id,
               CourseTitle: name,
@@ -49,6 +64,7 @@ export const PaidCourseBtn = ({
               data: courses,
               mcq: mcq,
             });
+          }
         }
       }}>
       <View>

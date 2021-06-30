@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, TouchableOpacity} from 'react-native';
 import {colors} from '../Constants';
 
-const SubmitBtn = ({onPress}) => {
+const SubmitBtn = ({title = 'SUBMIT', onPress}) => {
   return (
     <TouchableOpacity
       onPress={() => {
@@ -10,14 +10,14 @@ const SubmitBtn = ({onPress}) => {
       }}
       style={{
         backgroundColor: colors.secondary,
-        width: 200,
+        width: title === 'SUBMIT' ? 200 : 250,
         height: 30,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20,
         marginBottom: 10,
       }}>
-      <Text style={{color: '#fff', fontSize: 16}}>SUBMIT</Text>
+      <Text style={{color: '#fff', fontSize: 16}}>{title}</Text>
     </TouchableOpacity>
   );
 };
