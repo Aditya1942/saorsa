@@ -10,8 +10,6 @@ import {
   View,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {ActivityIndicator} from 'react-native-paper';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Header from '../../Components/Header';
 import Loader from '../../Components/Loader';
 import {colors, sizes} from '../../Constants';

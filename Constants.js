@@ -161,7 +161,7 @@ export const courses = [
     id: '1',
     title: 'RELAXATION',
     img: require('./assets/Relax.png'),
-    Component: 'Relaxation',
+    Component: 'RELAXATION',
     onPress: true,
   },
   {

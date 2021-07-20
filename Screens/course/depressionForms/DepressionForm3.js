@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ImageBackground,
   SafeAreaView,
@@ -13,21 +13,28 @@ import SubmitBtn from '../../../Components/SubmitBtn';
 import {colors, sizes} from '../../../Constants';
 import {getUserAuthToken} from '../../Auth/auth';
 import axios from '../../Auth/axios';
+import DropdownAlert from 'react-native-dropdownalert';
+import Loader from '../../../Components/Loader';
 
 const DepressionForm3 = ({navigation, route}) => {
+  const dropDownAlertRef = useRef();
+  const [Loading, setLoading] = React.useState(true);
+
   var FormInput = [];
   const CourseTitle = route.params.CourseTitle;
   const image = route.params.image;
   const CourseData = route.params.data;
-  const MCQS = route.params.mcq;
   const [CurrentDate, setCurrentDate] = useState('');
   const [Error, setError] = useState(false);
+  useEffect(() => {
+    setLoading(false);
+  }, []);
   const convertPostArrayy = (arr) => {
     let questions = [];
     let answers = [];
     arr.forEach((element) => {
       questions.push(element[0]);
-      answers.push(element[1]);
+      answers.push({ans: element[1]});
     });
     let result = {
       questions,
@@ -37,6 +44,8 @@ const DepressionForm3 = ({navigation, route}) => {
     return result;
   };
   const handleSubmit = () => {
+    setLoading(true);
+
     let data = Object.entries(FormInput);
 
     if (data.length === CourseData[1].questions.length) {
@@ -44,13 +53,39 @@ const DepressionForm3 = ({navigation, route}) => {
       console.log(PostData);
       getUserAuthToken().then((token) => {
         axios({
-          url: '/api/formsubmit/',
+          url: '/api/formsubmit',
           method: 'post',
           data: PostData,
           headers: {'Content-Type': 'application/json', 'x-auth-token': token},
-        }).then((res) => {
-          console.log(res);
-        });
+        })
+          .then((res) => {
+            setLoading(false);
+
+            console.log(res);
+            if (res.status === 200) {
+              dropDownAlertRef.current.alertWithType(
+                'success',
+                'Success',
+                'Thought added successfully',
+              );
+            } else {
+              dropDownAlertRef.current.alertWithType(
+                'error',
+                'Error',
+                'Something Went wrong Try Again',
+              );
+            }
+          })
+          .catch((err) => {
+            setLoading(false);
+
+            console.log(err);
+            dropDownAlertRef.current.alertWithType(
+              'error',
+              'Error',
+              'Something Went wrong Try Again',
+            );
+          });
       });
       setError(false);
     } else {
@@ -142,6 +177,9 @@ const DepressionForm3 = ({navigation, route}) => {
         flex: 1,
         backgroundColor: colors.primary,
       }}>
+      <DropdownAlert ref={dropDownAlertRef} />
+      <Loader Loading={Loading} setLoading={setLoading} />
+
       <ImageBackground source={{uri: image}} style={Styles.headerImg}>
         <View style={Styles.header}>
           <Header navigation={navigation} />

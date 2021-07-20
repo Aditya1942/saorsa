@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Button,
   Dimensions,
@@ -19,12 +19,18 @@ import axios, {CancelToken} from '../Auth/axios';
 import {getUserAuthToken} from '../Auth/auth';
 import AutoHeightImage from 'react-native-auto-height-image';
 import SubmitBtn from '../../Components/SubmitBtn';
+import DropdownAlert from 'react-native-dropdownalert';
+import Loader from '../../Components/Loader';
+import {Title} from '../steps/StepCourse';
 
 const Questions = ({
   data,
   onOpenBottomSheetHandler,
   setUpdateGraph,
   CourseTitle,
+  Loading,
+  setLoading,
+  dropDownAlertRef,
 }) => {
   const QuestionsInput = data;
   const [AnswerError, setAnswerError] = useState(false);
@@ -93,6 +99,7 @@ const Questions = ({
     );
   };
   const submit = () => {
+    setLoading(true);
     let mcqSum = 0;
     let error = false;
     let length = 0;
@@ -122,14 +129,25 @@ const Questions = ({
           headers: {'Content-Type': 'application/json', 'x-auth-token': token},
         })
           .then((res) => {
+            setLoading(false);
+            if (res.status === 200) {
+              dropDownAlertRef.current.alertWithType(
+                'success',
+                'Success',
+                'Thought added successfully',
+              );
+            }
             console.log(res);
             setUpdateGraph((e) => (e += 1));
           })
           .catch((err) => {
+            setLoading(false);
             console.log(err);
           });
       });
       setAnswerError(false);
+    } else {
+      setLoading(false);
     }
   };
   return (
@@ -205,7 +223,13 @@ const Questions = ({
 //   );
 // };
 const PaidSubCourse = ({navigation, route}) => {
+  const dropDownAlertRef = useRef();
+  const [Loading, setLoading] = React.useState(true);
+
   console.log(route.params);
+  useEffect(() => {
+    setLoading(false);
+  }, []);
   const CourseTitle = route.params.CourseTitle;
   const image = route.params.image;
   const CourseData = route.params.data;
@@ -379,6 +403,9 @@ const PaidSubCourse = ({navigation, route}) => {
         flex: 1,
         backgroundColor: colors.primary,
       }}>
+      <DropdownAlert ref={dropDownAlertRef} />
+      <Loader Loading={Loading} setLoading={setLoading} />
+
       <ImageBackground source={{uri: image}} style={Styles.headerImg}>
         <View style={Styles.header}>
           <Header navigation={navigation} />
@@ -402,11 +429,25 @@ const PaidSubCourse = ({navigation, route}) => {
             setUpdateGraph={setUpdateGraph}
             data={MCQS.mcqs}
             CourseTitle={CourseTitle}
+            Loading={Loading}
+            setLoading={setLoading}
+            dropDownAlertRef={dropDownAlertRef}
           />
         ) : (
           <View>
             {CourseData?.map((course, i) => (
               <View key={i}>
+                {course?.title !== undefined && (
+                  <Title
+                    audio={''}
+                    titleText={course.title}
+                    navigation={navigation}
+                  />
+                )}
+                {course.description && (
+                  <Text style={Styles.description}>{course.description}</Text>
+                )}
+
                 {course?.video !== undefined && (
                   <TouchableOpacity
                     onPress={() => {
@@ -518,5 +559,13 @@ const Styles = StyleSheet.create({
     borderBottomWidth: 2,
 
     padding: 0,
+  },
+  description: {
+    color: '#fff',
+    padding: 10,
+    paddingHorizontal: 20,
+    fontFamily: sizes.fontFamily,
+    fontSize: sizes.title,
+    textAlign: 'center',
   },
 });

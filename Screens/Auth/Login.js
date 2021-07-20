@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
 import {
   BackHandler,
@@ -152,8 +151,8 @@ const Login = ({navigation}) => {
           });
         }
       },
-      function (error) {
-        console.log('Login fail with error: ' + error);
+      function (err) {
+        console.log('Login fail with error: ' + err);
       },
     );
   };

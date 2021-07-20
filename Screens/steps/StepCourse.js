@@ -24,7 +24,7 @@ import {getUserAuthToken} from '../Auth/auth';
 import {Button} from 'react-native-elements';
 import SubmitBtn from '../../Components/SubmitBtn';
 
-const Audio = ({navigation, audio}) => {
+export const Audio = ({navigation, audio}) => {
   return (
     <TouchableOpacity
       style={StepCourseStyles.audio}
@@ -252,7 +252,7 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
   );
 };
 
-const Title = ({audio, titleText, navigation}) => {
+export const Title = ({audio, titleText, navigation}) => {
   const stepCourseTitleStyle = {
     main: {
       flexDirection: 'row',
@@ -457,7 +457,9 @@ const StepCourse = ({route, navigation}) => {
           setStepData(steps);
           setnextCourse(steps[Coursedata.stepId]?.courses[Coursedata.id + 1]);
         })
-        .catch((err) => {});
+        .catch((err) => {
+          console.log(err);
+        });
       const onBackPress = () => {
         if (navigation.canGoBack()) {
           navigation.goBack();
