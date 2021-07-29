@@ -397,6 +397,7 @@ const PaidSubCourse = ({navigation, route}) => {
       />
     );
   };
+
   return (
     <SafeAreaView
       style={{
@@ -435,44 +436,100 @@ const PaidSubCourse = ({navigation, route}) => {
           />
         ) : (
           <View>
-            {CourseData?.map((course, i) => (
-              <View key={i}>
-                {course?.title !== undefined && (
-                  <Title
-                    audio={''}
-                    titleText={course.title}
-                    navigation={navigation}
-                  />
-                )}
-                {course.description && (
-                  <Text style={Styles.description}>{course.description}</Text>
-                )}
+            {CourseData?.map((course, i) => {
+              function WordCount(str) {
+                var lengthyTitle = [];
+                let titleStr = '';
+                str = str.split(' ');
+                str.forEach((word, i) => {
+                  titleStr = titleStr.concat(word + ' ');
+                  let join = false;
+                  let n = str[i + 1];
+                  // if string length is greater then 23
+                  if (titleStr.length >= 24) {
+                    join = true;
+                    if (n) {
+                      if (
+                        titleStr.length >= 10 &&
+                        titleStr.length <= 26 &&
+                        n.length <= 4
+                      ) {
+                        join = false;
+                      }
+                      if (n.length < 2) {
+                        join = false;
+                      }
+                    }
+                  }
+                  if (
+                    titleStr.length >= 20 &&
+                    titleStr.length <= 25 &&
+                    word.length <= 10
+                  ) {
+                    join = true;
+                  }
 
-                {course?.video !== undefined && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate('VideoPlayer', {video: course.video});
-                    }}
-                    key={i}
-                    style={Styles.introvideo}>
-                    <FastImage
-                      style={Styles.playBtn}
-                      source={require('../../assets/playButton.png')}
-                    />
-                    <FastImage
-                      style={Styles.VideoThumbnail}
-                      source={{uri: course.thumbnail}}
-                    />
-                  </TouchableOpacity>
-                )}
-                {course?.img !== undefined && (
-                  <View style={{paddingHorizontal: 10}}>
-                    <AutoHeightImage width={350} source={{uri: course.img}} />
-                    {/* <FastImage width={350} source={{uri: img}} /> */}
-                  </View>
-                )}
-              </View>
-            ))}
+                  if (join) {
+                    lengthyTitle.push(titleStr);
+                    titleStr = '';
+                  }
+                });
+                if (titleStr !== '') {
+                  lengthyTitle.push(titleStr);
+                }
+
+                return lengthyTitle;
+              }
+              var titles = [];
+              if (course.title) {
+                titles = WordCount(course.title);
+                // console.log(titles);
+              }
+
+              return (
+                <View key={i}>
+                  {course?.title &&
+                    titles.map((titleText, index) => (
+                      <Title
+                        key={index}
+                        titleText={titleText}
+                        audio={''}
+                        navigation={navigation}
+                      />
+                    ))}
+
+                  {course.description && (
+                    <Text style={Styles.description}>{course.description}</Text>
+                  )}
+
+                  {course?.video !== undefined && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate('VideoPlayer', {
+                          video: course.video,
+                        });
+                      }}
+                      key={i}
+                      style={Styles.introvideo}>
+                      <FastImage
+                        style={Styles.playBtn}
+                        source={require('../../assets/playButton.png')}
+                      />
+                      <FastImage
+                        style={Styles.VideoThumbnail}
+                        source={{uri: course.thumbnail}}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  {course?.img !== undefined && (
+                    <View style={{paddingHorizontal: 10}}>
+                      <AutoHeightImage width={350} source={{uri: course.img}} />
+                      {/* <FastImage width={350} source={{uri: img}} /> */}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
           </View>
         )}
         <View style={{margin: 60}} />

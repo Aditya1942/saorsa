@@ -168,7 +168,7 @@ export const courses = [
     id: '2',
     title: 'MINDFULLNESS',
     img: require('./assets/Mindfull.png'),
-    Component: 'Mindfullness',
+    Component: 'Mindfulness',
     onPress: true,
   },
   {
