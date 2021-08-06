@@ -163,7 +163,11 @@ export const StepBtn = ({
     </TouchableOpacity>
   );
 };
-const NextStep = ({navigationData, navigation, navigateToStep6 = false}) => {
+export const NextStep = ({
+  navigationData,
+  navigation,
+  navigateToStep6 = false,
+}) => {
   return (
     <TouchableOpacity
       onPress={() => {

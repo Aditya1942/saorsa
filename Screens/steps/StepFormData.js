@@ -16,6 +16,7 @@ import {getUserAuthToken} from '../Auth/auth';
 import axios, {CancelToken} from '../Auth/axios';
 const StepFormDataDetails = ({id, Fdata}) => {
   const loop = ['1', '2', '3', '4', '5', '6', '7'];
+  console.log(Fdata);
   return (
     <View>
       {loop.map((e) => (
@@ -94,13 +95,13 @@ const StepFormData = ({navigation, route}) => {
     getUserAuthToken().then((token) => {
       console.log(token);
       axios({
-        url: '/api/formsubmit/',
+        url: '/api/formsubmit/4d',
         method: 'get',
         headers: {'Content-Type': 'application/json', 'x-auth-token': token},
       })
         .then((res) => {
           console.log(res.data);
-          setdata(res.data.responses);
+          setdata(res.data.qnaResponses);
         })
         .catch((err) => {
           console.log(err);

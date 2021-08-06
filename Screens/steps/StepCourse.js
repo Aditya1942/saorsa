@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   BackHandler,
-  FlatList,
   TextInput,
+  Dimensions,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -17,12 +17,13 @@ import {colors, sizes} from '../../Constants';
 import {useFocusEffect} from '@react-navigation/core';
 import AutoHeightImage from 'react-native-auto-height-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StepBtn} from './Step';
 import FastImage from 'react-native-fast-image';
 import axios from '../Auth/axios';
 import {getUserAuthToken} from '../Auth/auth';
-import {Button} from 'react-native-elements';
 import SubmitBtn from '../../Components/SubmitBtn';
+import Loader from '../../Components/Loader';
+import DropdownAlert from 'react-native-dropdownalert';
+import {NextStep} from './Step';
 
 export const Audio = ({navigation, audio}) => {
   return (
@@ -37,7 +38,16 @@ export const Audio = ({navigation, audio}) => {
     </TouchableOpacity>
   );
 };
-const Forms = ({formData, navigation, stepName, image, description}) => {
+const Forms = ({
+  formData,
+  navigation,
+  stepName,
+  image,
+  description,
+  Loading,
+  setLoading,
+  dropDownAlertRef,
+}) => {
   const formStyle = {
     smallBox: {
       flex: 0.5,
@@ -158,7 +168,7 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
     let answers = [];
     arr.forEach((element) => {
       questions.push(element[0]);
-      answers.push(element[1]);
+      answers.push({ans: element[1]});
     });
     let result = {
       questions,
@@ -168,6 +178,8 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
     return result;
   };
   const handleSubmit = () => {
+    setLoading(true);
+
     let data = Object.entries(FormInput);
 
     let PostData = convertPostArrayy(data);
@@ -184,14 +196,25 @@ const Forms = ({formData, navigation, stepName, image, description}) => {
         })
           .then((res) => {
             console.log(res);
+            setLoading(false);
+            if (res.status === 200) {
+              dropDownAlertRef.current.alertWithType(
+                'success',
+                'Success',
+                'Plane added successfully',
+              );
+            }
           })
           .catch((err) => {
+            setLoading(false);
+
             console.log(err);
           });
       });
       setError(false);
     } else {
       setError(true);
+      setLoading(false);
     }
     // setError(!Error);
   };
@@ -410,13 +433,47 @@ const Course = ({
     </View>
   );
 };
+const StepBtn = ({
+  courseimage,
+  name,
+  id,
+  navigation,
+  data,
+  stepName,
+  stepId,
+}) => {
+  return (
+    <TouchableOpacity
+      style={StepCourseStyles.StepBtn}
+      onPress={() => {
+        navigation.navigate('StepCourse', {
+          id: id,
+          Coursename: name,
+          data: data,
+          stepName: stepName,
+          stepId: stepId,
+        });
+      }}>
+      <View>
+        <View style={StepCourseStyles.StepBtnBody}>
+          <FastImage
+            style={StepCourseStyles.courseImg}
+            source={{uri: courseimage}}
+          />
+          <Text style={StepCourseStyles.StepBtnText}>{name}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
 const StepCourse = ({route, navigation}) => {
   const {data} = route.params;
   const Coursedata = route.params;
   const FormData = route.params.data?.data;
   const [StepData, setStepData] = React.useState([]);
   const [nextCourse, setnextCourse] = React.useState([]);
-
+  const dropDownAlertRef = useRef();
+  const [Loading, setLoading] = React.useState(true);
   const getStepData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('@StepData');
@@ -449,13 +506,16 @@ const StepCourse = ({route, navigation}) => {
       clearTimeout(myVar);
     };
   }, [data.name, route]);
-
+  useEffect(() => {
+    setLoading(false);
+  }, []);
   useFocusEffect(
     React.useCallback(() => {
       getStepData()
         .then((steps) => {
           setStepData(steps);
           setnextCourse(steps[Coursedata.stepId]?.courses[Coursedata.id + 1]);
+          console.log(steps, Coursedata.id);
         })
         .catch((err) => {
           console.log(err);
@@ -482,6 +542,8 @@ const StepCourse = ({route, navigation}) => {
         flex: 1,
         backgroundColor: colors.primary,
       }}>
+      <DropdownAlert ref={dropDownAlertRef} />
+      <Loader Loading={Loading} setLoading={setLoading} />
       <ImageBackground
         source={{uri: data.img}}
         style={StepCourseStyles.headerImg}>
@@ -515,6 +577,9 @@ const StepCourse = ({route, navigation}) => {
               stepName={route.params.stepName}
               description={data.name}
               image={data.img}
+              Loading={Loading}
+              setLoading={setLoading}
+              dropDownAlertRef={dropDownAlertRef}
             />
           )}
         </View>
@@ -536,6 +601,38 @@ const StepCourse = ({route, navigation}) => {
               stepName={Coursedata.stepName}
             />
           )}
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              flex: 1,
+              width: Dimensions.get('window').width - 10,
+            }}>
+            {!nextCourse && (
+              <View>
+                {Coursedata.stepId + 1 !== 5 ? (
+                  <NextStep
+                    navigationData={{
+                      id: Coursedata.stepId + 2,
+                      index: Coursedata.stepId + 1,
+                      stepName: StepData[Coursedata.stepId + 1]?.name,
+                    }}
+                    navigation={navigation}
+                  />
+                ) : (
+                  <NextStep
+                    navigationData={{
+                      id: Coursedata.stepId + 2,
+                      index: Coursedata.stepId + 1,
+                      stepName: StepData[Coursedata.stepId + 1]?.name,
+                    }}
+                    navigation={navigation}
+                    navigateToStep6={true}
+                  />
+                )}
+              </View>
+            )}
+          </View>
         </View>
         <View style={{height: 100}} />
       </ScrollView>
@@ -622,5 +719,40 @@ const StepCourseStyles = StyleSheet.create({
     width: 100,
     flex: 1,
     alignSelf: 'center',
+  },
+  stepBtns: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+    flexWrap: 'wrap',
+  },
+  StepBtn: {
+    alignItems: 'center',
+    width: sizes.ITEM_WIDTH * 1.62,
+    // width: sizes.width,
+    height: sizes.ITEM_HEIGHT * 1.25,
+    // flexGrow: 1,
+  },
+  StepBtnBody: {
+    backgroundColor: '#fff',
+    // height: sizes.ITEM_HEIGHT + 15,
+    borderRadius: 20,
+  },
+  StepBtnText: {
+    color: 'black',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    fontSize: 12,
+    // width: 170,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textAlignVertical: 'bottom',
+    textTransform: 'uppercase',
+  },
+  courseImg: {
+    width: sizes.ITEM_WIDTH * 1.65,
+    height: sizes.ITEM_WIDTH,
+    borderRadius: 20,
   },
 });
