@@ -6,6 +6,7 @@ const instance = axios.create({
   validateStatus: function (status) {
     return status >= 200 && status <= 500; // default
   },
+  headers: {},
 });
 export const CancelToken = axios.CancelToken;
 

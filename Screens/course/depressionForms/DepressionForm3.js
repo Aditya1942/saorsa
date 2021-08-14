@@ -78,7 +78,6 @@ const DepressionForm3 = ({navigation, route}) => {
           })
           .catch((err) => {
             setLoading(false);
-
             console.log(err);
             dropDownAlertRef.current.alertWithType(
               'error',
@@ -90,6 +89,7 @@ const DepressionForm3 = ({navigation, route}) => {
       setError(false);
     } else {
       setError(true);
+      setLoading(false);
     }
   };
   const FormInputFeild = ({title, placeholder}) => {
