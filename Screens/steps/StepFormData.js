@@ -16,10 +16,10 @@ import {getUserAuthToken} from '../Auth/auth';
 import axios, {CancelToken} from '../Auth/axios';
 const StepFormDataDetails = ({id, Fdata}) => {
   const loop = ['1', '2', '3', '4', '5', '6', '7'];
-  console.log(Fdata);
+  console.log(id, Fdata);
   return (
     <View>
-      {loop.map((e) => (
+      {loop.map((e, i) => (
         <View key={e} style={{marginVertical: 20}}>
           <View>
             <Text
@@ -32,11 +32,11 @@ const StepFormDataDetails = ({id, Fdata}) => {
                 paddingHorizontal: 20,
                 fontSize: 18,
               }}>
-              {Fdata[id]['q' + e]}
+              {Fdata[id].questions[i]}
             </Text>
           </View>
           <Text style={{paddingHorizontal: 20, color: 'white', fontSize: 16}}>
-            {Fdata[id]['a' + e]}
+            {Fdata[id].answers[i].ans}
           </Text>
         </View>
       ))}
@@ -104,7 +104,7 @@ const StepFormData = ({navigation, route}) => {
           setdata(res.data.qnaResponses);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     });
     return () => {};

@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AccessToken,
@@ -100,7 +92,7 @@ export default function DrawerScreen({navigation}) {
       </View>
       <View style={DrawerStyle.drawerFooter}></View>
       <View style={{alignItems: 'center'}}>
-        <Text style={DrawerStyle.footerText}>Connect witsh us</Text>
+        <Text style={DrawerStyle.footerText}>Connect with us</Text>
       </View>
       <TouchableOpacity activeOpacity={0.5} style={DrawerStyle.iconView}>
         <Image

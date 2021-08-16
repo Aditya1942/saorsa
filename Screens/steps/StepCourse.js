@@ -24,6 +24,7 @@ import SubmitBtn from '../../Components/SubmitBtn';
 import Loader from '../../Components/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import {NextStep} from './Step';
+import {set} from 'react-native-reanimated';
 
 export const Audio = ({navigation, audio}) => {
   return (
@@ -441,7 +442,11 @@ const StepBtn = ({
   data,
   stepName,
   stepId,
+  height,
 }) => {
+  let equalHeight = {
+    height: height,
+  };
   return (
     <TouchableOpacity
       style={StepCourseStyles.StepBtn}
@@ -455,7 +460,7 @@ const StepBtn = ({
         });
       }}>
       <View>
-        <View style={StepCourseStyles.StepBtnBody}>
+        <View style={{...StepCourseStyles.StepBtnBody, ...equalHeight}}>
           <FastImage
             style={StepCourseStyles.courseImg}
             source={{uri: courseimage}}
@@ -483,6 +488,8 @@ const StepCourse = ({route, navigation}) => {
       throw e;
     }
   };
+  const scrollRef = useRef();
+
   // this function will post progress
   useEffect(() => {
     var myVar = setTimeout(function () {
@@ -530,6 +537,12 @@ const StepCourse = ({route, navigation}) => {
         }
         return true;
       };
+      setTimeout(() => {
+        scrollRef.current?.scrollTo({
+          y: 0,
+          animated: true,
+        });
+      }, 100);
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
@@ -555,21 +568,47 @@ const StepCourse = ({route, navigation}) => {
           <Text style={StepCourseStyles.titleDescription}>{data.name}</Text>
         </View>
       </ImageBackground>
-      <ScrollView style={StepCourseStyles.body}>
+      <ScrollView style={StepCourseStyles.body} ref={scrollRef}>
         <View style={{marginTop: 30}}>
           {data.data[0].category !== 'basic_form' ? (
-            data.data.map((course, index) => (
-              <Course
-                key={index}
-                title={course?.title}
-                description={course?.description}
-                img={course?.img}
-                audio={course?.audio}
-                video={course.video}
-                thumbnail={course.thumbnail}
-                navigation={navigation}
-              />
-            ))
+            data.data.map((course, index) => {
+              return course.category === 'coursecards' ? (
+                <View style={StepCourseStyles.stepBtns}>
+                  {course.coursecards.map((e) => {
+                    console.log(e);
+                    let step = StepData[e.p]?.courses[e.c];
+                    // eslint-disable-next-line no-lone-blocks
+
+                    return (
+                      step && (
+                        <StepBtn
+                          navigation={navigation}
+                          key={step?._id}
+                          id={e.c}
+                          name={step.name}
+                          courseimage={step.img}
+                          data={step}
+                          stepId={step.p}
+                          stepName={step.step}
+                          height={sizes.ITEM_HEIGHT + 10}
+                        />
+                      )
+                    );
+                  })}
+                </View>
+              ) : (
+                <Course
+                  key={index}
+                  title={course?.title}
+                  description={course?.description}
+                  img={course?.img}
+                  audio={course?.audio}
+                  video={course.video}
+                  thumbnail={course.thumbnail}
+                  navigation={navigation}
+                />
+              );
+            })
           ) : (
             <Forms
               formData={FormData}
@@ -725,7 +764,10 @@ const StepCourseStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 30,
+    marginTop: 10,
     flexWrap: 'wrap',
+
+    flex: 1,
   },
   StepBtn: {
     alignItems: 'center',
@@ -736,7 +778,6 @@ const StepCourseStyles = StyleSheet.create({
   },
   StepBtnBody: {
     backgroundColor: '#fff',
-    // height: sizes.ITEM_HEIGHT + 15,
     borderRadius: 20,
   },
   StepBtnText: {

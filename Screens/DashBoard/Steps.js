@@ -1,8 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
-import {TouchableHighlight} from 'react-native';
-import {View, Text, FlatList, Image, StyleSheet} from 'react-native';
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {colors, sizes, coursesImages} from '../../Constants';
 import {getUserAuthToken} from '../Auth/auth';

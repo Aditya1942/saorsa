@@ -1,23 +1,15 @@
 import {useFocusEffect} from '@react-navigation/core';
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  BackHandler,
-} from 'react-native';
-import {FlatList, ScrollView} from 'react-native-gesture-handler';
+import {StyleSheet, Text, Pressable, BackHandler} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../../Components/Header';
-import {colors, sizes, coursesImages, courses} from '../../Constants';
+import {colors, sizes, courses} from '../../Constants';
 import Courseslist from './Courseslist';
 import Steps from './Steps';
-import axios, {CancelToken} from '../Auth/axios';
 
 const Home = ({navigation}) => {
-  const [CourseData, setCourseData] = React.useState([]);
+  // const [CourseData, setCourseData] = React.useState([]);
   useFocusEffect(
     React.useCallback(() => {
       // const source = CancelToken.source();
@@ -72,7 +64,7 @@ const Home = ({navigation}) => {
             color: '#fff',
             fontFamily: 'AvenirLTStd-Book',
           }}>
-          How are you feel today
+          How are you feeling today
         </Text>
         <Text
           style={{

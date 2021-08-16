@@ -3,15 +3,13 @@ import {
   StyleSheet,
   Text,
   View,
-  FlatList,
   Dimensions,
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {courses} from '../../Constants';
-import {colors, sizes, coursesImages} from '../../Constants';
+import {colors, sizes} from '../../Constants';
 // import { Fontisto } from '@expo/vector-icons';
-const {width, height} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
 const Courseslist = ({image, title, navigation, onPress, componentName}) => {
   return (
@@ -45,7 +43,7 @@ const Courseslist = ({image, title, navigation, onPress, componentName}) => {
             START YOUR FREE INTRO NOW
           </Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{color: '#fff', fontFamily: 'AvenirLTStd-Black'}}>
             MUSIC
           </Text>
@@ -63,6 +61,7 @@ const Courseslist = ({image, title, navigation, onPress, componentName}) => {
             style={{width: 13, height: 13, marginLeft: 5}}
           />
         </View>
+       */}
       </View>
     </TouchableOpacity>
   );
