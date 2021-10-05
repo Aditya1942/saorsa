@@ -24,7 +24,6 @@ import SubmitBtn from '../../Components/SubmitBtn';
 import Loader from '../../Components/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import {NextStep} from './Step';
-import {set} from 'react-native-reanimated';
 
 export const Audio = ({navigation, audio}) => {
   return (

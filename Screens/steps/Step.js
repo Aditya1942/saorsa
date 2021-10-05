@@ -15,6 +15,7 @@ import {colors, sizes} from '../../Constants';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useFocusEffect} from '@react-navigation/core';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Title} from './StepCourse';
 
 function Step({route, navigation}) {
   const [StepData, setStepData] = useState([]);
@@ -80,19 +81,91 @@ function Step({route, navigation}) {
           {StepData[index]?.headingText}
         </Text>
 
-        <View style={StepStyles.stepBtns}>
-          {StepData[index]?.courses.map((course, i) => (
-            <StepBtn
-              navigation={navigation}
-              key={i}
-              id={i}
-              name={course.name}
-              courseimage={course.img}
-              data={course}
-              stepId={index}
-              stepName={StepData[index]?.name}
-            />
-          ))}
+        <View>
+          {StepData[index]?.data.map((item, i) => {
+            let title = item.title;
+            let video = item.video;
+            let thumbnail = item.thumbnail;
+            const WordCount = (str) => {
+              var lengthyTitle = [];
+              let titleStr = '';
+              str = str.split(' ');
+              str.forEach((word, i) => {
+                titleStr = titleStr.concat(word + ' ');
+                let join = false;
+                let n = str[i + 1];
+                // if string length is greater then 23
+                if (titleStr.length >= 24) {
+                  join = true;
+                  if (n) {
+                    if (
+                      titleStr.length >= 10 &&
+                      titleStr.length <= 26 &&
+                      n.length <= 4
+                    ) {
+                      join = false;
+                    }
+                    if (n.length < 2) {
+                      join = false;
+                    }
+                  }
+                }
+                if (
+                  titleStr.length >= 20 &&
+                  titleStr.length <= 25 &&
+                  word.length <= 10
+                ) {
+                  join = true;
+                }
+
+                if (join) {
+                  lengthyTitle.push(titleStr);
+                  titleStr = '';
+                }
+              });
+              if (titleStr !== '') {
+                lengthyTitle.push(titleStr);
+              }
+              return lengthyTitle;
+            };
+            let titles = [];
+            if (title) {
+              titles = WordCount(title);
+              // console.log(titles);
+            }
+            return (
+              <View key={item._id || i}>
+                {title &&
+                  titles.map((titleText, titleIndex) => (
+                    <Title
+                      key={titleIndex}
+                      titleText={titleText}
+                      audio={null}
+                      navigation={navigation}
+                    />
+                  ))}
+                {video !== undefined && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('VideoPlayer', {
+                        video: video,
+                      });
+                    }}
+                    key={i}
+                    style={StepStyles.introvideo}>
+                    <FastImage
+                      style={StepStyles.playBtn}
+                      source={require('../../assets/playButton.png')}
+                    />
+                    <FastImage
+                      style={StepStyles.VideoThumbnail}
+                      source={{uri: thumbnail}}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+            );
+          })}
         </View>
         <View style={StepStyles.footer}>
           {id !== 1 ? (
@@ -272,6 +345,34 @@ const StepStyles = StyleSheet.create({
     textAlignVertical: 'bottom',
     textTransform: 'uppercase',
   },
+  introvideo: {
+    backgroundColor: '#fff',
+    height: sizes.ITEM_HEIGHT * 1.3,
+    borderRadius: 20,
+    margin: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playBtn: {
+    position: 'absolute',
+    justifyContent: 'center',
+    aspectRatio: 1,
+    width: 100,
+    flex: 1,
+    alignSelf: 'center',
+    zIndex: 2,
+  },
+  VideoThumbnail: {
+    position: 'absolute',
+    justifyContent: 'center',
+    aspectRatio: 1,
+    height: sizes.ITEM_HEIGHT * 1.3,
+    width: '100%',
+    flex: 1,
+    borderRadius: 20,
+    alignSelf: 'center',
+  },
+
   courses: {},
   courseImg: {
     width: sizes.ITEM_WIDTH * 1.65,

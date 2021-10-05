@@ -6,22 +6,21 @@ import {BackHandler} from 'react-native';
 const VideoPlayerView = ({navigation, route}) => {
   const video = route.params.video;
   const player = useRef();
-  console.log(navigation);
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
         player.current.methods.togglePlayPause();
-        navigation.goBack();
+        // navigation.goBack();
         return false;
       };
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [navigation]),
+    }, []),
   );
+
   const whenGoBack = () => {
     console.log('BACK');
-    console.log(player);
     player.current.methods.togglePlayPause();
     navigation.goBack();
   };
