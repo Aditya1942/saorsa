@@ -493,7 +493,7 @@ const PaidSubCourse = ({navigation, route}) => {
                       <Title
                         key={index}
                         titleText={titleText}
-                        audio={''}
+                        audio={course?.audio || null}
                         navigation={navigation}
                       />
                     ))}

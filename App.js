@@ -102,6 +102,7 @@ const HomeStackScreen = () => {
       <HomeStack.Screen name="DepressionForm3" component={DepressionForm3} />
       <HomeStack.Screen name="StepFormData" component={StepFormData} />
       <HomeStack.Screen name="AboutUs" component={About} />
+      <HomeStack.Screen name="PlayerScreen" component={PlayerScreen} />
       <HomeStack.Screen name="BottomMenu" component={BottomMenu} />
     </HomeStack.Navigator>
   );

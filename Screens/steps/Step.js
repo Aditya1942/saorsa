@@ -71,10 +71,10 @@ function Step({route, navigation}) {
         <View style={StepStyles.header}>
           <Header navigation={navigation} />
         </View>
-        <View style={StepStyles.headerText}>
+        {/* <View style={StepStyles.headerText}>
           <Text style={StepStyles.title}>{StepData[index]?.name}</Text>
           <Text style={StepStyles.title2}>{StepData[index]?.title}</Text>
-        </View>
+        </View> */}
       </ImageBackground>
       <ScrollView style={StepStyles.body}>
         <Text style={StepStyles.bodyTitles}>
@@ -140,7 +140,7 @@ function Step({route, navigation}) {
                     <Title
                       key={titleIndex}
                       titleText={titleText}
-                      audio={null}
+                      audio={item?.audio || null}
                       navigation={navigation}
                     />
                   ))}
@@ -284,7 +284,7 @@ const StepStyles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0,0.3)',
+    // backgroundColor: 'rgba(0, 0, 0,0.3)',
   },
   headerText: {
     paddingHorizontal: 10,

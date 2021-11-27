@@ -283,6 +283,7 @@ export const Title = ({audio, titleText, navigation}) => {
       position: 'relative',
       left: -10,
       justifyContent: 'space-between',
+      marginTop: 15,
     },
     body: {
       flexDirection: 'row',
@@ -562,10 +563,10 @@ const StepCourse = ({route, navigation}) => {
         <View style={StepCourseStyles.header}>
           <Header navigation={navigation} />
         </View>
-        <View style={StepCourseStyles.headerText}>
+        {/* <View style={StepCourseStyles.headerText}>
           <Text style={StepCourseStyles.title}>{route.params.stepName}</Text>
           <Text style={StepCourseStyles.titleDescription}>{data.name}</Text>
-        </View>
+        </View> */}
       </ImageBackground>
       <ScrollView style={StepCourseStyles.body} ref={scrollRef}>
         <View style={{marginTop: 30}}>

@@ -1,17 +1,17 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
-  View,
+
   Dimensions,
-  Image,
   TouchableOpacity,
 } from 'react-native';
-import {colors, sizes} from '../../Constants';
+import AutoHeightImage from 'react-native-auto-height-image';
+import FastImage from 'react-native-fast-image';
+import { sizes } from '../../Constants';
 // import { Fontisto } from '@expo/vector-icons';
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
-const Courseslist = ({image, title, navigation, onPress, componentName}) => {
+const Courseslist = ({ image, title, navigation, onPress, componentName }) => {
   return (
     <TouchableOpacity
       style={styles.courseItems}
@@ -25,8 +25,8 @@ const Courseslist = ({image, title, navigation, onPress, componentName}) => {
         }
         console.log(onPress);
       }}>
-      <Image source={image} style={styles.courseImg} />
-      <View style={styles.captions}>
+      <AutoHeightImage width={350} source={image} style={styles.courseImg} />
+      {/* <View style={styles.captions}>
         <Text
           style={[
             styles.title,
@@ -43,7 +43,7 @@ const Courseslist = ({image, title, navigation, onPress, componentName}) => {
             START YOUR FREE INTRO NOW
           </Text>
         </View>
-        {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{color: '#fff', fontFamily: 'AvenirLTStd-Black'}}>
             MUSIC
           </Text>
@@ -61,8 +61,7 @@ const Courseslist = ({image, title, navigation, onPress, componentName}) => {
             style={{width: 13, height: 13, marginLeft: 5}}
           />
         </View>
-       */}
-      </View>
+      </View> */}
     </TouchableOpacity>
   );
 };
@@ -71,15 +70,14 @@ export default Courseslist;
 
 const styles = StyleSheet.create({
   courseItems: {
-    width: sizes.width,
+    width: sizes.width * 0.89,
     height: height * 0.2,
     marginVertical: 10,
     borderRadius: 10,
     overflow: 'hidden',
   },
   courseImg: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
   },
   captions: {
     position: 'absolute',

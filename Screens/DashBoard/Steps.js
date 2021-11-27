@@ -1,27 +1,27 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
-import FastImage from 'react-native-fast-image';
-import {colors, sizes, coursesImages} from '../../Constants';
-import {getUserAuthToken} from '../Auth/auth';
-import axios from '../Auth/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, {useEffect, useState} from 'react'
+import {TouchableOpacity} from 'react-native'
+import {View, Text, FlatList, StyleSheet} from 'react-native'
+import FastImage from 'react-native-fast-image'
+import {colors, sizes, coursesImages} from '../../Constants'
+import {getUserAuthToken} from '../Auth/auth'
+import axios from '../Auth/axios'
 
 const Steps = ({navigation}) => {
-  const [stepDataLoaded, setstepDataLoaded] = useState(false);
-  const setStepData = async (value) => {
+  const [stepDataLoaded, setstepDataLoaded] = useState(false)
+  const setStepData = async value => {
     try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem('@StepData', jsonValue);
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('@StepData', jsonValue)
     } catch (e) {
       // saving error
-      throw e;
+      throw e
     }
-  };
+  }
   useEffect(() => {
     let a = setTimeout(() => {
-      getUserAuthToken().then((token) => {
-        if (!token) navigation.navigate('Login');
+      getUserAuthToken().then(token => {
+        if (!token) navigation.navigate('Login')
         axios({
           method: 'get',
           url: '/api/step',
@@ -31,20 +31,20 @@ const Steps = ({navigation}) => {
           },
         })
           .then(({data}) => {
-            setStepData(data);
+            setStepData(data)
           })
-          .catch((err) => {});
-      });
-      setstepDataLoaded(true);
-    }, 1000);
+          .catch(err => {})
+      })
+      setstepDataLoaded(true)
+    }, 1000)
     return () => {
-      clearTimeout(a);
-    };
-  }, [navigation]);
+      clearTimeout(a)
+    }
+  }, [navigation])
   return (
     <FlatList
       data={coursesImages}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={item => item.id.toString()}
       initialNumToRender={6}
       horizontal
       style={{paddingTop: 10}}
@@ -58,13 +58,13 @@ const Steps = ({navigation}) => {
             onPress={() => {
               if (stepDataLoaded) {
                 if (item.id === 'Step 6') {
-                  navigation.navigate('Profile', {activeTab: 'tab3'});
+                  navigation.navigate('Profile', {activeTab: 'tab3'})
                 } else {
                   navigation.navigate('Step', {
                     id: index + 1,
                     index: index,
                     stepName: item.id,
-                  });
+                  })
                 }
               }
             }}>
@@ -74,7 +74,7 @@ const Steps = ({navigation}) => {
                 style={styles.courseImg}
                 resizeMode={'cover'}
               />
-              <View style={styles.courseTitle}>
+              {/* <View style={styles.courseTitle}>
                 <Text
                   style={{
                     fontSize: sizes.body,
@@ -92,20 +92,20 @@ const Steps = ({navigation}) => {
                   }}>
                   {item.title}
                 </Text>
-              </View>
+              </View> */}
             </View>
           </TouchableOpacity>
-        );
+        )
       }}
     />
-  );
-};
+  )
+}
 
-export default Steps;
+export default Steps
 
 const styles = StyleSheet.create({
   courseItems: {
-    width: sizes.ITEM_WIDTH,
+    width: sizes.ITEM_HEIGHT,
     height: sizes.ITEM_HEIGHT,
     backgroundColor: colors.primary,
     marginRight: sizes.SPACING,
@@ -121,4 +121,4 @@ const styles = StyleSheet.create({
     bottom: 10,
     paddingHorizontal: 10,
   },
-});
+})
