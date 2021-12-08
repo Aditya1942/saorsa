@@ -9,7 +9,9 @@
     "test": "jest",
     "lint": "eslint .",
     "dev": "react-devtools",
-    "build": "react-native bundle --platform android --dev false  --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/ ; cd android; ./gradlew assembleDebug"
+    "build": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res; cd android; ./gradlew assembleDebug",
+    "release": "react-native bundle --platform android --dev false  --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/ ; cd android; ./gradlew assembleRelease",
+    "android:run": "adb -s bedc8c11 install -r  ./android/app/build/outputs/apk/debug/app-universal-debug.apk "
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.15.7",
